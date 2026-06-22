@@ -9,8 +9,8 @@ export default function OverviewPage() {
 
     return (
         <>
-            <Typography variant="h4" gutterBottom>
-                Parking Overview
+            <Typography variant="h4" gutterBottom sx={{ mb: 3 }}>
+                Network Overview
             </Typography>
 
             {isError && (

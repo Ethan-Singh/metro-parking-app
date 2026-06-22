@@ -16,10 +16,26 @@ export function FacilityCard({ facility }: { facility: Facility }) {
     const percent = Math.round(facility.occupancyRate * 100);
 
     return (
-        <Card variant="outlined">
+        <Card
+            variant="outlined"
+            sx={{
+                borderRadius: 3,
+                transition: "all 150ms ease",
+                "&:hover": {
+                    boxShadow: "0 6px 18px rgba(16,24,40,0.12)",
+                },
+            }}
+        >
             <CardActionArea
                 onClick={() => navigate(`/facility/${facility.slug}`)}
                 aria-label={facility.ariaLabel}
+                sx={{
+                    borderRadius: 2,
+                    "&:hover": {
+                        transform: "translateY(-2px)",
+                        transition: "all 150ms ease",
+                    },
+                }}
             >
                 <CardContent>
                     <Stack spacing={1.2}>
