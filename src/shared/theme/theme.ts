@@ -1,59 +1,122 @@
 import { createTheme } from "@mui/material/styles";
 
+const CIVIC_BLUE = "#1A56DB";
+const CIVIC_BLUE_DARK = "#1447C0";
+const CIVIC_TEAL = "#0D7A6E";
+const AMBER_WARN = "#B45309";
+const INK = "#0F1924";
+const INK_MUTED = "#4A5568";
+const SURFACE = "#F7F9FC";
+const BORDER = "rgba(15, 25, 36, 0.08)";
+
 export const theme = createTheme({
     palette: {
         mode: "light",
         primary: {
-            main: "#0B5FFF", // modern gov blue
+            main: CIVIC_BLUE,
+            dark: CIVIC_BLUE_DARK,
+            contrastText: "#FFFFFF",
         },
         secondary: {
-            main: "#00A3A3", // calm teal accent
+            main: CIVIC_TEAL,
+            contrastText: "#FFFFFF",
+        },
+        warning: {
+            main: AMBER_WARN,
+            light: "#FEF3C7",
+            contrastText: "#FFFFFF",
+        },
+        success: {
+            main: CIVIC_TEAL,
+            light: "#D1FAE5",
+            contrastText: "#FFFFFF",
         },
         background: {
-            default: "#F6F8FB",
+            default: SURFACE,
             paper: "#FFFFFF",
         },
         text: {
-            primary: "#1A1D21",
-            secondary: "#5B6470",
+            primary: INK,
+            secondary: INK_MUTED,
         },
-        divider: "rgba(0,0,0,0.08)",
+        divider: BORDER,
     },
 
     typography: {
         fontFamily: [
             "Inter",
-            "Roboto",
             "system-ui",
             "-apple-system",
             "sans-serif",
         ].join(","),
-
         h4: {
             fontWeight: 700,
-            letterSpacing: "-0.5px",
+            fontSize: "1.5rem",
+            letterSpacing: "-0.3px",
+            color: INK,
         },
-
+        h5: {
+            fontWeight: 600,
+            fontSize: "1.125rem",
+            letterSpacing: "-0.2px",
+            color: INK,
+        },
         h6: {
             fontWeight: 600,
+            fontSize: "0.9375rem",
+            letterSpacing: "-0.1px",
+            color: INK,
         },
-
         body1: {
-            fontSize: "0.95rem",
+            fontSize: "0.9375rem",
             lineHeight: 1.6,
+        },
+        body2: {
+            fontSize: "0.8125rem",
+            lineHeight: 1.55,
+            color: INK_MUTED,
+        },
+        caption: {
+            fontSize: "0.75rem",
+            color: INK_MUTED,
+            letterSpacing: "0.01em",
         },
     },
 
     shape: {
-        borderRadius: 14,
+        borderRadius: 10,
     },
 
     components: {
+        MuiCssBaseline: {
+            styleOverrides: {
+                body: {
+                    backgroundColor: SURFACE,
+                    // Tabular nums globally — no jitter on live-updating numbers
+                    fontVariantNumeric: "tabular-nums",
+                },
+            },
+        },
+
         MuiCard: {
+            defaultProps: {
+                elevation: 0,
+            },
             styleOverrides: {
                 root: {
-                    boxShadow: "0 2px 10px rgba(16,24,40,0.06)",
-                    border: "1px solid rgba(0,0,0,0.06)",
+                    backgroundColor: "#FFFFFF",
+                    border: `1px solid ${BORDER}`,
+                    boxShadow: "0 1px 3px rgba(15,25,36,0.06), 0 1px 2px rgba(15,25,36,0.04)",
+                    borderRadius: 12,
+                },
+            },
+        },
+
+        MuiCardContent: {
+            styleOverrides: {
+                root: {
+                    padding: "1rem 1.125rem",
+                    "&:last-child": { paddingBottom: "1rem" },
                 },
             },
         },
@@ -62,14 +125,61 @@ export const theme = createTheme({
             styleOverrides: {
                 root: {
                     fontWeight: 500,
+                    fontSize: "0.75rem",
+                    letterSpacing: "0.01em",
+                    height: 22,
+                    borderRadius: 5,
+                },
+                label: {
+                    paddingLeft: 8,
+                    paddingRight: 8,
                 },
             },
         },
 
-        MuiCssBaseline: {
+        MuiLinearProgress: {
             styleOverrides: {
-                body: {
-                    backgroundColor: "#F6F8FB",
+                root: {
+                    borderRadius: 99,
+                    height: 5,
+                    backgroundColor: "rgba(15,25,36,0.08)",
+                },
+                bar: {
+                    borderRadius: 99,
+                },
+            },
+        },
+
+        MuiPaper: {
+            defaultProps: {
+                elevation: 0,
+            },
+            styleOverrides: {
+                outlined: {
+                    border: `1px solid ${BORDER}`,
+                    boxShadow: "0 1px 3px rgba(15,25,36,0.06)",
+                },
+            },
+        },
+
+        MuiAlert: {
+            styleOverrides: {
+                root: {
+                    borderRadius: 10,
+                    fontSize: "0.875rem",
+                },
+            },
+        },
+
+        MuiTooltip: {
+            styleOverrides: {
+                tooltip: {
+                    backgroundColor: INK,
+                    fontSize: "0.75rem",
+                    borderRadius: 6,
+                },
+                arrow: {
+                    color: INK,
                 },
             },
         },
