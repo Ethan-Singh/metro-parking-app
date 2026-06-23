@@ -4,34 +4,51 @@ import {
     CardContent,
     Typography,
     Box,
-    alpha,
     useTheme,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { LocalParking, AccessTime } from "@mui/icons-material";
 import type { Facility } from "../types";
+import { semantic } from "../../../design-tokens/semantic";
+import {StatusBadge} from "./StatusBadge.tsx";
+
+function getCapacityState(rate: number) {
+    if (rate >= 0.9) return "critical";
+    if (rate >= 0.75) return "warning";
+    return "success";
+}
 
 function getCapacityGradient(rate: number) {
-    if (rate >= 0.9) return "linear-gradient(135deg, #9B1C1C 0%, #FF6B6B 100%)";
-    if (rate >= 0.75) return "linear-gradient(135deg, #92610A 0%, #FDCB6E 100%)";
-    return "linear-gradient(135deg, #007D66 0%, #00B894 100%)";
+    const state = getCapacityState(rate);
+
+    switch (state) {
+        case "critical":
+            return `linear-gradient(135deg, ${semantic.color.error}, #FF6B6B)`;
+        case "warning":
+            return `linear-gradient(135deg, ${semantic.color.warning}, #FDCB6E)`;
+        default:
+            return `linear-gradient(135deg, ${semantic.color.success}, #00B894)`;
+    }
 }
 
 function getCapacityColor(rate: number) {
-    if (rate >= 0.9) return "#9B1C1C";
-    if (rate >= 0.75) return "#92610A";
-    return "#007D66";
+    const state = getCapacityState(rate);
+
+    switch (state) {
+        case "critical":
+            return semantic.color.error;
+        case "warning":
+            return semantic.color.warning;
+        default:
+            return semantic.color.success;
+    }
 }
 
-function getStatusBadgeClass(status: Facility["status"]) {
-    if (status === "ALMOST_FULL") return "status-badge status-badge--warn";
-    if (status === "FULL") return "status-badge status-badge--full";
-    return "status-badge status-badge--available";
-}
 
 export function FacilityCard({ facility }: { facility: Facility }) {
     const navigate = useNavigate();
     const theme = useTheme();
+
     const percent = Math.round(facility.occupancyRate * 100);
     const gradient = getCapacityGradient(facility.occupancyRate);
     const solidColor = getCapacityColor(facility.occupancyRate);
@@ -42,13 +59,13 @@ export function FacilityCard({ facility }: { facility: Facility }) {
             sx={{
                 height: "100%",
                 overflow: "hidden",
-                // Premium gradient accent bar
+
                 "&::before": {
                     content: '""',
                     position: "absolute",
-                    top: -1,
-                    left: -1,
-                    right: -1,
+                    top: 0,
+                    left: 0,
+                    right: 0,
                     height: 4,
                     background: gradient,
                     borderRadius: "14px 14px 0 0",
@@ -60,76 +77,77 @@ export function FacilityCard({ facility }: { facility: Facility }) {
                 aria-label={facility.ariaLabel}
                 sx={{
                     height: "100%",
-                    borderRadius: "inherit",
                     "&:hover .MuiCardActionArea-focusHighlight": { opacity: 0 },
                 }}
             >
                 <CardContent sx={{ pt: 3, display: "flex", flexDirection: "column", gap: 1.5 }}>
-                    {/* Header with icon and name */}
+
+                    {/* Header */}
                     <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
                         <Box
                             sx={{
                                 width: 40,
                                 height: 40,
-                                borderRadius: "12px",
+                                borderRadius: (t) => t.shape.borderRadius,
                                 background: gradient,
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                color: "white",
+                                color: "#fff",
                                 flexShrink: 0,
+                                boxShadow: theme.shadows[2],
                             }}
                         >
                             <LocalParking sx={{ fontSize: 20 }} />
                         </Box>
-                        <Box sx={{ flex: 1, minWidth: 0 }}>
-                            <Typography
-                                variant="h6"
-                                sx={{
-                                    lineHeight: 1.3,
-                                    overflow: "hidden",
-                                    display: "-webkit-box",
-                                    WebkitLineClamp: 2,
-                                    WebkitBoxOrient: "vertical",
-                                }}
-                            >
-                                {facility.facilityName}
-                            </Typography>
-                        </Box>
+
+                        <Typography
+                            variant="h6"
+                            sx={{
+                                lineHeight: 1.3,
+                                overflow: "hidden",
+                                display: "-webkit-box",
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: "vertical",
+                                color: (t) => t.palette.text.primary,
+                            }}
+                        >
+                            {facility.facilityName}
+                        </Typography>
                     </Box>
 
-                    {/* Status badge */}
-                    <span className={getStatusBadgeClass(facility.status)}>
-            {facility.statusLabel}
-          </span>
+                    <StatusBadge status={facility.status} />
 
-                    {/* Availability metric */}
+                    {/* Availability */}
                     <Box>
-                        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 0.75 }}>
-                            <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
+                        <Box
+                            sx={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                                mb: 0.75,
+                            }}
+                        >
+                            <Typography variant="body2" color="text.secondary">
                                 Available spots
                             </Typography>
+
                             <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                                <Box
-                                    component="span"
-                                    sx={{
-                                        color: solidColor,
-                                    }}
-                                >
+                                <Box component="span" sx={{ color: solidColor }}>
                                     {facility.available}
                                 </Box>
-                                <Box component="span" color="text.secondary" sx={{ fontWeight: 400 }}>
-                                    {" "}/ {facility.spots}
+                                <Box component="span" color="text.secondary">
+                                    {" "} / {facility.spots}
                                 </Box>
                             </Typography>
                         </Box>
+
                         {/* Capacity bar */}
                         <Box
                             sx={{
                                 height: 6,
-                                borderRadius: 99,
-                                backgroundColor: alpha(theme.palette.text.primary, 0.06),
-                                position: "relative",
+                                borderRadius: (t) => t.shape.borderRadius,
+                                backgroundColor: "rgba(0,0,0,0.04)",
                                 overflow: "hidden",
                             }}
                         >
@@ -137,7 +155,7 @@ export function FacilityCard({ facility }: { facility: Facility }) {
                                 sx={{
                                     height: "100%",
                                     width: `${percent}%`,
-                                    borderRadius: 99,
+                                    borderRadius: (t) => t.shape.borderRadius,
                                     background: gradient,
                                     transition: "width 400ms ease",
                                 }}
@@ -145,7 +163,7 @@ export function FacilityCard({ facility }: { facility: Facility }) {
                         </Box>
                     </Box>
 
-                    {/* Footer with timestamp */}
+                    {/* Footer */}
                     <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, mt: 0.5 }}>
                         <AccessTime sx={{ fontSize: 14, color: "text.secondary" }} />
                         <Typography variant="caption" color="text.secondary">
@@ -155,6 +173,7 @@ export function FacilityCard({ facility }: { facility: Facility }) {
                             })}
                         </Typography>
                     </Box>
+
                 </CardContent>
             </CardActionArea>
         </Card>

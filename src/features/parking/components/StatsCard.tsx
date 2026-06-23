@@ -1,25 +1,49 @@
-import { Card, CardContent, Typography, Box, alpha, useTheme } from "@mui/material";
+import {
+    Card,
+    CardContent,
+    Typography,
+    Box,
+    alpha,
+    useTheme,
+} from "@mui/material";
 import { TrendingUp, TrendingDown } from "@mui/icons-material";
+import { semantic } from "../../../design-tokens/semantic";
+import React from "react";
 
-interface StatsCard {
+interface StatsCardProps {
     icon: React.ReactNode;
     label: string;
     value: string | number;
     trend?: number;
     subtitle?: string;
-    gradient?: string;
+    variant?: "primary" | "success" | "warning" | "error";
+}
+
+function getGradient(variant: StatsCardProps["variant"] = "primary") {
+    switch (variant) {
+        case "success":
+            return `linear-gradient(135deg, ${semantic.color.success}, #00B894)`;
+        case "warning":
+            return `linear-gradient(135deg, ${semantic.color.warning}, #FDCB6E)`;
+        case "error":
+            return `linear-gradient(135deg, ${semantic.color.error}, #FF6B6B)`;
+        default:
+            return `linear-gradient(135deg, ${semantic.color.primary}, ${semantic.color.info})`;
+    }
 }
 
 export function StatsCard({
-                                     icon,
-                                     label,
-                                     value,
-                                     trend,
-                                     subtitle,
-                                     gradient = "linear-gradient(135deg, #0A4FA6 0%, #0097B8 100%)",
-                                 }: StatsCard) {
+                              icon,
+                              label,
+                              value,
+                              trend,
+                              subtitle,
+                              variant = "primary",
+                          }: StatsCardProps) {
     const theme = useTheme();
-    const isPositive = trend && trend > 0;
+    const isPositive = trend !== undefined && trend > 0;
+
+    const gradient = getGradient(variant);
 
     return (
         <Card
@@ -28,21 +52,22 @@ export function StatsCard({
                 height: "100%",
                 position: "relative",
                 overflow: "hidden",
+
                 "&::before": {
                     content: '""',
                     position: "absolute",
-                    top: -1,
-                    left: -1,
-                    right: -1,
+                    top: 0,
+                    left: 0,
+                    right: 0,
                     height: 3,
                     background: gradient,
-                    borderRadius: "14px 14px 0 0",
                 },
             }}
         >
             <CardContent>
-                <Box display="flex" justifyContent="space-between" alignItems="flex-start">
-                    <Box flex={1}>
+                <Box>
+                    {/* LEFT */}
+                    <Box>
                         <Typography
                             variant="caption"
                             sx={{
@@ -55,52 +80,62 @@ export function StatsCard({
                         >
                             {label}
                         </Typography>
+
                         <Typography
                             variant="h4"
                             sx={{
                                 fontWeight: 700,
                                 mt: 0.5,
-                                background: gradient,
-                                WebkitBackgroundClip: "text",
-                                WebkitTextFillColor: "transparent",
+                                color: semantic.color.text.primary,
                             }}
                         >
                             {value}
                         </Typography>
+
                         {subtitle && (
-                            <Typography variant="caption" color="text.secondary" sx={{ display: "block", mt: 0.5 }}>
+                            <Typography
+                                variant="caption"
+                                color="text.secondary"
+                                sx={{ display: "block", mt: 0.5 }}
+                            >
                                 {subtitle}
                             </Typography>
                         )}
                     </Box>
+
+                    {/* ICON */}
                     <Box
                         sx={{
                             width: 48,
                             height: 48,
-                            borderRadius: "12px",
+                            borderRadius: (t) => t.shape.borderRadius,
                             background: gradient,
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            color: "white",
+                            color: "#fff",
                             flexShrink: 0,
-                            boxShadow: `0 4px 12px ${alpha(theme.palette.primary.main, 0.25)}`,
+                            boxShadow: theme.shadows[2],
                         }}
                     >
                         {icon}
                     </Box>
                 </Box>
+
+                {/* TREND */}
                 {trend !== undefined && (
-                    <Box display="flex" alignItems="center" gap={0.5} sx={{ mt: 1.5 }}>
+                    <Box>
                         <Box
                             sx={{
                                 display: "flex",
                                 alignItems: "center",
-                                color: isPositive ? "success.main" : "error.main",
+                                color: isPositive
+                                    ? semantic.color.success
+                                    : semantic.color.error,
                                 bgcolor: isPositive
-                                    ? alpha(theme.palette.success.main, 0.1)
-                                    : alpha(theme.palette.error.main, 0.1),
-                                borderRadius: "6px",
+                                    ? alpha(theme.palette.success.main, 0.12)
+                                    : alpha(theme.palette.error.main, 0.12),
+                                borderRadius: 1,
                                 px: 0.75,
                                 py: 0.25,
                             }}
@@ -110,11 +145,13 @@ export function StatsCard({
                             ) : (
                                 <TrendingDown sx={{ fontSize: 14 }} />
                             )}
-                            <Typography variant="caption" fontWeight={600} sx={{ ml: 0.25 }}>
+
+                            <Typography variant="caption" sx={{ ml: 0.25 }}>
                                 {isPositive ? "+" : ""}
                                 {trend}%
                             </Typography>
                         </Box>
+
                         <Typography variant="caption" color="text.secondary">
                             vs last week
                         </Typography>

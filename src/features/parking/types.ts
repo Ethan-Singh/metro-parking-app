@@ -9,7 +9,6 @@ export interface Facility {
     available: number;
     occupancyRate: number;
     status: AvailabilityStatus;
-    statusLabel: string;
     approximation: string;
     asOf: string; // LocalDateTime from Java becomes ISO string
     ariaLabel: string;

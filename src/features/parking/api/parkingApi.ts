@@ -1,5 +1,15 @@
 import { httpGet } from "../../../services/httpClient";
-import type {Facility, FacilityHistory} from "../types";
+import type { Facility, FacilityHistory } from "../types";
+
+const buildQuery = (params: Record<string, string | number | undefined>) => {
+    const qs = new URLSearchParams();
+
+    Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined) qs.append(key, String(value));
+    });
+
+    return qs.toString();
+};
 
 export const parkingApi = {
     getAll: () => httpGet<Facility[]>("/api/v1/parking"),
@@ -9,6 +19,10 @@ export const parkingApi = {
 
     getHistory: (slug: string, from: string, to: string) =>
         httpGet<FacilityHistory>(
-            `/api/v1/parking/${slug}/history?from=${from}&to=${to}&granularity=TEN_MINUTE`
+            `/api/v1/parking/${slug}/history?${buildQuery({
+                from,
+                to,
+                granularity: "TEN_MINUTE",
+            })}`
         ),
 };
