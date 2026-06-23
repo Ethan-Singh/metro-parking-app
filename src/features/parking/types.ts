@@ -1,4 +1,5 @@
-export type FacilityStatus = "AVAILABLE" | "ALMOST_FULL";
+export type AvailabilityStatus = 'AVAILABLE' | 'ALMOST_FULL' | 'FULL';
+export type Granularity = 'TEN_MINUTE' | 'HOURLY' | 'DAILY';
 
 export interface Facility {
     slug: string;
@@ -7,22 +8,38 @@ export interface Facility {
     occupancy: number;
     available: number;
     occupancyRate: number;
-    status: FacilityStatus;
+    status: AvailabilityStatus;
     statusLabel: string;
-    asOf: string;
+    approximation: string;
+    asOf: string; // LocalDateTime from Java becomes ISO string
     ariaLabel: string;
 }
 
-export interface FacilityHistoryPoint {
-    timestamp: string;
+export interface DataPoint {
+    timestamp: string; // LocalDateTime from Java becomes ISO string
     occupancy: number;
     available: number;
     occupancyRate: number;
 }
 
-export interface FacilityHistory {
+export interface ParkingHistoryResponse {
     slug: string;
-    date: string;
-    granularity: string;
-    dataPoints: FacilityHistoryPoint[];
+    date: string; // LocalDate from Java becomes ISO string (YYYY-MM-DD)
+    granularity: Granularity;
+    dataPoints: DataPoint[];
+}
+
+export type FacilityOverview = Facility;
+export type FacilityHistory = ParkingHistoryResponse;
+export type FacilityHistoryPoint = DataPoint;
+
+export interface ErrorResponse {
+    error: string;
+    timestamp: string;
+}
+
+export interface ApiError {
+    status: number;
+    message: string;
+    details?: ErrorResponse;
 }

@@ -2,53 +2,37 @@ import { Card, CardActionArea, CardContent, Typography, Stack, Box } from "@mui/
 import { useNavigate } from "react-router-dom";
 import type { Facility } from "../types";
 
-// Capacity bar colour thresholds
-function getCapacityColor(rate: number): string {
-    if (rate >= 0.9) return "#C53030"; // critical — red
-    if (rate >= 0.75) return "#B45309"; // almost full — amber
-    return "#0D7A6E"; // available — civic teal
+// Maps occupancy to CSS class names defined in global.css
+function getCapacityClass(rate: number) {
+    if (rate >= 0.9) return { text: "capacity-critical", bar: "capacity-bar-critical" };
+    if (rate >= 0.75) return { text: "capacity-warn",     bar: "capacity-bar-warn" };
+    return              { text: "capacity-available",      bar: "capacity-bar-available" };
 }
 
-// Inline status badge — no MUI Chip, full control
-function StatusBadge({ status, label }: { status: Facility["status"]; label: string }) {
-    const isWarn = status === "ALMOST_FULL";
-    return (
-        <Box
-            component="span"
-            sx={{
-                display: "inline-block",
-                px: "6px",
-                py: "2px",
-                borderRadius: "4px",
-                fontSize: "0.6875rem",
-                fontWeight: 600,
-                letterSpacing: "0.04em",
-                textTransform: "uppercase",
-                backgroundColor: isWarn ? "#FEF3C7" : "#D1FAE5",
-                color: isWarn ? "#92400E" : "#065F46",
-                border: isWarn ? "1px solid #FDE68A" : "1px solid #A7F3D0",
-                lineHeight: 1.4,
-            }}
-        >
-            {label}
-        </Box>
-    );
+function getStatusBadgeClass(status: Facility["status"]) {
+    if (status === "ALMOST_FULL") return "status-badge status-badge--warn";
+    if (status === "FULL")        return "status-badge status-badge--full";
+    return                               "status-badge status-badge--available";
 }
 
 export function FacilityCard({ facility }: { facility: Facility }) {
-    const navigate = useNavigate();
-    const percent = Math.round(facility.occupancyRate * 100);
-    const capacityColor = getCapacityColor(facility.occupancyRate);
+    const navigate  = useNavigate();
+    const percent   = Math.round(facility.occupancyRate * 100);
+    const classes   = getCapacityClass(facility.occupancyRate);
 
     return (
+        /*
+         * We keep the MUI Card for semantic structure and CardActionArea for
+         * keyboard/a11y, but override visual styling via className + global.css
+         * rather than inline sx on every property.
+         */
         <Card
+            className="glass-card"
             sx={{
                 height: "100%",
-                transition: "box-shadow 150ms ease, transform 150ms ease",
-                "&:hover": {
-                    boxShadow: "0 4px 16px rgba(15,25,36,0.10), 0 2px 6px rgba(15,25,36,0.06)",
-                    transform: "translateY(-1px)",
-                },
+                transition: "box-shadow 180ms ease, transform 180ms ease",
+                // glass-card::before shine line needs overflow:hidden on the Card root
+                overflow: "hidden",
             }}
         >
             <CardActionArea
@@ -57,22 +41,15 @@ export function FacilityCard({ facility }: { facility: Facility }) {
                 sx={{
                     height: "100%",
                     borderRadius: "inherit",
-                    // Override MUI hover overlay — card handles hover itself
+                    // Suppress MUI's own hover overlay — the card handles hover
                     "&:hover .MuiCardActionArea-focusHighlight": { opacity: 0 },
                 }}
             >
-                <CardContent
-                    sx={{
-                        display: "flex",
-                        gap: "12px",
-                        alignItems: "stretch",
-                        p: "1rem 1.125rem !important",
-                    }}
-                >
+                <CardContent sx={{ display: "flex", gap: "12px", alignItems: "stretch", p: "1rem 1.125rem !important" }}>
                     {/*
-           * SIGNATURE ELEMENT: vertical capacity bar
-           * A narrow 4px bar that fills proportionally to occupancy.
-           * Across a grid these bars form a scannable "skyline" of the network.
+           * SIGNATURE: vertical capacity bar
+           * Across a grid these form a scannable "skyline" of the network.
+           * The Aero twist: the filled bar has a soft inner glow.
            */}
                     <Box
                         aria-hidden="true"
@@ -80,7 +57,7 @@ export function FacilityCard({ facility }: { facility: Facility }) {
                             width: 4,
                             borderRadius: 99,
                             flexShrink: 0,
-                            backgroundColor: "rgba(15,25,36,0.08)",
+                            backgroundColor: "rgba(10,79,166,0.08)",
                             position: "relative",
                             overflow: "hidden",
                             alignSelf: "stretch",
@@ -88,15 +65,24 @@ export function FacilityCard({ facility }: { facility: Facility }) {
                         }}
                     >
                         <Box
+                            className={classes.bar}
                             sx={{
                                 position: "absolute",
                                 bottom: 0,
                                 left: 0,
                                 right: 0,
                                 height: `${percent}%`,
-                                backgroundColor: capacityColor,
                                 borderRadius: 99,
                                 transition: "height 400ms ease",
+                                // Aero gloss: lighter stripe at top of filled bar
+                                "&::after": {
+                                    content: '""',
+                                    position: "absolute",
+                                    inset: 0,
+                                    borderRadius: 99,
+                                    background: "linear-gradient(180deg, rgba(255,255,255,0.35) 0%, transparent 60%)",
+                                    pointerEvents: "none",
+                                },
                             }}
                         />
                     </Box>
@@ -107,7 +93,6 @@ export function FacilityCard({ facility }: { facility: Facility }) {
                             variant="h6"
                             sx={{
                                 lineHeight: 1.3,
-                                // Truncate long names gracefully
                                 overflow: "hidden",
                                 display: "-webkit-box",
                                 WebkitLineClamp: 2,
@@ -117,41 +102,27 @@ export function FacilityCard({ facility }: { facility: Facility }) {
                             {facility.facilityName}
                         </Typography>
 
-                        <StatusBadge status={facility.status} label={facility.statusLabel} />
+                        <span className={getStatusBadgeClass(facility.status)}>
+              {facility.statusLabel}
+            </span>
 
-                        {/* Availability numbers — tabular-nums keeps them from jittering */}
+                        {/* Availability numbers */}
                         <Box sx={{ display: "flex", alignItems: "baseline", gap: "4px" }}>
                             <Typography
                                 component="span"
-                                sx={{
-                                    fontSize: "1.25rem",
-                                    fontWeight: 700,
-                                    color: capacityColor,
-                                    fontVariantNumeric: "tabular-nums",
-                                    lineHeight: 1,
-                                }}
+                                className={classes.text}
+                                sx={{ fontSize: "1.25rem", fontWeight: 700, lineHeight: 1 }}
                             >
                                 {facility.available}
                             </Typography>
-                            <Typography
-                                component="span"
-                                variant="body2"
-                                sx={{ fontVariantNumeric: "tabular-nums" }}
-                            >
+                            <Typography component="span" variant="body2">
                                 / {facility.spots} spots
                             </Typography>
                         </Box>
 
-                        {/* Occupancy percentage */}
-                        <Typography
-                            variant="caption"
-                            sx={{ display: "block", color: "text.secondary" }}
-                        >
+                        <Typography variant="caption" sx={{ display: "block" }}>
                             {percent}% occupied · updated{" "}
-                            {new Date(facility.asOf).toLocaleTimeString([], {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                            })}
+                            {new Date(facility.asOf).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                         </Typography>
                     </Stack>
                 </CardContent>
