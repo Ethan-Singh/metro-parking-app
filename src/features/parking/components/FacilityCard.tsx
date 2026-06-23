@@ -11,6 +11,8 @@ import { LocalParking, AccessTime } from "@mui/icons-material";
 import type { Facility } from "../types";
 import { semantic } from "../../../design-tokens/semantic";
 import {StatusBadge} from "./StatusBadge.tsx";
+import {LineBadge} from "./LineBadge.tsx";
+import {resolveFacilityLines} from "../utils/resolveFacilityLines.tsx";
 
 function getCapacityState(rate: number) {
     if (rate >= 0.9) return "critical";
@@ -53,6 +55,8 @@ export function FacilityCard({ facility }: { facility: Facility }) {
     const gradient = getCapacityGradient(facility.occupancyRate);
     const solidColor = getCapacityColor(facility.occupancyRate);
 
+    const lines = resolveFacilityLines(facility.slug);
+
     return (
         <Card
             className="glass-card"
@@ -84,6 +88,7 @@ export function FacilityCard({ facility }: { facility: Facility }) {
 
                     {/* Header */}
                     <Box sx={{ display: "flex", alignItems: "flex-start", gap: 1 }}>
+
                         <Box
                             sx={{
                                 width: 40,
@@ -101,19 +106,27 @@ export function FacilityCard({ facility }: { facility: Facility }) {
                             <LocalParking sx={{ fontSize: 20 }} />
                         </Box>
 
-                        <Typography
-                            variant="h6"
-                            sx={{
-                                lineHeight: 1.3,
-                                overflow: "hidden",
-                                display: "-webkit-box",
-                                WebkitLineClamp: 2,
-                                WebkitBoxOrient: "vertical",
-                                color: (t) => t.palette.text.primary,
-                            }}
-                        >
-                            {facility.facilityName}
-                        </Typography>
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
+
+                            {/* LINE RIBBON (NEW) */}
+                            <Box sx={{ mb: 0.5 }}>
+                                <LineBadge lines={lines} />
+                            </Box>
+
+                            <Typography
+                                variant="h6"
+                                sx={{
+                                    lineHeight: 1.3,
+                                    overflow: "hidden",
+                                    display: "-webkit-box",
+                                    WebkitLineClamp: 2,
+                                    WebkitBoxOrient: "vertical",
+                                    color: (t) => t.palette.text.primary,
+                                }}
+                            >
+                                {facility.facilityName}
+                            </Typography>
+                        </Box>
                     </Box>
 
                     <StatusBadge status={facility.status} />
