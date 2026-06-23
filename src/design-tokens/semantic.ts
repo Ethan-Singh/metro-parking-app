@@ -1,29 +1,30 @@
-import { core } from "./core";
-
 export const semantic = {
     color: {
-        primary: core.azure[500],
-        primaryDark: core.azure[600],
+        // ── Core brand (Metro identity) ──
+        primary: "#168388",
+        primaryDark: "#0F5F63",
 
-        success: core.mint[500],
-        warning: core.amber[500],
-        error: core.red[500],
+        // ── Status system (Sydney Transport aligned) ──
+        success: "#00954C",   // green line / available
+        warning: "#F99D1C",   // T1 / congestion warning
+        error: "#D11F2F",     // T9 / critical full
+        info: "#0098CD",      // T2 / informational
 
-        info: "#0097B8",
-
+        // ── Text ──
         text: {
-            primary: core.ink[900],
-            secondary: core.ink[700],
-            muted: core.ink[500],
+            primary: "#0C1C2E",
+            secondary: "#3D5166",
+            muted: "#5E748A",
             inverse: "#FFFFFF",
         },
 
+        // ── Background ──
         background: {
-            page: core.azure[100],
-            card: core.neutral.glass,
+            page: "#F3F7FB",
+            card: "rgba(255,255,255,0.82)",
         },
 
-        border: "rgba(10,79,166,0.10)",
+        border: "rgba(0,0,0,0.06)",
     },
 
     radius: {
@@ -38,8 +39,8 @@ export const semantic = {
     },
 
     shadow: {
-        sm: "0 2px 8px rgba(10,79,166,0.08)",
-        md: "0 8px 24px rgba(10,79,166,0.10)",
-        lg: "0 16px 40px rgba(10,79,166,0.14)",
+        sm: "0 2px 8px rgba(0,0,0,0.06)",
+        md: "0 8px 24px rgba(0,0,0,0.08)",
+        lg: "0 16px 40px rgba(0,0,0,0.12)",
     },
 } as const;
