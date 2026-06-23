@@ -4,40 +4,50 @@ import { LocalParking } from "@mui/icons-material";
 
 export default function AppLayout() {
     return (
-        <Box sx={{ minHeight: "100vh" }}>
-            {/*
-       * app-bar class in global.css applies:
-       *   - glass background + backdrop blur
-       *   - azure top accent stripe (Frutiger Aero chrome)
-       *   - subtle shadow
-       */}
+        <Box sx={{ minHeight: "100vh", display: "flex", flexDirection: "column" }}>
             <AppBar position="sticky" className="app-bar">
                 <Toolbar>
+
+                    {/* Logo Container */}
                     <Box
                         sx={{
                             width: 40,
                             height: 40,
-                            borderRadius: "12px",
-                            background: "linear-gradient(135deg, #0A4FA6 0%, #0097B8 100%)",
+                            borderRadius: (t) => t.shape.borderRadius,
+                            background: (t) =>
+                                `linear-gradient(135deg, ${t.palette.primary.main} 0%, ${t.palette.secondary.main} 100%)`,
                             display: "flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            color: "white",
+                            color: "#fff",
                             mr: 1.5,
+                            boxShadow: (t) => t.shadows[2],
                         }}
                     >
                         <LocalParking sx={{ fontSize: 22 }} />
                     </Box>
+
+                    {/* Title */}
                     <Typography
                         variant="h6"
-                        sx={{ fontWeight: 700, color: "primary.main", letterSpacing: "-0.02em" }}
+                        sx={{
+                            fontWeight: 700,
+                            color: (t) => t.palette.primary.main,
+                            letterSpacing: "-0.02em",
+                        }}
                     >
                         Metro Parking App
                     </Typography>
                 </Toolbar>
             </AppBar>
 
-            <Container maxWidth="xl" sx={{ py: 4 }}>
+            <Container
+                maxWidth="xl"
+                sx={{
+                    py: 4,
+                    flex: 1,
+                }}
+            >
                 <Outlet />
             </Container>
         </Box>
