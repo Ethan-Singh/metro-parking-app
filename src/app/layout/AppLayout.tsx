@@ -1,5 +1,6 @@
-import { AppBar, Toolbar, Typography, Box } from "@mui/material";
+import { AppBar, Toolbar, Typography, Box, Container } from "@mui/material";
 import { Outlet } from "react-router-dom";
+import { LocalParking } from "@mui/icons-material";
 
 export default function AppLayout() {
     return (
@@ -9,22 +10,36 @@ export default function AppLayout() {
        *   - glass background + backdrop blur
        *   - azure top accent stripe (Frutiger Aero chrome)
        *   - subtle shadow
-       * MUI AppBar handles sticky + elevation reset.
        */}
             <AppBar position="sticky" className="app-bar">
                 <Toolbar>
+                    <Box
+                        sx={{
+                            width: 40,
+                            height: 40,
+                            borderRadius: "12px",
+                            background: "linear-gradient(135deg, #0A4FA6 0%, #0097B8 100%)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            color: "white",
+                            mr: 1.5,
+                        }}
+                    >
+                        <LocalParking sx={{ fontSize: 22 }} />
+                    </Box>
                     <Typography
                         variant="h6"
-                        sx={{ fontWeight: 700, color: "primary.main", letterSpacing: "-0.3px" }}
+                        sx={{ fontWeight: 700, color: "primary.main", letterSpacing: "-0.02em" }}
                     >
-                        Parking Operations Dashboard
+                        Metro Parking App
                     </Typography>
                 </Toolbar>
             </AppBar>
 
-            <Box sx={{ p: 3 }}>
+            <Container maxWidth="xl" sx={{ py: 4 }}>
                 <Outlet />
-            </Box>
+            </Container>
         </Box>
     );
 }
