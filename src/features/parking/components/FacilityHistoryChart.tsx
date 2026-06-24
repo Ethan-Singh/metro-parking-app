@@ -16,18 +16,12 @@ export function FacilityHistoryChart({ dataPoints }: Props) {
 
     const values = dataPoints.map((d) => d.occupancyRate * 100);
 
-    const labels = dataPoints.map((d) =>
-        new Date(d.timestamp).toLocaleString()
-    );
-
     const current = values.at(-1) ?? 0;
 
     const avg =
         values.reduce((a, b) => a + b, 0) / values.length;
 
     const option = {
-        animation: false,
-
         ...chartTheme,
 
         tooltip: {
@@ -35,23 +29,13 @@ export function FacilityHistoryChart({ dataPoints }: Props) {
             valueFormatter: (v: number) => `${v.toFixed(1)}%`,
         },
 
-        dataZoom: [
-            {
-                type: "inside",
-                throttle: 50,
-            },
-        ],
-
-        xAxis: {
-            ...chartTheme.xAxis,
-            data: labels,
-            boundaryGap: false,
-        },
-
         series: [
             {
                 type: "line",
-                data: values,
+                data: dataPoints.map((d) => [
+                    d.timestamp,
+                    d.occupancyRate * 100,
+                ]),
                 showSymbol: false,
                 smooth: true,
                 lineStyle: {
