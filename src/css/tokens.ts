@@ -37,17 +37,3 @@ export const tokens = {
     },
     shape: { borderRadius: 14 },
 } as const;
-
-export const theme = {
-    palette: {
-        primary: { main: tokens.color.primary },
-        secondary: { main: tokens.color.secondary },
-        success: { main: tokens.color.success },
-        warning: { main: tokens.color.warning },
-        error: { main: tokens.color.error },
-        text: { primary: tokens.color.text, secondary: tokens.color.textMuted },
-        background: { default: tokens.color.bg, paper: tokens.color.surface },
-        divider: tokens.color.border,
-    },
-    shape: { borderRadius: tokens.radius },
-};
