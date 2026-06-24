@@ -1,9 +1,9 @@
 import { ThemeProvider, CssBaseline } from "@mui/material";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import FacilityPage from "../features/parking/components/pages/FacilityPage.tsx";
+import FacilityPage from "../features/parking/pages/FacilityPage.tsx";
 import AppLayout from "./AppLayout.tsx";
-import OverviewPage from "../features/parking/components/pages/OverviewPage.tsx";
+import OverviewPage from "../features/parking/pages/OverviewPage.tsx";
 import "../css/styles.css";
 import {theme} from "../css/theme.ts";
 
