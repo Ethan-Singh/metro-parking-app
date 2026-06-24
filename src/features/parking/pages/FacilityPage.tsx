@@ -1,9 +1,8 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { Typography, Stack, Alert, Card, CardContent, Button } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
-import { useFacilityOverview } from "../../hooks/useFacilityOverview";
-import { useFacilityHistory } from "../../hooks/useFacilityHistory";
-import { FacilityHistoryChart } from "../FacilityHistoryChart";
+import { FacilityHistoryChart } from "../components/FacilityHistoryChart.tsx";
+import {useFacilityHistory, useFacilityOverview} from "../services/useParkingQueries.ts";
 
 export default function FacilityPage() {
     const { slug } = useParams();
@@ -67,7 +66,7 @@ export default function FacilityPage() {
             {history.data && (
                 <Card>
                     <CardContent>
-                        <FacilityHistoryChart data={history.data.dataPoints} />
+                        <FacilityHistoryChart dataPoints={history.data.dataPoints} />
                     </CardContent>
                 </Card>
             )}

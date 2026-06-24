@@ -1,11 +1,11 @@
 import Grid from "@mui/material/Grid";
 import { Typography, Alert, Card, CardContent, Skeleton } from "@mui/material";
-import { useFacilities } from "../../hooks/useFacilities.ts";
-import { FacilityCard } from "../FacilityCard.tsx";
-import {tokens} from "../../../../css/tokens.ts";
+import { useParkingQueries } from "../services/useParkingQueries.ts";
+import { FacilityCard } from "../components/FacilityCard.tsx";
+import {tokens} from "../../../css/tokens.ts";
 
 export default function OverviewPage() {
-    const { data, isLoading, isError } = useFacilities();
+    const { data, isLoading, isError } = useParkingQueries();
 
     return (
         <div>

@@ -1,16 +1,28 @@
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { Typography, Chip } from "@mui/material";
-import type { FacilityHistoryPoint } from "../types";
+import type {DataPoint} from "../services/parking.ts";
 import {tokens} from "../../../css/tokens.ts";
+import { Skeleton } from "@mui/material";
 
-export function FacilityHistoryChart({ data }: { data: FacilityHistoryPoint[] }) {
-    const chartData = data.map((d) => ({
+interface Props {
+    dataPoints: DataPoint[]; // matches ParkingHistory.dataPoints exactly
+}
+
+export function FacilityHistoryChart({ dataPoints }: Props) {
+    if (!dataPoints) {
+        return <Skeleton variant="rectangular" height={280} />;
+    }
+
+    const chartData = dataPoints.map((d) => ({
         time: new Date(d.timestamp).toLocaleDateString(),
         rate: +(d.occupancyRate * 100).toFixed(1),
     }));
 
-    const current = chartData[chartData.length - 1]?.rate || 0;
-    const avg = (chartData.reduce((a, d) => a + d.rate, 0) / chartData.length).toFixed(1);
+    const current = chartData[chartData.length - 1]?.rate ?? 0;
+    const avg =
+        chartData.length > 0
+            ? (chartData.reduce((sum, d) => sum + d.rate, 0) / chartData.length).toFixed(1)
+            : "—";
 
     return (
         <div>
@@ -32,8 +44,14 @@ export function FacilityHistoryChart({ data }: { data: FacilityHistoryPoint[] })
                     <LineChart data={chartData}>
                         <XAxis dataKey="time" tick={{ fontSize: 11 }} />
                         <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} />
-                        <Tooltip formatter={(v: any) => `${v}%`} />
-                        <Line type="monotone" dataKey="rate" stroke={tokens.color.secondary} strokeWidth={2} dot={false} />
+                        <Tooltip formatter={(value) => `${value}%`}/>
+                        <Line
+                            type="monotone"
+                            dataKey="rate"
+                            stroke={tokens.color.secondary}
+                            strokeWidth={2}
+                            dot={false}
+                        />
                     </LineChart>
                 </ResponsiveContainer>
             </div>
