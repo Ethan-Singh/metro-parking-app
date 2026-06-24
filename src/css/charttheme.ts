@@ -1,6 +1,8 @@
 import { tokens } from "./tokens";
 
 export const chartTheme = {
+    animation: false,
+
     grid: {
         left: 40,
         right: 20,
@@ -13,18 +15,40 @@ export const chartTheme = {
         axisPointer: { type: "line" },
     },
 
+    dataZoom: [
+        {
+            type: "inside",
+            throttle: 50,
+        },
+    ],
+
     xAxis: {
-        type: "category",
+        type: "time",
         axisLine: {
             lineStyle: { color: tokens.color.border },
         },
         axisLabel: {
             color: tokens.color.textMuted,
+            hideOverlap: true,
+            formatter: (value: number) => {
+                const date = new Date(value);
+
+                const isSameDay =
+                    new Date().toDateString() === date.toDateString();
+
+                if (!isSameDay) {
+                    return date.toLocaleDateString();
+                }
+
+                return date.toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                });
+            },
         },
     },
 
     yAxis: {
-        type: "value",
         min: 0,
         max: 100,
         axisLine: {
