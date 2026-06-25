@@ -20,15 +20,14 @@ export const chartTheme = {
 
             const date = new Date(x);
 
-            const time = date.toLocaleString([], {
-                day: "2-digit",
-                month: "2-digit",
+            const day = date.toLocaleDateString("en-AU", {
+                weekday: "short",
                 hour: "2-digit",
                 minute: "2-digit",
-                hour12: false,
+                hour12: true,
             });
 
-            return `${time}<br/>Occupancy: ${Number(y).toFixed(1)}%`;
+            return `${day}<br/>${Number(y).toFixed(1)}%`;
         },
     },
 
@@ -49,7 +48,8 @@ export const chartTheme = {
             formatter: (value: number) => {
                 const date = new Date(value);
 
-                return date.toLocaleString([], {
+                return date.toLocaleString(["en-AU"], {
+                    weekday: "short",
                     day: "2-digit",
                     month: "2-digit",
                 });

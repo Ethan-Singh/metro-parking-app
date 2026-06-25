@@ -14,9 +14,7 @@ export function FacilityHistoryChart({ dataPoints }: Props) {
     }
 
     const values = dataPoints.map((d) => d.occupancyRate * 100);
-
-    const current = values.at(-1) ?? 0;
-
+    
     const average = values.reduce((a, b) => a + b, 0) / values.length;
 
     const option = {
@@ -37,15 +35,14 @@ export function FacilityHistoryChart({ dataPoints }: Props) {
         <div>
             <div className="chart-header">
                 <div>
-                    <Typography variant="h6">Occupancy</Typography>
+                    <Typography variant="h6">Historical Occupancy</Typography>
                     <Typography variant="body2" color="textSecondary">
-                        7-day trend
+                        Past 7-days
                     </Typography>
                 </div>
 
                 <div className="chart-chips">
-                    <Chip label={`Current: ${current.toFixed(1)}%`} size="small" />
-                    <Chip label={`Average: ${average.toFixed(1)}%`} size="small" />
+                    <Chip label={`7-day Average: ${average.toFixed(1)}%`} size="small" />
                 </div>
             </div>
 

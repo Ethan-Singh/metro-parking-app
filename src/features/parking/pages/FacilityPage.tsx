@@ -36,7 +36,7 @@ export default function FacilityPage() {
                         <div className="metrics-grid">
                             <div className="metric-box">
                                 <Typography variant="caption" color="textSecondary" className="metric-label">
-                                    Occupancy
+                                    Current Occupancy
                                 </Typography>
                                 <Typography variant="h4" className="metric-value">
                                     {percent}%
@@ -44,7 +44,7 @@ export default function FacilityPage() {
                             </div>
                             <div className="metric-box">
                                 <Typography variant="caption" color="textSecondary" className="metric-label">
-                                    Available
+                                    Current Available
                                 </Typography>
                                 <Typography variant="h4" className="metric-value" style={{ color: "rgb(0, 125, 102)" }}>
                                     {f.available}
@@ -52,7 +52,7 @@ export default function FacilityPage() {
                             </div>
                             <div className="metric-box">
                                 <Typography variant="caption" color="textSecondary" className="metric-label">
-                                    Total
+                                    Current Total
                                 </Typography>
                                 <Typography variant="h4" className="metric-value">
                                     {f.spots}
