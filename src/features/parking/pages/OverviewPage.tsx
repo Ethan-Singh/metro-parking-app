@@ -10,7 +10,7 @@ export default function OverviewPage() {
     return (
         <div>
             <Typography variant="h4" className="page-title">
-                Network Overview
+                Network
             </Typography>
             <Typography variant="body2" color="textSecondary" className="page-subtitle">
                 {data?.length || 0} facilities
