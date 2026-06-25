@@ -1,9 +1,8 @@
 import ReactECharts from "echarts-for-react";
 import { Typography, Chip } from "@mui/material";
 import type { DataPoint } from "../services/parking";
-import { tokens } from "../../../css/tokens";
 import { LoadingSkeleton } from "./LoadingSkeleton";
-import {chartTheme} from "../../../css/charttheme.ts";
+import {chartTheme} from "../../../css/chartTheme.ts";
 
 interface Props {
     dataPoints: DataPoint[];
@@ -18,33 +17,18 @@ export function FacilityHistoryChart({ dataPoints }: Props) {
 
     const current = values.at(-1) ?? 0;
 
-    const avg =
-        values.reduce((a, b) => a + b, 0) / values.length;
+    const average = values.reduce((a, b) => a + b, 0) / values.length;
 
     const option = {
         ...chartTheme,
 
-        tooltip: {
-            ...chartTheme.tooltip,
-            valueFormatter: (v: number) => `${v.toFixed(1)}%`,
-        },
-
         series: [
             {
-                type: "line",
+                ...chartTheme.series,
                 data: dataPoints.map((d) => [
                     d.timestamp,
                     d.occupancyRate * 100,
                 ]),
-                showSymbol: false,
-                smooth: true,
-                lineStyle: {
-                    width: 2,
-                    color: tokens.color.secondary,
-                },
-                areaStyle: {
-                    color: `${tokens.color.secondary}22`,
-                },
             },
         ],
     };
@@ -58,15 +42,10 @@ export function FacilityHistoryChart({ dataPoints }: Props) {
                         7-day trend
                     </Typography>
                 </div>
+
                 <div className="chart-chips">
-                    <Chip
-                        label={`Current: ${current.toFixed(1)}%`}
-                        size="small"
-                    />
-                    <Chip
-                        label={`Avg: ${avg.toFixed(1)}%`}
-                        size="small"
-                    />
+                    <Chip label={`Current: ${current.toFixed(1)}%`} size="small" />
+                    <Chip label={`Average: ${average.toFixed(1)}%`} size="small" />
                 </div>
             </div>
 

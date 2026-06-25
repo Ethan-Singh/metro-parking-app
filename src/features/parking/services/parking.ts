@@ -26,7 +26,7 @@ export interface ParkingOverview {
 /** One row inside ParkingHistoryResponse.dataPoints */
 export interface DataPoint {
     timestamp: string;            // LocalDateTime → ISO-8601 string
-    occupancy: number;
+    occupancy: number;            // 0-1 decimal
     available: number;
     occupancyRate: number;        // 0–1 decimal
 }

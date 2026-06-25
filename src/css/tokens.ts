@@ -37,3 +37,9 @@ export const tokens = {
     },
     shape: { borderRadius: 14 },
 } as const;
+
+export const occupancyColors = {
+    FULL: tokens.color.error,
+    ALMOST_FULL: tokens.color.warning,
+    AVAILABLE: tokens.color.success,
+} as const;
