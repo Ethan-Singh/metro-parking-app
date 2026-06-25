@@ -14,8 +14,36 @@ export function FacilityHistoryChart({ dataPoints }: Props) {
     }
 
     const values = dataPoints.map((d) => d.occupancyRate * 100);
-    
-    const average = values.reduce((a, b) => a + b, 0) / values.length;
+
+    const average =
+        values.length > 0
+            ? values.reduce((a, b) => a + b, 0) / values.length
+            : 0;
+
+    const sevenAmValues = Object.values(
+        dataPoints.reduce<Record<string, DataPoint>>((acc, point) => {
+            const date = new Date(point.timestamp);
+
+            const dayKey = date.toISOString().slice(0, 10);
+
+            // First point at or after 07:00 for this day
+            if (
+                date.getHours() >= 7 &&
+                (!acc[dayKey] ||
+                    new Date(point.timestamp) <
+                    new Date(acc[dayKey].timestamp))
+            ) {
+                acc[dayKey] = point;
+            }
+
+            return acc;
+        }, {})
+    ).map((p) => p.occupancyRate * 100);
+
+    const sevenAmAverage =
+        sevenAmValues.length > 0
+            ? sevenAmValues.reduce((a, b) => a + b, 0) / sevenAmValues.length
+            : 0;
 
     const option = {
         ...chartTheme,
@@ -42,6 +70,7 @@ export function FacilityHistoryChart({ dataPoints }: Props) {
                 </div>
 
                 <div className="chart-chips">
+                    <Chip label={`7AM Average: ${sevenAmAverage.toFixed(1)}%`} size="small" />
                     <Chip label={`7-day Average: ${average.toFixed(1)}%`} size="small" />
                 </div>
             </div>
