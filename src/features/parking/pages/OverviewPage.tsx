@@ -13,7 +13,7 @@ export default function OverviewPage() {
                 Network
             </Typography>
             <Typography variant="body2" color="textSecondary" className="page-subtitle">
-                {data?.length || 0} facilities
+                {data?.length || 0} parkings
             </Typography>
 
             {isError && <Alert severity="error" style={{ marginBottom: 24 }}>Failed to load data</Alert>}

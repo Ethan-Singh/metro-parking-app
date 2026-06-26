@@ -1,4 +1,6 @@
 // Design Tokens - Single Source of Truth
+import {Cancel, CheckCircle, WarningAmber} from "@mui/icons-material";
+
 export const tokens = {
     color: {
         primary: "#0A4FA6",
@@ -36,10 +38,58 @@ export const tokens = {
         divider: "rgba(10, 79, 166, 0.10)",
     },
     shape: { borderRadius: 14 },
+    metaFooter: {
+        container: {
+            display: "flex",
+            alignItems: "center",
+            gap: 4,
+        },
+
+        icon: {
+            fontSize: 14,
+            color: "#3D5166",
+        },
+
+        text: {
+            color: "#3D5166",
+        },
+
+        separator: {
+            margin: "0 4px",
+            color: "#3D5166",
+        },
+
+        item: {
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 4,
+        },
+    },
 } as const;
 
 export const occupancyColors = {
     FULL: tokens.color.error,
     ALMOST_FULL: tokens.color.warning,
     AVAILABLE: tokens.color.success,
+} as const;
+
+export const availability = {
+    icon: {
+        size: 14,
+    },
+
+    map: {
+        AVAILABLE: {
+            icon: CheckCircle,
+            color: "#007D66",
+        },
+        ALMOST_FULL: {
+            icon: WarningAmber,
+            color: "#92610A",
+        },
+        FULL: {
+            icon: Cancel,
+            color: "#9B1C1C",
+        },
+    },
 } as const;
