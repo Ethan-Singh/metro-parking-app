@@ -1,6 +1,6 @@
 import { AppBar, Toolbar, Typography, Box, Container } from "@mui/material";
 import { Outlet } from "react-router-dom";
-import { LocalParking } from "@mui/icons-material";
+import {LocalParking, Train} from "@mui/icons-material";
 import {tokens} from "../css/tokens.ts";
 
 export default function AppLayout() {
@@ -29,10 +29,10 @@ export default function AppLayout() {
                             mr: 2,
                         }}
                     >
-                        <LocalParking sx={{ fontSize: 20 }} />
+                        <Train sx={{ fontSize: 20 }} />
                     </Box>
                     <Typography variant="h6" sx={{ fontWeight: 700, color: "primary.main" }}>
-                        Parking
+                        Metro Parking App
                     </Typography>
                 </Toolbar>
             </AppBar>

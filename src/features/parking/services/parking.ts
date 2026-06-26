@@ -1,7 +1,8 @@
 // ─── Enums ───────────────────────────────────────────────────────────────────
 // Mirrors Java enums exactly — don't rename these.
 
-export type AvailabilityStatus = "AVAILABLE" | "ALMOST_FULL" | "FULL";
+export type Status = "AVAILABLE" | "ALMOST_FULL" | "FULL";
+export type StatusLabel = "Available" | "Almost full" | "Full";
 export type Granularity = "TEN_MINUTE" | "HOURLY" | "DAILY";
 
 // ─── Backend response shapes ──────────────────────────────────────────────────
@@ -16,8 +17,8 @@ export interface ParkingOverview {
     occupancy: number;
     available: number;
     occupancyRate: number;        // 0–1 decimal
-    status: AvailabilityStatus;
-    statusLabel: string;          // human-readable label from the backend
+    status: Status;
+    statusLabel: StatusLabel;
     approximation: string;
     asOf: string;                 // LocalDateTime → ISO-8601 string
     ariaLabel: string;

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { LocalParking, AccessTime } from "@mui/icons-material";
 import { tokens, occupancyColors } from "../../../css/tokens.ts";
 import type { ParkingOverview } from "../services/parking.ts";
+import {getAvailabilityIcon} from "../utils/utils.tsx";
 
 export function FacilityCard({ facility }: { facility: ParkingOverview }) {
     const navigate = useNavigate();
@@ -30,16 +31,12 @@ export function FacilityCard({ facility }: { facility: ParkingOverview }) {
 
                 <div style={{ marginTop: tokens.space.lg }}>
                     <div className="card-stats">
-                        <Typography variant="body2" color="textSecondary">
-                            Available
-                        </Typography>
-
                         <Typography
                             variant="body2"
                             className="card-stat-value"
                             style={{ color }}
                         >
-                            {facility.available} / {facility.spots}
+                            {facility.occupancy} / {facility.spots}
                         </Typography>
                     </div>
 
@@ -57,22 +54,25 @@ export function FacilityCard({ facility }: { facility: ParkingOverview }) {
                     </div>
                 </div>
 
-                <div
-                    className="card-footer"
-                    style={{ marginTop: tokens.space.lg }}
-                >
-                    <AccessTime sx={{ fontSize: 14, color: "textSecondary" }} />
+                <div className="card-footer">
+                    <AccessTime style={tokens.metaFooter.icon} />
 
-                    <Typography variant="caption" color="textSecondary">
+                    <Typography variant="caption" style={tokens.metaFooter.text}>
+                        Last updated{" "}
                         {new Date(facility.asOf).toLocaleTimeString([], {
                             hour: "2-digit",
                             minute: "2-digit",
                         })}
                     </Typography>
 
-                    <Typography variant="caption" color="textSecondary" sx={{ ml: 1 }}>
-                        · {facility.statusLabel}
-                    </Typography>
+                    <span style={tokens.metaFooter.separator}>·</span>
+
+                    <span style={tokens.metaFooter.item}>
+                        {getAvailabilityIcon(facility.status)}
+                                        <Typography variant="caption" style={tokens.metaFooter.text}>
+                            {facility.statusLabel}
+                        </Typography>
+                    </span>
                 </div>
             </CardContent>
         </Card>

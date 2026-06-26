@@ -109,7 +109,6 @@ export const chartTheme = {
             label: {
                 position: "inside",
                 color: tokens.color.warning,
-                formatter: "ALMOST FULL",
             },
             data: [[{ yAxis: 85 }, { yAxis: 100 }]],
         },
