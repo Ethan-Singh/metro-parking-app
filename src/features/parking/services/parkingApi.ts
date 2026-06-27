@@ -1,4 +1,4 @@
-import type {Granularity, ParkingHistory, ParkingOverview} from "./parking.ts";
+import type {Granularity, ParkingHistory, ParkingOverview} from "../utils/types.ts";
 import {httpGet} from "../../../services/httpClient.ts";
 
 const BASE = "/api/v1/parking";

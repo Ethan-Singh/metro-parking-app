@@ -73,7 +73,7 @@ export const occupancyColors = {
     AVAILABLE: tokens.color.success,
 } as const;
 
-export const availability = {
+export const availabilityIcons = {
     icon: {
         size: 14,
     },
@@ -81,15 +81,15 @@ export const availability = {
     map: {
         AVAILABLE: {
             icon: CheckCircle,
-            color: "#007D66",
+            color: tokens.color.success,
         },
         ALMOST_FULL: {
             icon: WarningAmber,
-            color: "#92610A",
+            color: tokens.color.warning,
         },
         FULL: {
             icon: Cancel,
-            color: "#9B1C1C",
+            color: tokens.color.error,
         },
     },
 } as const;

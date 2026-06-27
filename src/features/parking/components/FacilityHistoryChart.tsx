@@ -1,6 +1,6 @@
 import ReactECharts from "echarts-for-react";
 import { Typography, Chip } from "@mui/material";
-import type { DataPoint } from "../services/parking";
+import type { DataPoint } from "../utils/types.ts";
 import { LoadingSkeleton } from "./LoadingSkeleton";
 import {chartTheme} from "../../../css/chartTheme.ts";
 

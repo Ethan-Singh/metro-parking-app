@@ -1,8 +1,8 @@
-import { availability } from "../../../css/tokens";
-import type {Status} from "../services/parking.ts";
+import {availabilityIcons} from "../../../css/tokens";
+import type {Availability} from "./types.ts";
 
-export function getAvailabilityIcon(status: Status) {
-    const config = availability.map[status];
+export function getAvailabilityIcon(availability: Availability) {
+    const config = availabilityIcons.map[availability];
 
     if (!config) return null;
 
@@ -11,7 +11,7 @@ export function getAvailabilityIcon(status: Status) {
     return (
         <Icon
             style={{
-                fontSize: availability.icon.size,
+                fontSize: availabilityIcons.icon.size,
                 color: config.color,
             }}
         />

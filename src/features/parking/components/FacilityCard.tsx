@@ -2,7 +2,7 @@ import { Card, CardContent, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { LocalParking, AccessTime } from "@mui/icons-material";
 import { tokens, occupancyColors } from "../../../css/tokens.ts";
-import type { ParkingOverview } from "../services/parking.ts";
+import type { ParkingOverview } from "../utils/types.ts";
 import {getAvailabilityIcon} from "../utils/utils.tsx";
 
 export function FacilityCard({ facility }: { facility: ParkingOverview }) {
@@ -10,7 +10,7 @@ export function FacilityCard({ facility }: { facility: ParkingOverview }) {
     const percent = Math.round(facility.occupancyRate * 100);
 
     const color =
-        occupancyColors[facility.status as keyof typeof occupancyColors] ??
+        occupancyColors[facility.availability as keyof typeof occupancyColors] ??
         tokens.color.success;
 
     return (
@@ -59,7 +59,7 @@ export function FacilityCard({ facility }: { facility: ParkingOverview }) {
 
                     <Typography variant="caption" style={tokens.metaFooter.text}>
                         Last updated{" "}
-                        {new Date(facility.asOf).toLocaleTimeString([], {
+                        {new Date(facility.timestamp).toLocaleTimeString([], {
                             hour: "2-digit",
                             minute: "2-digit",
                         })}
@@ -68,9 +68,9 @@ export function FacilityCard({ facility }: { facility: ParkingOverview }) {
                     <span style={tokens.metaFooter.separator}>·</span>
 
                     <span style={tokens.metaFooter.item}>
-                        {getAvailabilityIcon(facility.status)}
+                        {getAvailabilityIcon(facility.availability)}
                                         <Typography variant="caption" style={tokens.metaFooter.text}>
-                            {facility.statusLabel}
+                            {facility.availability}
                         </Typography>
                     </span>
                 </div>

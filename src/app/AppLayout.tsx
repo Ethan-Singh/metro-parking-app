@@ -1,6 +1,6 @@
 import { AppBar, Toolbar, Typography, Box, Container } from "@mui/material";
 import { Outlet } from "react-router-dom";
-import {LocalParking, Train} from "@mui/icons-material";
+import {Train} from "@mui/icons-material";
 import {tokens} from "../css/tokens.ts";
 
 export default function AppLayout() {
