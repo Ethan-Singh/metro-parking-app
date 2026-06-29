@@ -1,4 +1,4 @@
-import {availabilityIcons} from "../../../css/tokens";
+import {availabilityIcons} from "../../css/tokens.ts";
 import type {Availability} from "./types.ts";
 
 export function getAvailabilityIcon(availability: Availability) {

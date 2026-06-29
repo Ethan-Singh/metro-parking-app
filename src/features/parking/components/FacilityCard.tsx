@@ -1,9 +1,10 @@
 import { Card, CardContent, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { LocalParking, AccessTime } from "@mui/icons-material";
+import { AccessTime } from "@mui/icons-material";
 import { tokens, occupancyColors } from "../../../css/tokens.ts";
-import type { ParkingOverview } from "../utils/types.ts";
-import {getAvailabilityIcon} from "../utils/utils.tsx";
+import type { ParkingOverview } from "../types.ts";
+import {getAvailabilityIcon} from "../utils.tsx";
+import {LineBadge} from "./LineBadge.tsx";
 
 export function FacilityCard({ facility }: { facility: ParkingOverview }) {
     const navigate = useNavigate();
@@ -20,13 +21,11 @@ export function FacilityCard({ facility }: { facility: ParkingOverview }) {
         >
             <CardContent>
                 <div className="card-header">
-                    <div className="card-icon" style={{ backgroundColor: color }}>
-                        <LocalParking sx={{ fontSize: 20 }} />
-                    </div>
-
                     <Typography variant="h6" className="card-name">
                         {facility.facilityName}
                     </Typography>
+
+                    <LineBadge slug={facility.slug} />
                 </div>
 
                 <div style={{ marginTop: tokens.space.lg }}>
@@ -58,7 +57,7 @@ export function FacilityCard({ facility }: { facility: ParkingOverview }) {
                     <AccessTime style={tokens.metaFooter.icon} />
 
                     <Typography variant="caption" style={tokens.metaFooter.text}>
-                        Last updated{" "}
+                        Updated{" "}
                         {new Date(facility.timestamp).toLocaleTimeString([], {
                             hour: "2-digit",
                             minute: "2-digit",

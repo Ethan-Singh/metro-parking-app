@@ -1,6 +1,6 @@
 import Grid from "@mui/material/Grid";
 import { Typography, Alert, Card, CardContent, Skeleton } from "@mui/material";
-import { useParkingQueries } from "../services/useParkingQueries.ts";
+import { useParkingQueries } from "../api/useParkingQueries.ts";
 import { FacilityCard } from "../components/FacilityCard.tsx";
 import {tokens} from "../../../css/tokens.ts";
 

@@ -1,4 +1,4 @@
-import type {ApiError} from "../features/parking/utils/types.ts";
+import type {ApiError} from "../features/parking/types.ts";
 
 export class HttpError extends Error {
     public readonly status: number;

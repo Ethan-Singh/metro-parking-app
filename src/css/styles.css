@@ -135,3 +135,29 @@ body {
 .facilities-grid {
     width: 100%;
 }
+
+/* LineBadge */
+.line-badge-group {
+    display: flex;
+    gap: 4px;
+}
+
+.line-badge {
+    width: var(--line-badge-size);
+    height: var(--line-badge-size);
+
+    border-radius: 999px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: white;
+    font-weight: 700;
+
+    font-size: var(--line-badge-font-size);
+
+    background-color: var(--line-badge-color);
+
+    flex-shrink: 0;
+}

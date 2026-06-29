@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Typography, Stack, Alert, Card, CardContent, Button } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
 import { FacilityHistoryChart } from "../components/FacilityHistoryChart.tsx";
-import {useFacilityHistory, useFacilityOverview} from "../services/useParkingQueries.ts";
+import {useFacilityHistory, useFacilityOverview} from "../api/useParkingQueries.ts";
 
 export default function FacilityPage() {
     const { slug } = useParams();
