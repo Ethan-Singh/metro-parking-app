@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import { Search, LocalParking } from "@mui/icons-material";
+import TFNSWLogo from "../../public/assets/TFNSW.png";
 
 export default function AppLayout() {
     return (
@@ -24,7 +25,7 @@ export default function AppLayout() {
                             sx={{
                                 display: "flex",
                                 justifyContent: "space-between",
-                                alignItems: "flex-start",
+                                alignItems: "center",
                                 gap: 3,
                                 flexWrap: "wrap",
                             }}
@@ -56,7 +57,7 @@ export default function AppLayout() {
 
                                 <Box sx={{ display: "flex", flexDirection: "column" }}>
                                     <Typography variant="h4">
-                                        Sydney Park & Ride
+                                        A Metro Parking App
                                     </Typography>
 
                                     <Typography variant="body2" color="text.secondary">
@@ -65,39 +66,61 @@ export default function AppLayout() {
                                 </Box>
                             </Box>
 
-                            {/* attribution */}
+                            {/* right side: search + attribution */}
                             <Box
                                 sx={{
                                     display: "flex",
                                     flexDirection: "column",
                                     alignItems: "flex-end",
+                                    gap: 1.5,
+                                    minWidth: 320,
                                 }}
                             >
-                                <Typography variant="caption" color="text.secondary">
-                                    Data supplied by
-                                </Typography>
+                                {/* search */}
+                                <OutlinedInput
+                                    placeholder="Search for a station..."
+                                    startAdornment={
+                                        <InputAdornment position="start">
+                                            <Search />
+                                        </InputAdornment>
+                                    }
+                                    sx={{
+                                        width: 320,
+                                    }}
+                                />
 
-                                <Typography variant="body2">
-                                    Transport for NSW
-                                </Typography>
+                                {/* attribution */}
+                                <Box
+                                    sx={{
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        alignItems: "flex-end",
+                                        textAlign: "right",
+                                        gap: 0.5,
+                                    }}
+                                >
+                                    <Typography variant="caption" color="text.secondary">
+                                        Data supplied by
+                                    </Typography>
+
+                                    <Typography variant="body2" color="text.secondary">
+                                        Transport for NSW
+                                    </Typography>
+
+                                    <Box
+                                        component="img"
+                                        src={TFNSWLogo}
+                                        alt="Transport for NSW"
+                                        sx={{
+                                            height: 40,
+                                            width: "auto",
+                                            mt: 0.5,
+                                            opacity: 0.95,
+                                        }}
+                                    />
+                                </Box>
                             </Box>
 
-                        </Box>
-
-                        {/* search */}
-                        <Box sx={{ mt: 2 }}>
-                            <OutlinedInput
-                                fullWidth
-                                placeholder="Search for a station..."
-                                startAdornment={
-                                    <InputAdornment position="start">
-                                        <Search />
-                                    </InputAdornment>
-                                }
-                                sx={{
-                                    maxWidth: 420,
-                                }}
-                            />
                         </Box>
 
                     </CardContent>
