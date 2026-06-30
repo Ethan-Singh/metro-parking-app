@@ -4,7 +4,6 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import FacilityPage from "../features/parking/pages/FacilityPage.tsx";
 import AppLayout from "./AppLayout.tsx";
 import OverviewPage from "../features/parking/pages/OverviewPage.tsx";
-import "../css/styles.css";
 import {theme} from "../css/theme.ts";
 
 const queryClient = new QueryClient({
