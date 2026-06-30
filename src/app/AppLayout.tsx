@@ -6,14 +6,11 @@ import {
     Typography,
 } from "@mui/material";
 import { Outlet } from "react-router-dom";
-import { LocalParking } from "@mui/icons-material";
 import TFNSWLogo from "../../public/assets/TFNSW.png";
-import { FacilitySearchBar } from "../features/parking/components/FacilitySearchBar";
-import { useSearch } from "../features/parking/search/SearchContext";
+import Logo from "../../public/assets/Logo.svg";
+import {SearchBar} from "../features/parking/search/SearchBar.tsx";
 
 export default function AppLayout() {
-    const { query, setQuery } = useSearch();
-
     return (
         <Box sx={{ minHeight: "100vh" }}>
             <Container maxWidth="lg" sx={{ py: 4 }}>
@@ -21,65 +18,79 @@ export default function AppLayout() {
                 <Card sx={{ mb: 3 }}>
                     <CardContent>
 
-                        {/* TOP ROW */}
                         <Box
                             sx={{
                                 display: "flex",
                                 justifyContent: "space-between",
-                                alignItems: "center",
+                                alignItems: "flex-start",
                                 gap: 3,
-                                flexWrap: "wrap",
                             }}
                         >
-                            {/* BRAND */}
-                            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+
+                            {/* LEFT: BRAND */}
+                            <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
                                 <Box
+                                    component="img"
+                                    src={Logo}
+                                    alt="Logo"
                                     sx={{
-                                        width: 48,
-                                        height: 48,
-                                        borderRadius: 12,
-                                        bgcolor: "primary.main",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        color: "white",
+                                        width: 44,
+                                        height: 44,
+                                        display: "block",
                                     }}
-                                >
-                                    <LocalParking />
-                                </Box>
+                                />
 
                                 <Box>
-                                    <Typography variant="h4">
-                                        Sydney Park & Ride
+                                    <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                                        A Metro Parking App
                                     </Typography>
 
                                     <Typography variant="body2" color="text.secondary">
-                                        Live parking availability across NSW
+                                        Live parking availability across the Transport for NSW network
                                     </Typography>
                                 </Box>
                             </Box>
 
-                            {/* LOGO */}
+                            {/* RIGHT: ATTRIBUTION */}
                             <Box
-                                component="img"
-                                src={TFNSWLogo}
-                                alt="Transport for NSW"
-                                sx={{ height: 40, opacity: 0.95 }}
-                            />
+                                sx={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "flex-end",
+                                    textAlign: "right",
+                                    gap: 0.5,
+                                }}
+                            >
+                                <Typography variant="caption" color="text.secondary">
+                                    Public data from
+                                </Typography>
+
+                                <Typography variant="body2" color="text.secondary">
+                                    Transport for NSW
+                                </Typography>
+
+                                <Box
+                                    component="img"
+                                    src={TFNSWLogo}
+                                    alt="Transport for NSW"
+                                    sx={{
+                                        height: 34,
+                                        width: "auto",
+                                        mt: 0.5,
+                                    }}
+                                />
+                            </Box>
+
                         </Box>
 
                         {/* SEARCH */}
                         <Box sx={{ mt: 2 }}>
-                            <FacilitySearchBar
-                                value={query}
-                                onChange={setQuery}
-                            />
+                            <SearchBar />
                         </Box>
 
                     </CardContent>
                 </Card>
 
-                {/* NO CONTEXT PASSED, NO FILTERING HERE */}
                 <Outlet />
 
             </Container>
