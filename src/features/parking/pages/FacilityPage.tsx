@@ -15,8 +15,8 @@ import {
     useFacilityHistory,
     useFacilityOverview,
 } from "../api/useParkingQueries.ts";
-import { facilityLines, type FacilitySlug } from "../config/lineConfig.ts";
 import {QueryBoundary} from "../components/QueryBoundary.tsx";
+import type {FacilitySlug} from "../types.ts";
 
 export default function FacilityPage() {
     const navigate = useNavigate();
@@ -25,9 +25,6 @@ export default function FacilityPage() {
     const slug = params.slug;
     if (!slug) {
         return <Alert severity="error">Missing facility slug</Alert>;
-    }
-    if (!(slug in facilityLines)) {
-        return <Alert severity="error">Unknown facility</Alert>;
     }
     const safeSlug = slug as FacilitySlug;
 
