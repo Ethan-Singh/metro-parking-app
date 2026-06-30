@@ -5,7 +5,7 @@ import FacilityPage from '../features/parking/pages/FacilityPage.tsx';
 import AppLayout from './AppLayout.tsx';
 import OverviewPage from '../features/parking/pages/OverviewPage.tsx';
 import { theme } from '../css/theme.ts';
-import { SearchProvider } from '../features/parking/search/SearchContext.tsx';
+import { SearchProvider } from '../features/parking/search/SearchProvider.tsx';
 
 const queryClient = new QueryClient({
   defaultOptions: {

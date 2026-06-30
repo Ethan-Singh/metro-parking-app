@@ -3,7 +3,7 @@ import { Typography, Box } from '@mui/material';
 import { useParkingQueries } from '../api/useParkingQueries.ts';
 import { FacilityCard } from '../components/FacilityCard.tsx';
 import { QueryBoundary } from '../components/QueryBoundary.tsx';
-import { useSearch } from '../search/SearchContext';
+import { useSearch } from '../search/useSearch.tsx';
 
 export default function OverviewPage() {
   const { data, isLoading, isError } = useParkingQueries();

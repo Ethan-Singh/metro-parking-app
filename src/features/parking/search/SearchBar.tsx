@@ -11,10 +11,10 @@ import {
 } from '@mui/material';
 import { Search, Close } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { useSearch } from './SearchContext';
 import { useParkingQueries } from '../api/useParkingQueries';
 import { useSearchMode } from './useSearchMode';
 import { useState } from 'react';
+import { useSearch } from './useSearch.tsx';
 
 export function SearchBar() {
   const { query, setQuery, clear } = useSearch();
