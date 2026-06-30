@@ -10,8 +10,18 @@ interface Props {
 }
 
 export function FacilityHistoryChart({ dataPoints }: Props) {
-    if (!dataPoints?.length) {
+    if (!dataPoints) {
         return <LoadingSkeleton height={280} />;
+    }
+
+    if (dataPoints.length === 0) {
+        return (
+            <Box sx={{ height: 280, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <Typography variant="body2" color="text.secondary">
+                    No historical data available
+                </Typography>
+            </Box>
+        );
     }
 
     const values = dataPoints.map((d) => d.occupancyRate * 100);

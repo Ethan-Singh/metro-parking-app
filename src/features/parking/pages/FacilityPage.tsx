@@ -7,6 +7,7 @@ import {
     CardContent,
     Button,
     Box,
+    Skeleton,
 } from "@mui/material";
 import { ArrowBack } from "@mui/icons-material";
 import { FacilityHistoryChart } from "../components/FacilityHistoryChart.tsx";
@@ -14,23 +15,24 @@ import {
     useFacilityHistory,
     useFacilityOverview,
 } from "../api/useParkingQueries.ts";
-import {facilityLines, type FacilitySlug} from "../config/lineConfig.ts";
+import { facilityLines, type FacilitySlug } from "../config/lineConfig.ts";
+import {QueryBoundary} from "../components/QueryBoundary.tsx";
 
 export default function FacilityPage() {
-    const { slug } = useParams<{ slug: string }>();
-    if (!slug || !(slug in facilityLines)) {
+    const navigate = useNavigate();
+
+    const params = useParams<{ slug: string }>();
+    const slug = params.slug;
+    if (!slug) {
+        return <Alert severity="error">Missing facility slug</Alert>;
+    }
+    if (!(slug in facilityLines)) {
         return <Alert severity="error">Unknown facility</Alert>;
     }
     const safeSlug = slug as FacilitySlug;
 
-    const navigate = useNavigate();
-
     const overview = useFacilityOverview(safeSlug);
     const history = useFacilityHistory(safeSlug);
-
-    if (overview.isError) {
-        return <Alert severity="error">Failed to load</Alert>;
-    }
 
     const f = overview.data;
     const percent = f ? Math.round(f.occupancyRate * 100) : 0;
@@ -39,25 +41,32 @@ export default function FacilityPage() {
         <Stack spacing={3}>
 
             {/* HEADER */}
-            <Box sx={{ mb: 1 }}>
-                <Button
-                    startIcon={<ArrowBack />}
-                    onClick={() => navigate("/")}
-                    sx={{
-                        textTransform: "none",
-                        mb: 2,
-                    }}
-                >
-                    Back
-                </Button>
+            <QueryBoundary
+                isLoading={overview.isLoading}
+                isError={overview.isError}
+                loading={<Skeleton height={60} />}
+            >
+                <Box sx={{ mb: 1 }}>
+                    <Button
+                        startIcon={<ArrowBack />}
+                        onClick={() => navigate("/")}
+                        sx={{ textTransform: "none", mb: 2 }}
+                    >
+                        Back
+                    </Button>
 
-                <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                    {f?.facilityName}
-                </Typography>
-            </Box>
+                    <Typography variant="h4" sx={{ fontWeight: 700 }}>
+                        {f?.facilityName}
+                    </Typography>
+                </Box>
+            </QueryBoundary>
 
             {/* METRICS */}
-            {f && (
+            <QueryBoundary
+                isLoading={overview.isLoading}
+                isError={overview.isError}
+                loading={<Skeleton height={120} />}
+            >
                 <Card>
                     <CardContent>
                         <Box
@@ -68,13 +77,8 @@ export default function FacilityPage() {
                                 gap: 3,
                             }}
                         >
-                            {/* Occupancy */}
                             <Box sx={{ display: "flex", flexDirection: "column" }}>
-                                <Typography
-                                    variant="caption"
-                                    color="text.secondary"
-                                    sx={{ mb: 0.5 }}
-                                >
+                                <Typography variant="caption" color="text.secondary">
                                     Current Occupancy
                                 </Typography>
                                 <Typography variant="h4" sx={{ fontWeight: 700 }}>
@@ -82,54 +86,43 @@ export default function FacilityPage() {
                                 </Typography>
                             </Box>
 
-                            {/* Available */}
                             <Box sx={{ display: "flex", flexDirection: "column" }}>
-                                <Typography
-                                    variant="caption"
-                                    color="text.secondary"
-                                    sx={{ mb: 0.5 }}
-                                >
+                                <Typography variant="caption" color="text.secondary">
                                     Current Available
                                 </Typography>
-                                <Typography
-                                    variant="h4"
-                                    sx={{
-                                        fontWeight: 700,
-                                        color: "success.main",
-                                    }}
-                                >
-                                    {f.available}
+                                <Typography variant="h4" sx={{ fontWeight: 700, color: "success.main" }}>
+                                    {f?.available ?? 0}
                                 </Typography>
                             </Box>
 
-                            {/* Total */}
                             <Box sx={{ display: "flex", flexDirection: "column" }}>
-                                <Typography
-                                    variant="caption"
-                                    color="text.secondary"
-                                    sx={{ mb: 0.5 }}
-                                >
+                                <Typography variant="caption" color="text.secondary">
                                     Current Total
                                 </Typography>
                                 <Typography variant="h4" sx={{ fontWeight: 700 }}>
-                                    {f.spots}
+                                    {f?.spots ?? 0}
                                 </Typography>
                             </Box>
                         </Box>
                     </CardContent>
                 </Card>
-            )}
+            </QueryBoundary>
 
             {/* CHART */}
-            {history.data && (
+            <QueryBoundary
+                isLoading={history.isLoading}
+                isError={history.isError}
+                loading={<Skeleton height={280} />}
+            >
                 <Card>
                     <CardContent>
                         <FacilityHistoryChart
-                            dataPoints={history.data.dataPoints}
+                            dataPoints={history.data?.dataPoints ?? []}
                         />
                     </CardContent>
                 </Card>
-            )}
+            </QueryBoundary>
+
         </Stack>
     );
 }
