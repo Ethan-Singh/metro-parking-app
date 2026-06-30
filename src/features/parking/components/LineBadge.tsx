@@ -17,11 +17,14 @@ export function LineBadge({ slug }: { slug: string }) {
                     <div
                         key={line}
                         className="line-badge"
-                        style={{
-                            "--line-badge-color": config.color,
-                            "--line-badge-size": `${lineBadge.size}px`,
-                            "--line-badge-font-size": `${lineBadge.fontSize}px`,
-                        } as React.CSSProperties}
+                        style={
+                            {
+                                "--line-badge-color": config.color,
+                                "--line-badge-size": `${lineBadge.size}px`,
+                                "--line-badge-font-size": `${lineBadge.fontSize}px`,
+                                "--line-badge-border": `${lineBadge.border}px`,
+                            } as React.CSSProperties
+                        }
                     >
                         {line}
                     </div>

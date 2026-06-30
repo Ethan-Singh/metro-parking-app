@@ -96,8 +96,9 @@ export const availabilityIcons = {
 
 export const lineBadge = {
     size: 28,
-    fontSize: 11,
+    fontSize: 12,
     gap: 4,
+    border: 2,
 
     map: {
         M1: { color: "#168388" },
@@ -110,5 +111,6 @@ export const lineBadge = {
         T7: { color: "#6F818E" },
         T8: { color: "#00954C" },
         T9: { color: "#D11F2F" },
+        B1: { color: "#009ED7" },
     },
 } as const;

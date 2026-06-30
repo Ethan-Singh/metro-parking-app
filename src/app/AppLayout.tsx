@@ -32,7 +32,7 @@ export default function AppLayout() {
                         <Train sx={{ fontSize: 20 }} />
                     </Box>
                     <Typography variant="h6" sx={{ fontWeight: 700, color: "primary.main" }}>
-                        Metro Parking App
+                        Train stations
                     </Typography>
                 </Toolbar>
             </AppBar>
