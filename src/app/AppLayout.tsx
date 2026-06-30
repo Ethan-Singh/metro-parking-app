@@ -51,14 +51,11 @@ export default function AppLayout() {
                   alignItems: 'flex-end',
                   textAlign: 'right',
                   gap: 0.5,
+                  opacity: 0.8,
                 }}
               >
                 <Typography variant="caption" color="text.secondary">
-                  Public data from
-                </Typography>
-
-                <Typography variant="body2" color="text.secondary">
-                  Transport for NSW
+                  Live data from
                 </Typography>
 
                 <Box
