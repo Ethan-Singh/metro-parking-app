@@ -1,3 +1,4 @@
+import { Box, Typography } from "@mui/material";
 import { facilityLines } from "../config/lineConfig";
 import { lineBadge } from "../../../css/tokens";
 
@@ -7,29 +8,48 @@ export function LineBadge({ slug }: { slug: string }) {
     if (!lines.length) return null;
 
     return (
-        <div className={"line-badge-group"}>
+        <Box sx={{ display: "flex", gap: 0.5 }}>
             {lines.map((line) => {
                 const config = lineBadge.map[line];
 
                 if (!config) return null;
 
                 return (
-                    <div
+                    <Box
                         key={line}
-                        className="line-badge"
-                        style={
-                            {
-                                "--line-badge-color": config.color,
-                                "--line-badge-size": `${lineBadge.size}px`,
-                                "--line-badge-font-size": `${lineBadge.fontSize}px`,
-                                "--line-badge-border": `${lineBadge.border}px`,
-                            } as React.CSSProperties
-                        }
+                        sx={{
+                            width: lineBadge.size,
+                            height: lineBadge.size,
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            borderRadius: "50%",
+                            backgroundColor: config.color,
+                            border: `${lineBadge.border}px solid #fff`,
+                            boxShadow:
+                                "0 0 0 1px rgba(0, 0, 0, 0.18), 0 1px 2px rgba(0, 0, 0, 0.15)",
+                            color: "#fff",
+                            fontSize: lineBadge.fontSize,
+                            fontWeight: 700,
+                            lineHeight: 1,
+                            letterSpacing: "-0.02em",
+                            fontFamily: "Inter, sans-serif",
+                            flexShrink: 0,
+                        }}
                     >
-                        {line}
-                    </div>
+                        <Typography
+                            sx={{
+                                fontSize: lineBadge.fontSize,
+                                fontWeight: 700,
+                                lineHeight: 1,
+                                color: "inherit",
+                            }}
+                        >
+                            {line}
+                        </Typography>
+                    </Box>
                 );
             })}
-        </div>
+        </Box>
     );
 }

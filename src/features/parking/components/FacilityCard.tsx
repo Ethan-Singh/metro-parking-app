@@ -1,10 +1,10 @@
-import { Card, CardContent, Typography } from "@mui/material";
+import { Card, CardContent, Typography, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { AccessTime } from "@mui/icons-material";
 import { tokens, occupancyColors } from "../../../css/tokens.ts";
 import type { ParkingOverview } from "../types.ts";
-import {getAvailabilityIcon} from "../utils.tsx";
-import {LineBadge} from "./LineBadge.tsx";
+import { getAvailabilityIcon } from "../utils.tsx";
+import { LineBadge } from "./LineBadge.tsx";
 
 export function FacilityCard({ facility }: { facility: ParkingOverview }) {
     const navigate = useNavigate();
@@ -16,47 +16,83 @@ export function FacilityCard({ facility }: { facility: ParkingOverview }) {
 
     return (
         <Card
-            className="card-container"
+            sx={{
+                cursor: "pointer",
+                height: "100%",
+            }}
             onClick={() => navigate(`/facility/${facility.slug}`)}
         >
             <CardContent>
-                <div className="card-header">
-                    <Typography variant="h6" className="card-name">
+
+                {/* HEADER */}
+                <Box
+                    sx={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-start",
+                        gap: 2,
+                    }}
+                >
+                    <Typography variant="h6" sx={{ flex: 1 }}>
                         {facility.facilityName}
                     </Typography>
 
                     <LineBadge slug={facility.slug} />
-                </div>
+                </Box>
 
-                <div style={{ marginTop: tokens.space.lg }}>
-                    <div className="card-stats">
-                        <Typography
-                            variant="body2"
-                            className="card-stat-value"
-                            style={{ color }}
-                        >
-                            {facility.occupancy} / {facility.spots}
-                        </Typography>
-                    </div>
-
-                    <div
-                        className="card-progress-bar"
-                        style={{ backgroundColor: tokens.color.border }}
+                {/* STATS */}
+                <Box sx={{ mt: 2 }}>
+                    <Typography
+                        variant="body2"
+                        sx={{
+                            fontWeight: 700,
+                            color,
+                        }}
                     >
-                        <div
-                            className="card-progress-fill"
-                            style={{
+                        {facility.occupancy} / {facility.spots}
+                    </Typography>
+
+                    <Box
+                        sx={{
+                            mt: 1,
+                            height: 6,
+                            borderRadius: 999,
+                            backgroundColor: tokens.color.border,
+                            overflow: "hidden",
+                        }}
+                    >
+                        <Box
+                            sx={{
+                                height: "100%",
                                 width: `${percent}%`,
                                 backgroundColor: color,
+                                transition: "width 0.3s ease",
                             }}
                         />
-                    </div>
-                </div>
+                    </Box>
+                </Box>
 
-                <div className="card-footer">
-                    <AccessTime style={tokens.metaFooter.icon} />
+                {/* FOOTER */}
+                <Box
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                        mt: 2,
+                        flexWrap: "wrap",
+                    }}
+                >
+                    <AccessTime
+                        style={{
+                            fontSize: 14,
+                            color: tokens.color.textMuted,
+                        }}
+                    />
 
-                    <Typography variant="caption" style={tokens.metaFooter.text}>
+                    <Typography
+                        variant="caption"
+                        sx={{ color: tokens.color.textMuted }}
+                    >
                         Updated{" "}
                         {new Date(facility.timestamp).toLocaleTimeString([], {
                             hour: "2-digit",
@@ -64,15 +100,22 @@ export function FacilityCard({ facility }: { facility: ParkingOverview }) {
                         })}
                     </Typography>
 
-                    <span style={tokens.metaFooter.separator}>·</span>
+                    <Box sx={{ mx: 0.5, color: tokens.color.textMuted }}>
+                        ·
+                    </Box>
 
-                    <span style={tokens.metaFooter.item}>
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
                         {getAvailabilityIcon(facility.availability)}
-                                        <Typography variant="caption" style={tokens.metaFooter.text}>
+
+                        <Typography
+                            variant="caption"
+                            sx={{ color: tokens.color.textMuted }}
+                        >
                             {facility.availability}
                         </Typography>
-                    </span>
-                </div>
+                    </Box>
+                </Box>
+
             </CardContent>
         </Card>
     );

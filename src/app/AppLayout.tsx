@@ -4,15 +4,10 @@ import {
     CardContent,
     Container,
     OutlinedInput,
-    InputAdornment,
-    Typography,
+    InputAdornment, Typography
 } from "@mui/material";
 import { Outlet } from "react-router-dom";
-import {
-    Search,
-    LocalParking,
-} from "@mui/icons-material";
-
+import { Search, LocalParking } from "@mui/icons-material";
 import { tokens, header } from "../css/tokens";
 
 export default function AppLayout() {
@@ -20,68 +15,77 @@ export default function AppLayout() {
         <Box sx={{ minHeight: "100vh" }}>
             <Container maxWidth="lg" sx={{ py: tokens.space.xl }}>
 
-                <Card className="app-header">
+                {/* HEADER */}
+                <Card sx={{ mb: 3 }}>
                     <CardContent>
 
-                        <div className="app-header-top">
+                        {/* top row */}
+                        <Box
+                            sx={{
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "flex-start",
+                                gap: 3,
+                                flexWrap: "wrap",
+                            }}
+                        >
 
-                            <div className="app-brand">
-
+                            {/* brand */}
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 2,
+                                    minWidth: 280,
+                                }}
+                            >
                                 <Box
-                                    className="app-brand-icon"
                                     sx={{
                                         width: header.icon.size,
                                         height: header.icon.size,
                                         borderRadius: header.icon.radius,
                                         bgcolor: "primary.main",
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        color: "white",
                                     }}
                                 >
                                     <LocalParking />
                                 </Box>
 
-                                <div className="app-brand-text">
-
-                                    <Typography
-                                        variant="h5"
-                                        sx={{ fontWeight: 700 }}
-                                    >
+                                <Box sx={{ display: "flex", flexDirection: "column" }}>
+                                    <Typography variant="h4">
                                         Sydney Park & Ride
                                     </Typography>
 
-                                    <Typography
-                                        variant="body2"
-                                        color="text.secondary"
-                                    >
-                                        Live parking availability across the
-                                        Transport for NSW network
+                                    <Typography variant="body2" color="text.secondary">
+                                        Live parking availability across the Transport for NSW network
                                     </Typography>
+                                </Box>
+                            </Box>
 
-                                </div>
-
-                            </div>
-
-                            <div className="app-attribution">
-
-                                <Typography
-                                    variant="caption"
-                                    color="text.secondary"
-                                >
+                            {/* attribution */}
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "flex-end",
+                                }}
+                            >
+                                <Typography variant="caption" color="text.secondary">
                                     Data supplied by
                                 </Typography>
 
-                                <Typography
-                                    variant="body2"
-                                    sx={{ fontWeight: 600 }}
-                                >
+                                <Typography variant="body2">
                                     Transport for NSW
                                 </Typography>
+                            </Box>
 
-                            </div>
+                        </Box>
 
-                        </div>
-
-                        <div className="app-search">
-
+                        {/* search */}
+                        <Box sx={{ mt: 2 }}>
                             <OutlinedInput
                                 fullWidth
                                 placeholder="Search for a station..."
@@ -94,14 +98,12 @@ export default function AppLayout() {
                                     maxWidth: header.search.maxWidth,
                                 }}
                             />
-
-                        </div>
+                        </Box>
 
                     </CardContent>
                 </Card>
 
                 <Outlet />
-
             </Container>
         </Box>
     );
