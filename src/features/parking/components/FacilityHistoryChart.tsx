@@ -12,6 +12,11 @@ interface Props {
 }
 
 export function FacilityHistoryChart({ dataPoints }: Props) {
+  const summary = useMemo(() => {
+    const safeData = dataPoints ?? [];
+    return buildHistorySummary(safeData);
+  }, [dataPoints]);
+
   if (!dataPoints) {
     return <LoadingSkeleton height={280} />;
   }
@@ -32,8 +37,6 @@ export function FacilityHistoryChart({ dataPoints }: Props) {
       </Box>
     );
   }
-
-  const summary = useMemo(() => buildHistorySummary(dataPoints), [dataPoints]);
 
   const seriesData = dataPoints.map((d) => [
     d.timestamp,

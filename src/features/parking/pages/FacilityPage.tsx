@@ -23,13 +23,15 @@ export default function FacilityPage() {
 
   const params = useParams<{ slug: string }>();
   const slug = params.slug;
+
+  const safeSlug = slug as FacilitySlug | undefined;
+
+  const overview = useFacilityOverview(safeSlug as FacilitySlug);
+  const history = useFacilityHistory(safeSlug as FacilitySlug);
+
   if (!slug) {
     return <Alert severity="error">Missing facility slug</Alert>;
   }
-  const safeSlug = slug as FacilitySlug;
-
-  const overview = useFacilityOverview(safeSlug);
-  const history = useFacilityHistory(safeSlug);
 
   const f = overview.data;
   const percent = f ? Math.round(f.occupancyRate * 100) : 0;

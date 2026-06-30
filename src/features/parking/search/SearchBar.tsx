@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSearch } from './SearchContext';
 import { useParkingQueries } from '../api/useParkingQueries';
 import { useSearchMode } from './useSearchMode';
-import { useRef } from 'react';
+import { useState } from 'react';
 
 export function SearchBar() {
   const { query, setQuery, clear } = useSearch();
@@ -22,7 +22,7 @@ export function SearchBar() {
   const navigate = useNavigate();
   const { isFacilityPage } = useSearchMode();
 
-  const anchorRef = useRef<HTMLDivElement | null>(null);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
 
   const q = query.trim().toLowerCase();
 
@@ -30,7 +30,6 @@ export function SearchBar() {
     data?.filter((f) => {
       const name = f.facilityName.toLowerCase();
       const slug = f.slug.toLowerCase();
-
       return name.includes(q) || slug.includes(q);
     }) ?? [];
 
@@ -42,12 +41,13 @@ export function SearchBar() {
   };
 
   return (
-    <Box ref={anchorRef} sx={{ position: 'relative' }}>
+    <Box>
       <OutlinedInput
         fullWidth
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search facilities..."
+        inputRef={setAnchorEl}
         startAdornment={
           <InputAdornment position="start">
             <Search />
@@ -66,22 +66,20 @@ export function SearchBar() {
 
       <Popper
         open={show && results.length > 0}
-        anchorEl={anchorRef.current}
+        anchorEl={anchorEl}
         placement="bottom-start"
         style={{
           zIndex: 2000,
-          width: anchorRef.current?.clientWidth,
         }}
       >
         <Paper
           sx={{
-            bgcolor: '#ffffff',
-            opacity: 1,
-            backgroundImage: 'none',
+            bgcolor: '#fff',
             border: '1px solid rgba(0,0,0,0.08)',
             boxShadow: '0px 8px 24px rgba(0,0,0,0.12)',
             borderRadius: 2,
             mt: 1,
+            width: anchorEl?.clientWidth ?? 'auto',
           }}
         >
           <List dense>
