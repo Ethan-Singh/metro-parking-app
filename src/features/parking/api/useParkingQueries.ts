@@ -1,6 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
 import { parkingApi } from "./parkingApi.ts";
-import type {FacilitySlug} from "../config/lineConfig.ts";
+import {queryDefaults} from "./queryDefaults.ts";
+import type {FacilitySlug, ParkingHistory} from "../types.ts";
+import {useQuery} from "@tanstack/react-query";
 
 export const parkingKeys = {
     all: () => ["parking"] as const,
@@ -11,14 +12,11 @@ export const parkingKeys = {
         [...parkingKeys.all(), "history", slug, from, to] as const,
 };
 
-const LIVE_INTERVAL = 30_000;
-
 export function useParkingQueries() {
     return useQuery({
         queryKey: parkingKeys.list(),
         queryFn: parkingApi.getAll,
-        staleTime: LIVE_INTERVAL,
-        refetchInterval: LIVE_INTERVAL,
+        ...queryDefaults.live,
     });
 }
 
@@ -26,9 +24,7 @@ export function useFacilityOverview(slug: FacilitySlug) {
     return useQuery({
         queryKey: parkingKeys.overview(slug),
         queryFn: () => parkingApi.getOverview(slug),
-        staleTime: LIVE_INTERVAL,
-        refetchInterval: LIVE_INTERVAL,
-        enabled: Boolean(slug),
+        ...queryDefaults.live,
     });
 }
 
@@ -36,10 +32,10 @@ export function useFacilityHistory(slug: FacilitySlug) {
     const from = daysAgo(7);
     const to = daysAgo(0);
 
-    return useQuery({
+    return useQuery<ParkingHistory>({
         queryKey: parkingKeys.history(slug, from, to),
         queryFn: () => parkingApi.getHistory(slug, from, to),
-        enabled: Boolean(slug),
+        ...queryDefaults.static,
     });
 }
 
