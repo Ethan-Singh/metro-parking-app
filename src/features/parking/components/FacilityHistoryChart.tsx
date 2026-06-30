@@ -4,6 +4,8 @@ import type { DataPoint } from "../types.ts";
 import { LoadingSkeleton } from "./LoadingSkeleton";
 import { tokens } from "../../../css/tokens.ts";
 import type { CallbackDataParams } from "echarts/types/dist/shared";
+import { useMemo } from "react";
+import { buildHistorySummary } from "../utils/historySummary";
 
 interface Props {
     dataPoints: DataPoint[];
@@ -16,7 +18,14 @@ export function FacilityHistoryChart({ dataPoints }: Props) {
 
     if (dataPoints.length === 0) {
         return (
-            <Box sx={{ height: 280, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Box
+                sx={{
+                    height: 280,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                }}
+            >
                 <Typography variant="body2" color="text.secondary">
                     No historical data available
                 </Typography>
@@ -24,34 +33,10 @@ export function FacilityHistoryChart({ dataPoints }: Props) {
         );
     }
 
-    const values = dataPoints.map((d) => d.occupancyRate * 100);
-
-    const average =
-        values.length
-            ? values.reduce((a, b) => a + b, 0) / values.length
-            : 0;
-
-    const sevenAmValues = Object.values(
-        dataPoints.reduce<Record<string, DataPoint>>((acc, point) => {
-            const date = new Date(point.timestamp);
-            const dayKey = date.toISOString().slice(0, 10);
-
-            if (
-                date.getHours() >= 7 &&
-                (!acc[dayKey] ||
-                    new Date(point.timestamp) < new Date(acc[dayKey].timestamp))
-            ) {
-                acc[dayKey] = point;
-            }
-
-            return acc;
-        }, {})
-    ).map((p) => p.occupancyRate * 100);
-
-    const sevenAmAverage =
-        sevenAmValues.length
-            ? sevenAmValues.reduce((a, b) => a + b, 0) / sevenAmValues.length
-            : 0;
+    const summary = useMemo(
+        () => buildHistorySummary(dataPoints),
+        [dataPoints],
+    );
 
     const seriesData = dataPoints.map((d) => [
         d.timestamp,
@@ -75,14 +60,12 @@ export function FacilityHistoryChart({ dataPoints }: Props) {
 
                 const date = new Date(x);
 
-                const day = date.toLocaleDateString("en-AU", {
+                return `${date.toLocaleDateString("en-AU", {
                     weekday: "short",
                     hour: "2-digit",
                     minute: "2-digit",
                     hour12: true,
-                });
-
-                return `${day}<br/>${Number(y).toFixed(1)}%`;
+                })}<br/>${Number(y).toFixed(1)}%`;
             },
         },
 
@@ -96,14 +79,12 @@ export function FacilityHistoryChart({ dataPoints }: Props) {
             axisLabel: {
                 color: tokens.color.textMuted,
                 hideOverlap: true,
-                formatter: (value: number) => {
-                    const date = new Date(value);
-                    return date.toLocaleString(["en-AU"], {
+                formatter: (value: number) =>
+                    new Date(value).toLocaleDateString("en-AU", {
                         weekday: "short",
                         day: "2-digit",
                         month: "2-digit",
-                    });
-                },
+                    }),
             },
         },
 
@@ -168,7 +149,6 @@ export function FacilityHistoryChart({ dataPoints }: Props) {
 
     return (
         <Box>
-            {/* HEADER */}
             <Box
                 sx={{
                     display: "flex",
@@ -184,23 +164,55 @@ export function FacilityHistoryChart({ dataPoints }: Props) {
                         Historical Occupancy
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                        Past 7-days
+                        Past 7 days
                     </Typography>
                 </Box>
 
                 <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
                     <Chip
                         size="small"
-                        label={`7AM Avg: ${sevenAmAverage.toFixed(1)}%`}
+                        label={`7AM: ${summary.availableAt7am ?? "-"} available`}
                     />
                     <Chip
                         size="small"
-                        label={`7-day Avg: ${average.toFixed(1)}%`}
+                        label={`8AM: ${summary.availableAt8am ?? "-"} available`}
+                    />
+                    <Chip
+                        size="small"
+                        label={`50%: ${
+                            summary.halfFullTime
+                                ? summary.halfFullTime.toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                })
+                                : "-"
+                        }`}
+                    />
+                    <Chip
+                        size="small"
+                        label={`75%: ${
+                            summary.threeQuarterFullTime
+                                ? summary.threeQuarterFullTime.toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                })
+                                : "-"
+                        }`}
+                    />
+                    <Chip
+                        size="small"
+                        label={`90%: ${
+                            summary.ninetyPercentTime
+                                ? summary.ninetyPercentTime.toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                })
+                                : "-"
+                        }`}
                     />
                 </Box>
             </Box>
 
-            {/* CHART */}
             <Box sx={{ width: "100%", height: 280 }}>
                 <ReactECharts
                     option={option}
