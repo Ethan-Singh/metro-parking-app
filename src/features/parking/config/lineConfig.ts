@@ -9,5 +9,3 @@ export const facilityLines = {
     "park-ride-tallawong-p2": ["M1"],
     "park-ride-tallawong-p3": ["M1"],
 } as const;
-
-export type FacilitySlug = keyof typeof facilityLines;

@@ -1,9 +1,11 @@
 import { Box } from "@mui/material";
-import { facilityLines, type FacilitySlug } from "../config/lineConfig";
+import { facilityLines } from "../config/lineConfig";
 import { lineBadge } from "../../../css/lineBadge.ts";
 
-export function LineBadge({ slug }: { slug: FacilitySlug }) {
-    const lines = facilityLines[slug] ?? [];
+type Line = keyof typeof lineBadge.map;
+
+export function LineBadge({ slug }: { slug: string }) {
+    const lines = (facilityLines as Record<string, readonly Line[] | undefined>)[slug] ?? [];
 
     if (!lines.length) return null;
 

@@ -1,9 +1,7 @@
-import {type facilityLines, type FacilitySlug} from "./config/lineConfig.ts";
-
 export type Granularity = "TEN_MINUTE" | "HOURLY" | "DAILY";
 export type Availability = "AVAILABLE" | "ALMOST_FULL" | "FULL";
 
-export type FacilityLines = typeof facilityLines;
+export type FacilitySlug = keyof typeof String;
 
 export interface ParkingOverview {
     slug: FacilitySlug;
