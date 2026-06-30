@@ -1,5 +1,4 @@
-import type { Granularity, ParkingHistory, ParkingOverview } from "../types.ts";
-import type { FacilitySlug } from "../config/lineConfig.ts";
+import type {FacilitySlug, Granularity, ParkingHistory, ParkingOverview} from "../types.ts";
 import { httpGet } from "../../../services/httpClient.ts";
 
 const BASE = "/api/v1/parking";
@@ -24,7 +23,6 @@ export const parkingApi = {
         );
         return toParkingOverview(facility);
     },
-
     getHistory: (
         slug: FacilitySlug,
         from: string,
@@ -32,6 +30,6 @@ export const parkingApi = {
         granularity: Granularity = "TEN_MINUTE",
     ): Promise<ParkingHistory> => {
         const params = new URLSearchParams({ from, to, granularity });
-        return httpGet(`${BASE}/${slug}/history?${params}`);
+        return httpGet<ParkingHistory>(`${BASE}/${slug}/history?${params}`);
     },
 };

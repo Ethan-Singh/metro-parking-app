@@ -3,24 +3,25 @@ import {
     Card,
     CardContent,
     Container,
-    OutlinedInput,
-    InputAdornment,
     Typography,
 } from "@mui/material";
 import { Outlet } from "react-router-dom";
-import { Search, LocalParking } from "@mui/icons-material";
+import { LocalParking } from "@mui/icons-material";
 import TFNSWLogo from "../../public/assets/TFNSW.png";
+import { FacilitySearchBar } from "../features/parking/components/FacilitySearchBar";
+import { useSearch } from "../features/parking/search/SearchContext";
 
 export default function AppLayout() {
+    const { query, setQuery } = useSearch();
+
     return (
         <Box sx={{ minHeight: "100vh" }}>
             <Container maxWidth="lg" sx={{ py: 4 }}>
 
-                {/* HEADER */}
                 <Card sx={{ mb: 3 }}>
                     <CardContent>
 
-                        {/* top row */}
+                        {/* TOP ROW */}
                         <Box
                             sx={{
                                 display: "flex",
@@ -30,16 +31,8 @@ export default function AppLayout() {
                                 flexWrap: "wrap",
                             }}
                         >
-
-                            {/* brand */}
-                            <Box
-                                sx={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    gap: 2,
-                                    minWidth: 280,
-                                }}
-                            >
+                            {/* BRAND */}
+                            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
                                 <Box
                                     sx={{
                                         width: 48,
@@ -55,78 +48,40 @@ export default function AppLayout() {
                                     <LocalParking />
                                 </Box>
 
-                                <Box sx={{ display: "flex", flexDirection: "column" }}>
+                                <Box>
                                     <Typography variant="h4">
-                                        A Metro Parking App
+                                        Sydney Park & Ride
                                     </Typography>
 
                                     <Typography variant="body2" color="text.secondary">
-                                        Live parking availability across the Transport for NSW network
+                                        Live parking availability across NSW
                                     </Typography>
                                 </Box>
                             </Box>
 
-                            {/* right side: search + attribution */}
+                            {/* LOGO */}
                             <Box
-                                sx={{
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    alignItems: "flex-end",
-                                    gap: 1.5,
-                                    minWidth: 320,
-                                }}
-                            >
-                                {/* search */}
-                                <OutlinedInput
-                                    placeholder="Search for a station..."
-                                    startAdornment={
-                                        <InputAdornment position="start">
-                                            <Search />
-                                        </InputAdornment>
-                                    }
-                                    sx={{
-                                        width: 320,
-                                    }}
-                                />
+                                component="img"
+                                src={TFNSWLogo}
+                                alt="Transport for NSW"
+                                sx={{ height: 40, opacity: 0.95 }}
+                            />
+                        </Box>
 
-                                {/* attribution */}
-                                <Box
-                                    sx={{
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        alignItems: "flex-end",
-                                        textAlign: "right",
-                                        gap: 0.5,
-                                    }}
-                                >
-                                    <Typography variant="caption" color="text.secondary">
-                                        Data supplied by
-                                    </Typography>
-
-                                    <Typography variant="body2" color="text.secondary">
-                                        Transport for NSW
-                                    </Typography>
-
-                                    <Box
-                                        component="img"
-                                        src={TFNSWLogo}
-                                        alt="Transport for NSW"
-                                        sx={{
-                                            height: 40,
-                                            width: "auto",
-                                            mt: 0.5,
-                                            opacity: 0.95,
-                                        }}
-                                    />
-                                </Box>
-                            </Box>
-
+                        {/* SEARCH */}
+                        <Box sx={{ mt: 2 }}>
+                            <FacilitySearchBar
+                                value={query}
+                                onChange={setQuery}
+                            />
                         </Box>
 
                     </CardContent>
                 </Card>
 
+                {/* NO CONTEXT PASSED, NO FILTERING HERE */}
                 <Outlet />
+
             </Container>
         </Box>
     );

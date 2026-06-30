@@ -42,5 +42,6 @@ export function useFacilityHistory(slug: FacilitySlug) {
 function daysAgo(n: number): string {
     const d = new Date();
     d.setDate(d.getDate() - n);
+    d.setHours(0, 0, 0, 0);
     return d.toISOString().split("T")[0];
 }

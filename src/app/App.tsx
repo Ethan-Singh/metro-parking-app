@@ -4,10 +4,13 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import FacilityPage from "../features/parking/pages/FacilityPage.tsx";
 import AppLayout from "./AppLayout.tsx";
 import OverviewPage from "../features/parking/pages/OverviewPage.tsx";
-import {theme} from "../css/theme.ts";
+import { theme } from "../css/theme.ts";
+import { SearchProvider } from "../features/parking/search/SearchContext.tsx";
 
 const queryClient = new QueryClient({
-    defaultOptions: { queries: { staleTime: 30_000, refetchInterval: 30_000 } },
+    defaultOptions: {
+        queries: { staleTime: 30_000, refetchInterval: 30_000 },
+    },
 });
 
 const router = createBrowserRouter([
@@ -22,11 +25,13 @@ const router = createBrowserRouter([
 
 export default function App() {
     return (
-        <ThemeProvider theme={theme}>
-            <CssBaseline />
-            <QueryClientProvider client={queryClient}>
-                <RouterProvider router={router} />
-            </QueryClientProvider>
-        </ThemeProvider>
+        <SearchProvider>
+            <ThemeProvider theme={theme}>
+                <CssBaseline />
+                <QueryClientProvider client={queryClient}>
+                    <RouterProvider router={router} />
+                </QueryClientProvider>
+            </ThemeProvider>
+        </SearchProvider>
     );
 }
