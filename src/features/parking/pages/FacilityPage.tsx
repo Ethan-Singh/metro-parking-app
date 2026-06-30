@@ -14,13 +14,19 @@ import {
     useFacilityHistory,
     useFacilityOverview,
 } from "../api/useParkingQueries.ts";
+import {facilityLines, type FacilitySlug} from "../config/lineConfig.ts";
 
 export default function FacilityPage() {
-    const { slug } = useParams();
+    const { slug } = useParams<{ slug: string }>();
+    if (!slug || !(slug in facilityLines)) {
+        return <Alert severity="error">Unknown facility</Alert>;
+    }
+    const safeSlug = slug as FacilitySlug;
+
     const navigate = useNavigate();
 
-    const overview = useFacilityOverview(slug!);
-    const history = useFacilityHistory(slug!);
+    const overview = useFacilityOverview(safeSlug);
+    const history = useFacilityHistory(safeSlug);
 
     if (overview.isError) {
         return <Alert severity="error">Failed to load</Alert>;

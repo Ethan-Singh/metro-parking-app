@@ -17,7 +17,7 @@ export function FacilityHistoryChart({ dataPoints }: Props) {
     const values = dataPoints.map((d) => d.occupancyRate * 100);
 
     const average =
-        values.length > 0
+        values.length
             ? values.reduce((a, b) => a + b, 0) / values.length
             : 0;
 
@@ -39,9 +39,14 @@ export function FacilityHistoryChart({ dataPoints }: Props) {
     ).map((p) => p.occupancyRate * 100);
 
     const sevenAmAverage =
-        sevenAmValues.length > 0
+        sevenAmValues.length
             ? sevenAmValues.reduce((a, b) => a + b, 0) / sevenAmValues.length
             : 0;
+
+    const seriesData = dataPoints.map((d) => [
+        d.timestamp,
+        d.occupancyRate * 100,
+    ]);
 
     const option = {
         grid: {
@@ -115,11 +120,7 @@ export function FacilityHistoryChart({ dataPoints }: Props) {
             {
                 type: "line",
                 showSymbol: false,
-
-                data: dataPoints.map((d) => [
-                    d.timestamp,
-                    d.occupancyRate * 100,
-                ]),
+                data: seriesData,
 
                 lineStyle: {
                     width: 2,

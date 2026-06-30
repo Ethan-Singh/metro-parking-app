@@ -1,11 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { parkingApi } from "./parkingApi.ts";
+import type {FacilitySlug} from "../config/lineConfig.ts";
 
 export const parkingKeys = {
     all: () => ["parking"] as const,
     list: () => [...parkingKeys.all(), "list"] as const,
-    overview: (slug: string) => [...parkingKeys.all(), "overview", slug] as const,
-    history: (slug: string, from: string, to: string) =>
+    overview: (slug: FacilitySlug) =>
+        [...parkingKeys.all(), "overview", slug] as const,
+    history: (slug: FacilitySlug, from: string, to: string) =>
         [...parkingKeys.all(), "history", slug, from, to] as const,
 };
 
@@ -20,7 +22,7 @@ export function useParkingQueries() {
     });
 }
 
-export function useFacilityOverview(slug: string) {
+export function useFacilityOverview(slug: FacilitySlug) {
     return useQuery({
         queryKey: parkingKeys.overview(slug),
         queryFn: () => parkingApi.getOverview(slug),
@@ -30,7 +32,7 @@ export function useFacilityOverview(slug: string) {
     });
 }
 
-export function useFacilityHistory(slug: string) {
+export function useFacilityHistory(slug: FacilitySlug) {
     const from = daysAgo(7);
     const to = daysAgo(0);
 

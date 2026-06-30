@@ -1,11 +1,12 @@
+import {type facilityLines, type FacilitySlug} from "./config/lineConfig.ts";
+
 export type Granularity = "TEN_MINUTE" | "HOURLY" | "DAILY";
 export type Availability = "AVAILABLE" | "ALMOST_FULL" | "FULL";
 
-export type Line = "M1" | "T1" | "T2" | "T3" | "T4" | "T5" | "T6" | "T7" | "T8" | "T9";
-export type FacilityLines = Record<string, readonly Line[]>;
+export type FacilityLines = typeof facilityLines;
 
 export interface ParkingOverview {
-    slug: string;
+    slug: FacilitySlug;
     facilityName: string;
     spots: number;
     occupancy: number;

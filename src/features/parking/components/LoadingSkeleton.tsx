@@ -1,12 +1,11 @@
-import {Skeleton, type SxProps, type Theme} from "@mui/material";
-import { tokens } from "../../../css/tokens.ts";
+import { Skeleton, type SxProps, type Theme } from "@mui/material";
 
 interface Props {
     height?: number;
     sx?: SxProps<Theme>;
 }
 
-export function LoadingSkeleton({ height = tokens.grid.skeletonHeight, sx }: Props) {
+export function LoadingSkeleton({ height = 200, sx }: Props) {
     return (
         <Skeleton
             variant="rectangular"

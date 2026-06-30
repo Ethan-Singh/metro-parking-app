@@ -4,16 +4,16 @@ import {
     CardContent,
     Container,
     OutlinedInput,
-    InputAdornment, Typography
+    InputAdornment,
+    Typography,
 } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import { Search, LocalParking } from "@mui/icons-material";
-import { tokens, header } from "../css/tokens";
 
 export default function AppLayout() {
     return (
         <Box sx={{ minHeight: "100vh" }}>
-            <Container maxWidth="lg" sx={{ py: tokens.space.xl }}>
+            <Container maxWidth="lg" sx={{ py: 4 }}>
 
                 {/* HEADER */}
                 <Card sx={{ mb: 3 }}>
@@ -41,9 +41,9 @@ export default function AppLayout() {
                             >
                                 <Box
                                     sx={{
-                                        width: header.icon.size,
-                                        height: header.icon.size,
-                                        borderRadius: header.icon.radius,
+                                        width: 48,
+                                        height: 48,
+                                        borderRadius: 12,
                                         bgcolor: "primary.main",
                                         display: "flex",
                                         alignItems: "center",
@@ -95,7 +95,7 @@ export default function AppLayout() {
                                     </InputAdornment>
                                 }
                                 sx={{
-                                    maxWidth: header.search.maxWidth,
+                                    maxWidth: 420,
                                 }}
                             />
                         </Box>

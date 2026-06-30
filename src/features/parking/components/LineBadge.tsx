@@ -1,9 +1,9 @@
-import { Box, Typography } from "@mui/material";
-import { facilityLines } from "../config/lineConfig";
-import { lineBadge } from "../../../css/tokens";
+import { Box } from "@mui/material";
+import { facilityLines, type FacilitySlug } from "../config/lineConfig";
+import { lineBadge } from "../../../css/lineBadge.ts";
 
-export function LineBadge({ slug }: { slug: string }) {
-    const lines = facilityLines[slug as keyof typeof facilityLines] ?? [];
+export function LineBadge({ slug }: { slug: FacilitySlug }) {
+    const lines = facilityLines[slug] ?? [];
 
     if (!lines.length) return null;
 
@@ -37,16 +37,7 @@ export function LineBadge({ slug }: { slug: string }) {
                             flexShrink: 0,
                         }}
                     >
-                        <Typography
-                            sx={{
-                                fontSize: lineBadge.fontSize,
-                                fontWeight: 700,
-                                lineHeight: 1,
-                                color: "inherit",
-                            }}
-                        >
-                            {line}
-                        </Typography>
+                        {line}
                     </Box>
                 );
             })}

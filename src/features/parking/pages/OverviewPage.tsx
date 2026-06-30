@@ -9,7 +9,6 @@ import {
 } from "@mui/material";
 import { useParkingQueries } from "../api/useParkingQueries.ts";
 import { FacilityCard } from "../components/FacilityCard.tsx";
-import { tokens } from "../../../css/tokens.ts";
 
 export default function OverviewPage() {
     const { data, isLoading, isError } = useParkingQueries();
@@ -37,7 +36,7 @@ export default function OverviewPage() {
             )}
 
             {/* GRID */}
-            <Grid container spacing={tokens.grid.gap} sx={{ width: "100%" }}>
+            <Grid container spacing={2} sx={{ width: "100%" }}>
                 {isLoading
                     ? Array.from({ length: 8 }).map((_, i) => (
                         <Grid
@@ -46,9 +45,7 @@ export default function OverviewPage() {
                         >
                             <Card>
                                 <CardContent>
-                                    <Skeleton
-                                        height={tokens.grid.skeletonHeight}
-                                    />
+                                    <Skeleton height={200} />
                                 </CardContent>
                             </Card>
                         </Grid>
