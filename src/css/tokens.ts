@@ -114,3 +114,16 @@ export const lineBadge = {
         B1: { color: "#009ED7" },
     },
 } as const;
+
+export const header = {
+    height: 120,
+
+    icon: {
+        size: 48,
+        radius: 16,
+    },
+
+    search: {
+        maxWidth: 420,
+    },
+} as const;

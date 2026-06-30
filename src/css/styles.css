@@ -170,3 +170,45 @@ body {
 
     flex-shrink: 0;
 }
+
+/* AppLayout */
+
+.app-header {
+    margin-bottom: 24px;
+}
+
+.app-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 24px;
+}
+
+.app-brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.app-brand-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: white;
+}
+
+.app-brand-text {
+    display: flex;
+    flex-direction: column;
+}
+
+.app-attribution {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.app-search {
+    margin-top: 20px;
+}

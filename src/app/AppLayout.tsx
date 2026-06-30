@@ -1,44 +1,107 @@
-import { AppBar, Toolbar, Typography, Box, Container } from "@mui/material";
+import {
+    Box,
+    Card,
+    CardContent,
+    Container,
+    OutlinedInput,
+    InputAdornment,
+    Typography,
+} from "@mui/material";
 import { Outlet } from "react-router-dom";
-import {Train} from "@mui/icons-material";
-import {tokens} from "../css/tokens.ts";
+import {
+    Search,
+    LocalParking,
+} from "@mui/icons-material";
+
+import { tokens, header } from "../css/tokens";
 
 export default function AppLayout() {
     return (
         <Box sx={{ minHeight: "100vh" }}>
-            <AppBar
-                position="sticky"
-                elevation={0}
-                sx={{
-                    bgcolor: tokens.color.surface,
-                    borderBottom: `1px solid ${tokens.color.border}`,
-                    backdropFilter: "blur(12px)",
-                }}
-            >
-                <Toolbar>
-                    <Box
-                        sx={{
-                            width: 40,
-                            height: 40,
-                            borderRadius: tokens.radius,
-                            bgcolor: tokens.color.primary,
-                            color: "white",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            mr: 2,
-                        }}
-                    >
-                        <Train sx={{ fontSize: 20 }} />
-                    </Box>
-                    <Typography variant="h6" sx={{ fontWeight: 700, color: "primary.main" }}>
-                        Train stations
-                    </Typography>
-                </Toolbar>
-            </AppBar>
-
             <Container maxWidth="lg" sx={{ py: tokens.space.xl }}>
+
+                <Card className="app-header">
+                    <CardContent>
+
+                        <div className="app-header-top">
+
+                            <div className="app-brand">
+
+                                <Box
+                                    className="app-brand-icon"
+                                    sx={{
+                                        width: header.icon.size,
+                                        height: header.icon.size,
+                                        borderRadius: header.icon.radius,
+                                        bgcolor: "primary.main",
+                                    }}
+                                >
+                                    <LocalParking />
+                                </Box>
+
+                                <div className="app-brand-text">
+
+                                    <Typography
+                                        variant="h5"
+                                        sx={{ fontWeight: 700 }}
+                                    >
+                                        Sydney Park & Ride
+                                    </Typography>
+
+                                    <Typography
+                                        variant="body2"
+                                        color="text.secondary"
+                                    >
+                                        Live parking availability across the
+                                        Transport for NSW network
+                                    </Typography>
+
+                                </div>
+
+                            </div>
+
+                            <div className="app-attribution">
+
+                                <Typography
+                                    variant="caption"
+                                    color="text.secondary"
+                                >
+                                    Data supplied by
+                                </Typography>
+
+                                <Typography
+                                    variant="body2"
+                                    sx={{ fontWeight: 600 }}
+                                >
+                                    Transport for NSW
+                                </Typography>
+
+                            </div>
+
+                        </div>
+
+                        <div className="app-search">
+
+                            <OutlinedInput
+                                fullWidth
+                                placeholder="Search for a station..."
+                                startAdornment={
+                                    <InputAdornment position="start">
+                                        <Search />
+                                    </InputAdornment>
+                                }
+                                sx={{
+                                    maxWidth: header.search.maxWidth,
+                                }}
+                            />
+
+                        </div>
+
+                    </CardContent>
+                </Card>
+
                 <Outlet />
+
             </Container>
         </Box>
     );
