@@ -1,26 +1,30 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import AppLayout from './AppLayout';
 import { vi, describe, it, expect } from 'vitest';
+import AppLayout from '../../app/AppLayout.tsx';
 
-vi.mock('../features/parking/search/SearchBar.tsx', () => ({
+vi.mock('../../features/parking/search/SearchBar.tsx', () => ({
   SearchBar: () => <div>Search Bar</div>,
 }));
 
-vi.mock('../assets/Logo.svg', () => ({
+vi.mock('../../assets/Logo.svg', () => ({
   default: 'Logo.svg',
 }));
 
-vi.mock('../assets/TFNSW.png', () => ({
+vi.mock('../../assets/TFNSW.png', () => ({
   default: 'TFNSW.png',
 }));
+
+const Wrapper = ({ children }: { children: React.ReactNode }) => (
+  <MemoryRouter>{children}</MemoryRouter>
+);
 
 describe('AppLayout', () => {
   it('renders app title', () => {
     render(
-      <MemoryRouter>
+      <Wrapper>
         <AppLayout />
-      </MemoryRouter>
+      </Wrapper>
     );
 
     expect(screen.getByText('A Metro Parking App')).toBeInTheDocument();
@@ -28,9 +32,9 @@ describe('AppLayout', () => {
 
   it('renders description text', () => {
     render(
-      <MemoryRouter>
+      <Wrapper>
         <AppLayout />
-      </MemoryRouter>
+      </Wrapper>
     );
 
     expect(screen.getByText(/Live parking availability/i)).toBeInTheDocument();
@@ -38,9 +42,9 @@ describe('AppLayout', () => {
 
   it('renders search bar', () => {
     render(
-      <MemoryRouter>
+      <Wrapper>
         <AppLayout />
-      </MemoryRouter>
+      </Wrapper>
     );
 
     expect(screen.getByText('Search Bar')).toBeInTheDocument();
@@ -48,9 +52,9 @@ describe('AppLayout', () => {
 
   it('renders TFNSW attribution text', () => {
     render(
-      <MemoryRouter>
+      <Wrapper>
         <AppLayout />
-      </MemoryRouter>
+      </Wrapper>
     );
 
     expect(screen.getByText('Live data from')).toBeInTheDocument();
