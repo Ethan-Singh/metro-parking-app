@@ -21,7 +21,7 @@ export default function OverviewPage() {
   return (
     <Box>
       <Typography variant="h4" sx={{ fontWeight: 700 }}>
-        Network
+        Overview
       </Typography>
 
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>

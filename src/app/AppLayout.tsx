@@ -1,7 +1,7 @@
 import { Box, Card, CardContent, Container, Typography } from '@mui/material';
 import { Outlet } from 'react-router-dom';
-import TFNSWLogo from '../../public/assets/TFNSW.png';
-import Logo from '../../public/assets/Logo.svg';
+import TFNSWLogo from '../assets/TFNSW.png';
+import Logo from '../assets/Logo.svg';
 import { SearchBar } from '../features/parking/search/SearchBar.tsx';
 
 export default function AppLayout() {
