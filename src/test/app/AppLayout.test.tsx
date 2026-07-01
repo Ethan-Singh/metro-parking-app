@@ -1,17 +1,17 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { vi, describe, it, expect } from 'vitest';
-import AppLayout from '../../app/AppLayout.tsx';
+import AppLayout from '../../main/app/AppLayout.tsx';
 
-vi.mock('../../features/parking/search/SearchBar.tsx', () => ({
+vi.mock('../../main/features/parking/search/SearchBar.tsx', () => ({
   SearchBar: () => <div>Search Bar</div>,
 }));
 
-vi.mock('../../assets/Logo.svg', () => ({
+vi.mock('../../main/assets/Logo.svg', () => ({
   default: 'Logo.svg',
 }));
 
-vi.mock('../../assets/TFNSW.png', () => ({
+vi.mock('../../main/assets/TFNSW.png', () => ({
   default: 'TFNSW.png',
 }));
 
