@@ -16,7 +16,8 @@ export function FacilityCard({ facility }: { facility: ParkingOverview }) {
   const Icon = availability?.icon;
 
   return (
-    <Card data-testid="facility-card"
+    <Card
+      data-testid="facility-card"
       sx={{ cursor: 'pointer', height: '100%' }}
       onClick={() => navigate(`/facility/${facility.slug}`)}
     >
