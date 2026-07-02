@@ -169,41 +169,44 @@ export function FacilityHistoryChart({ dataPoints }: Props) {
         <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
           <Chip
             size="small"
-            label={`7AM: ${summary.availableAt7am ?? '-'} available`}
+            label={`7 am: ${summary.availableAt7am ?? '-'} available`}
           />
           <Chip
             size="small"
-            label={`8AM: ${summary.availableAt8am ?? '-'} available`}
+            label={`8 am: ${summary.availableAt8am ?? '-'} available`}
           />
           <Chip
             size="small"
-            label={`50%: ${
+            label={`50% full: ${
               summary.halfFullTime
                 ? summary.halfFullTime.toLocaleTimeString([], {
                     hour: '2-digit',
                     minute: '2-digit',
+                    hour12: true,
                   })
                 : '-'
             }`}
           />
           <Chip
             size="small"
-            label={`75%: ${
+            label={`75% full: ${
               summary.threeQuarterFullTime
                 ? summary.threeQuarterFullTime.toLocaleTimeString([], {
                     hour: '2-digit',
                     minute: '2-digit',
+                    hour12: true,
                   })
                 : '-'
             }`}
           />
           <Chip
             size="small"
-            label={`90%: ${
+            label={`90% full: ${
               summary.ninetyPercentTime
                 ? summary.ninetyPercentTime.toLocaleTimeString([], {
                     hour: '2-digit',
                     minute: '2-digit',
+                    hour12: true,
                   })
                 : '-'
             }`}
