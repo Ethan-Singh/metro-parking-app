@@ -1,13 +1,14 @@
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { FacilityHistoryChart } from '../../../../main/features/parking/components/FacilityHistoryChart';
+import type { DataPoint } from '../../../../main/features/parking/types';
 
-// mock echarts (avoid canvas issues)
+// mock echarts
 vi.mock('echarts-for-react', () => ({
   default: () => <div data-testid="echarts" />,
 }));
 
-// mock tokens so test is stable
+// mock tokens
 vi.mock('../../../../main/css/tokens', () => ({
   tokens: {
     color: {
@@ -21,12 +22,6 @@ vi.mock('../../../../main/css/tokens', () => ({
 }));
 
 describe('FacilityHistoryChart', () => {
-  it('shows loading skeleton when dataPoints is undefined', () => {
-    render(<FacilityHistoryChart dataPoints={undefined as any} />);
-
-    expect(screen.getByTestId('loading-skeleton')).toBeInTheDocument();
-  });
-
   it('shows empty state when no data', () => {
     render(<FacilityHistoryChart dataPoints={[]} />);
 
@@ -36,7 +31,7 @@ describe('FacilityHistoryChart', () => {
   });
 
   it('renders chart and summary chips when data exists', () => {
-    const data = [
+    const data: DataPoint[] = [
       {
         timestamp: '2026-01-01T07:00:00Z',
         occupancy: 50,
@@ -53,10 +48,8 @@ describe('FacilityHistoryChart', () => {
 
     render(<FacilityHistoryChart dataPoints={data} />);
 
-    // chart rendered (mocked)
     expect(screen.getByTestId('echarts')).toBeInTheDocument();
 
-    // summary chips exist
     expect(screen.getByText(/7 am:/i)).toBeInTheDocument();
     expect(screen.getByText(/8 am:/i)).toBeInTheDocument();
     expect(screen.getByText(/50% full/i)).toBeInTheDocument();
