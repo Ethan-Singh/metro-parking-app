@@ -56,7 +56,11 @@ export function SearchBar() {
         endAdornment={
           query ? (
             <InputAdornment position="end">
-              <IconButton size="small" onClick={() => setQuery('')}>
+              <IconButton
+                aria-label="Clear search"
+                size="small"
+                onClick={() => setQuery('')}
+              >
                 <Close fontSize="small" />
               </IconButton>
             </InputAdornment>
