@@ -87,7 +87,7 @@ export function SearchBar() {
           }}
         >
           <List dense>
-            {results.slice(0, 8).map((f) => (
+            {results.slice(0, 3).map((f) => (
               <ListItemButton key={f.slug} onClick={() => handleSelect(f.slug)}>
                 <ListItemText
                   primary={f.facilityName}
