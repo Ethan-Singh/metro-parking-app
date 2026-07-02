@@ -10,7 +10,7 @@
 
 A real-time parking availability dashboard for the Transport for NSW network. Displays live occupancy across all Park&Ride facilities with per-facility historical charts, transit line badges, and a global search experience.
 
-> **Backend:** [metro-parking-web-service](../metro-parking-web-service) — Spring Boot service that ingests and serves the parking data this app consumes.
+> **Backend:** [metro-parking-web-service](https://github.com/Ethan-Singh/metro-parking-web-service) — Spring Boot service that ingests and serves the parking data this app consumes.
 
 ---
 
