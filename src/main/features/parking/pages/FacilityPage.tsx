@@ -65,7 +65,7 @@ export default function FacilityPage() {
         isError={overview.isError}
         loading={<Skeleton height={120} />}
       >
-        <Card>
+        <Card data-testid="parking-metrics">
           <CardContent>
             <Box
               sx={{
@@ -74,20 +74,27 @@ export default function FacilityPage() {
                 gap: 3,
               }}
             >
-              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              {/* OCCUPANCY */}
+              <Box data-testid="metric-occupancy">
                 <Typography variant="caption" color="text.secondary">
                   Current Occupancy
                 </Typography>
-                <Typography variant="h4" sx={{ fontWeight: 700 }}>
+                <Typography
+                  data-testid="metric-occupancy-value"
+                  variant="h4"
+                  sx={{ fontWeight: 700 }}
+                >
                   {percent}%
                 </Typography>
               </Box>
 
-              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              {/* AVAILABLE */}
+              <Box data-testid="metric-available">
                 <Typography variant="caption" color="text.secondary">
                   Current Available
                 </Typography>
                 <Typography
+                  data-testid="metric-available-value"
                   variant="h4"
                   sx={{ fontWeight: 700, color: 'success.main' }}
                 >
@@ -95,11 +102,16 @@ export default function FacilityPage() {
                 </Typography>
               </Box>
 
-              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              {/* TOTAL */}
+              <Box data-testid="metric-total">
                 <Typography variant="caption" color="text.secondary">
                   Current Total
                 </Typography>
-                <Typography variant="h4" sx={{ fontWeight: 700 }}>
+                <Typography
+                  data-testid="metric-total-value"
+                  variant="h4"
+                  sx={{ fontWeight: 700 }}
+                >
                   {f?.spots ?? 0}
                 </Typography>
               </Box>
