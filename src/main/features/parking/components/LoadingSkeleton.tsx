@@ -6,5 +6,12 @@ interface Props {
 }
 
 export function LoadingSkeleton({ height = 200, sx }: Props) {
-  return <Skeleton variant="rectangular" height={height} sx={sx} />;
+  return (
+    <Skeleton
+      variant="rectangular"
+      height={height}
+      sx={sx}
+      data-testid="loading-skeleton"
+    />
+  );
 }
