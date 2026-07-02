@@ -1,7 +1,7 @@
 export type Granularity = 'TEN_MINUTE' | 'HOURLY' | 'DAILY';
 export type Availability = 'AVAILABLE' | 'ALMOST_FULL' | 'FULL';
 
-export type FacilitySlug = keyof typeof String;
+export type FacilitySlug = string;
 
 export interface ParkingOverview {
   slug: FacilitySlug;
