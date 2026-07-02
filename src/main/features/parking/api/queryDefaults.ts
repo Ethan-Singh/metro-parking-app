@@ -3,6 +3,8 @@ export const queryDefaults = {
     staleTime: 30_000,
     gcTime: 5 * 60 * 1000,
     refetchInterval: 30_000,
+    refetchIntervalInBackground: false,
+    refetchOnWindowFocus: true,
     retry: 1,
   },
 
