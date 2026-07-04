@@ -23,6 +23,7 @@ export function SearchBar() {
   const { isFacilityPage } = useSearchMode();
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [focused, setFocused] = useState(false);
 
   const q = query.trim().toLowerCase();
 
@@ -33,7 +34,7 @@ export function SearchBar() {
       return name.includes(q) || slug.includes(q);
     }) ?? [];
 
-  const show = isFacilityPage && q.length > 0;
+  const show = isFacilityPage && focused && q.length > 0;
 
   const handleSelect = (slug: string) => {
     clear();
@@ -46,6 +47,10 @@ export function SearchBar() {
         fullWidth
         value={query}
         onChange={(e) => setQuery(e.target.value)}
+        onFocus={() => setFocused(true)}
+        onBlur={() => {
+          setTimeout(() => setFocused(false));
+        }}
         placeholder="Search facilities..."
         inputRef={setAnchorEl}
         startAdornment={
