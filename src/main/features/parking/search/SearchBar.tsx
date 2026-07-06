@@ -48,9 +48,7 @@ export function SearchBar() {
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onFocus={() => setFocused(true)}
-        onBlur={() => {
-          setTimeout(() => setFocused(false));
-        }}
+        onBlur={() => setFocused(false)}
         placeholder="Search facilities..."
         inputRef={setAnchorEl}
         startAdornment={
@@ -64,7 +62,7 @@ export function SearchBar() {
               <IconButton
                 aria-label="Clear search"
                 size="small"
-                onClick={() => setQuery('')}
+                onClick={clear}
               >
                 <Close fontSize="small" />
               </IconButton>
