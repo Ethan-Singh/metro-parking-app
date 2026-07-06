@@ -6,7 +6,7 @@ import type {
 } from '../types.ts';
 import { httpGet } from '../../../services/httpClient.ts';
 
-const BASE = '/api/v1/parking';
+const BASE = import.meta.env.VITE_API_BASE || '/api/v1/parking';
 
 function toParkingOverview(dto: ParkingOverview): ParkingOverview {
   return {
