@@ -14,11 +14,12 @@ describe('queryDefaults', () => {
   });
 
   it('defines the static query defaults', () => {
-    expect(queryDefaults.static).toEqual({
-      staleTime: 1000 * 60 * 60 * 24,
-      gcTime: Infinity,
-      retry: false,
+    expect(queryDefaults.history).toEqual({
+      staleTime: 24 * 60 * 60 * 1000,
+      gcTime: 7 * 24 * 60 * 60 * 1000,
       refetchInterval: false,
+      refetchOnWindowFocus: false,
+      retry: 1,
     });
   });
 });

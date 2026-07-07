@@ -1,4 +1,4 @@
-import { Box } from '@mui/material';
+import Box from '@mui/material/Box';
 import { facilityLines } from '../config/lineConfig';
 import { lineBadge } from '../../../css/lineBadge.ts';
 

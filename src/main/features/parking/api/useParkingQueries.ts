@@ -35,7 +35,7 @@ export function useFacilityHistory(slug: FacilitySlug) {
   return useQuery<ParkingHistory>({
     queryKey: parkingKeys.history(slug, from, to),
     queryFn: () => parkingApi.getHistory(slug, from, to),
-    ...queryDefaults.static,
+    ...queryDefaults.history,
   });
 }
 

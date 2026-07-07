@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { CheckCircle, WarningAmber, Cancel } from '@mui/icons-material';
+import CheckCircle from '@mui/icons-material/CheckCircle';
+import WarningAmber from '@mui/icons-material/WarningAmber';
+import Cancel from '@mui/icons-material/Cancel';
 import { getAvailability } from '../../../../main/features/parking/utils/availability.ts';
 
 describe('getAvailability', () => {

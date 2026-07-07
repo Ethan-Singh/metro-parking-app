@@ -1,6 +1,6 @@
 import { Card, CardContent, Typography, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { AccessTime } from '@mui/icons-material';
+import AccessTime from '@mui/icons-material/AccessTime';
 import { tokens } from '../../../css/tokens.ts';
 import type { ParkingOverview } from '../types.ts';
 import { LineBadge } from './LineBadge.tsx';

@@ -1,14 +1,12 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import {
-  Typography,
-  Stack,
-  Alert,
-  Card,
-  CardContent,
-  Button,
-  Box,
-  Skeleton,
-} from '@mui/material';
+import Typography from '@mui/material/Typography';
+import Stack from '@mui/material/Stack';
+import Alert from '@mui/material/Alert';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+import Skeleton from '@mui/material/Skeleton';
 import { ArrowBack } from '@mui/icons-material';
 import { FacilityHistoryChart } from '../components/FacilityHistoryChart.tsx';
 import {
