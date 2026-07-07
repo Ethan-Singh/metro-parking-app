@@ -15,7 +15,7 @@ describe('queryDefaults', () => {
 
   it('defines the static query defaults', () => {
     expect(queryDefaults.history).toEqual({
-      staleTime: 24 * 60 * 60 * 1000,
+      staleTime: 60 * 60 * 1000,
       gcTime: 7 * 24 * 60 * 60 * 1000,
       refetchInterval: false,
       refetchOnWindowFocus: false,
