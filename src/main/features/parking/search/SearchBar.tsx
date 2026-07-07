@@ -13,8 +13,9 @@ import { Search, Close } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useParkingQueries } from '../api/useParkingQueries';
 import { useSearchMode } from './useSearchMode';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useSearch } from './useSearch.tsx';
+import Fuse from 'fuse.js';
 
 export function SearchBar() {
   const { query, setQuery, clear } = useSearch();
@@ -26,14 +27,18 @@ export function SearchBar() {
 
   const { data } = useParkingQueries(focused);
 
-  const q = query.trim().toLowerCase();
+  const fuse = useMemo(
+    () =>
+      new Fuse(data ?? [], {
+        keys: ['facilityName', 'slug'],
+        threshold: 0.3,
+      }),
+    [data]
+  );
 
-  const results =
-    data?.filter((f) => {
-      const name = f.facilityName.toLowerCase();
-      const slug = f.slug.toLowerCase();
-      return name.includes(q) || slug.includes(q);
-    }) ?? [];
+  const q = query.trim();
+
+  const results = q ? fuse.search(q).map((result) => result.item) : [];
 
   const show = isFacilityPage && focused && q.length > 0;
 
