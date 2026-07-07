@@ -12,10 +12,11 @@ export const parkingKeys = {
     [...parkingKeys.all(), 'history', slug, from, to] as const,
 };
 
-export function useParkingQueries() {
+export function useParkingQueries(enabled = true) {
   return useQuery({
     queryKey: parkingKeys.list(),
     queryFn: parkingApi.getAll,
+    enabled,
     ...queryDefaults.live,
   });
 }

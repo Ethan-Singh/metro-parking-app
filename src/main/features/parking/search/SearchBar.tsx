@@ -18,12 +18,13 @@ import { useSearch } from './useSearch.tsx';
 
 export function SearchBar() {
   const { query, setQuery, clear } = useSearch();
-  const { data } = useParkingQueries();
   const navigate = useNavigate();
   const { isFacilityPage } = useSearchMode();
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [focused, setFocused] = useState(false);
+
+  const { data } = useParkingQueries(focused);
 
   const q = query.trim().toLowerCase();
 
