@@ -120,7 +120,7 @@ describe('SearchBar', () => {
 
     const result = await screen.findByText('Ashfield');
 
-    fireEvent.click(result);
+    fireEvent.mouseDown(result);
 
     expect(clear).toHaveBeenCalled();
     expect(navigate).toHaveBeenCalledWith('/facility/park-ride-ashfield');
