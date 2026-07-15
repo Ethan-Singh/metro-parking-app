@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import Footer from '../../../../main/features/parking/components/Footer';
 
 describe('Footer', () => {
@@ -39,22 +39,74 @@ describe('Footer', () => {
     );
   });
 
-  it('renders legal links', () => {
+  it('renders legal buttons', () => {
     render(<Footer />);
 
     expect(screen.getByText('Legal')).toBeInTheDocument();
 
     expect(
-      screen.getByRole('link', { name: 'Privacy Policy' })
+      screen.getByRole('button', { name: 'Privacy Policy' })
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole('link', { name: 'Terms of Service' })
+      screen.getByRole('button', { name: 'Terms of Service' })
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole('link', { name: 'Disclaimer' })
+      screen.getByRole('button', { name: 'Disclaimer' })
     ).toBeInTheDocument();
+  });
+
+  it('opens privacy policy dialog', () => {
+    render(<Footer />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Privacy Policy' }));
+
+    const dialog = screen.getByRole('dialog');
+
+    expect(dialog).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('heading', { name: 'Privacy Policy' })
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByText(/does not collect or store personal information/i)
+    ).toBeInTheDocument();
+  });
+
+  it('opens terms of service dialog', () => {
+    render(<Footer />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Terms of Service' }));
+
+    const dialog = screen.getByRole('dialog');
+
+    expect(dialog).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('heading', { name: 'Terms of Service' })
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByText(/provided as a free community project/i)
+    ).toBeInTheDocument();
+  });
+
+  it('opens disclaimer dialog', () => {
+    render(<Footer />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Disclaimer' }));
+
+    const dialog = screen.getByRole('dialog');
+
+    expect(dialog).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('heading', { name: 'Disclaimer' })
+    ).toBeInTheDocument();
+
+    expect(screen.getByText(/independent project/i)).toBeInTheDocument();
   });
 
   it('renders the current year copyright text', () => {

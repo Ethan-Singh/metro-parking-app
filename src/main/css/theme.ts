@@ -73,5 +73,15 @@ export const theme = createTheme({
         },
       },
     },
+
+    MuiDialog: {
+      styleOverrides: {
+        paper: {
+          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+          backgroundImage: 'none',
+          boxShadow: tokens.shadow.base,
+        },
+      },
+    },
   },
 });
