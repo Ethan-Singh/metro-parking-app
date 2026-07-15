@@ -123,10 +123,6 @@ export default function Footer() {
                   Thanks for visiting! Feel free to share; the more people it
                   helps, the better. I'm paying to host this, lols.
                 </Typography>
-
-                <Typography variant="caption" color="text.secondary">
-                  Data powered by Transport for NSW.
-                </Typography>
               </Box>
 
               {/* RESOURCES */}

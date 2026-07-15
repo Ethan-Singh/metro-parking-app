@@ -17,10 +17,6 @@ describe('Footer', () => {
     expect(
       screen.getByText(/This is a side project of mine/i)
     ).toBeInTheDocument();
-
-    expect(
-      screen.getByText(/Data powered by Transport for NSW/i)
-    ).toBeInTheDocument();
   });
 
   it('renders resources links', () => {
