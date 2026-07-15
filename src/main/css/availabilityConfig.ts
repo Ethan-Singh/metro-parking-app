@@ -1,16 +1,17 @@
 import { Cancel, CheckCircle, WarningAmber } from '@mui/icons-material';
+import { tokens } from './tokens.ts';
 
 export const availabilityConfig = {
   AVAILABLE: {
-    color: '#007D66',
+    color: tokens.color.success,
     icon: CheckCircle,
   },
   ALMOST_FULL: {
-    color: '#92610A',
+    color: tokens.color.warning,
     icon: WarningAmber,
   },
   FULL: {
-    color: '#9B1C1C',
+    color: tokens.color.error,
     icon: Cancel,
   },
 } as const;

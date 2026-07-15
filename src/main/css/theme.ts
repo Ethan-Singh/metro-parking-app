@@ -37,7 +37,7 @@ export const theme = createTheme({
       styleOverrides: {
         body: {
           background:
-            'linear-gradient(180deg, #C8E8F8 0%, #DCF0FA 35%, #EAF5FC 100%)',
+            'linear-gradient(180deg, #91CCFF 0%, #FFE7D6 35%, #CFE4C9 100%)',
           backgroundAttachment: 'fixed',
           fontVariantNumeric: 'tabular-nums',
         },

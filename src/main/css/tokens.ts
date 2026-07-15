@@ -1,17 +1,17 @@
 export const tokens = {
   color: {
-    primary: '#0A4FA6',
-    secondary: '#0097B8',
-    success: '#007D66',
-    warning: '#92610A',
+    primary: '#0084D1',
+    secondary: '#D97706',
+    success: '#16A34A',
+    warning: '#EA580C',
     error: '#9B1C1C',
 
-    text: '#0C1C2E',
-    textMuted: '#3D5166',
+    text: '#1F2937',
+    textMuted: '#6B7280',
 
-    bg: '#DCF0FA',
-    surface: 'rgba(255, 255, 255, 0.80)',
-    border: 'rgba(10, 79, 166, 0.10)',
+    bg: '#FFF3ED',
+    surface: 'rgba(255, 255, 255, 0.75)',
+    border: 'rgba(217, 119, 6, 0.08)',
   },
 
   radius: 14,

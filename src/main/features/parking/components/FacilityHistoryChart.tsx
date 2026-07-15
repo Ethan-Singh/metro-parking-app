@@ -115,11 +115,11 @@ export function FacilityHistoryChart({ dataPoints }: Props) {
 
         lineStyle: {
           width: 2,
-          color: tokens.color.secondary,
+          color: tokens.color.primary, // #47A9FF
         },
 
         areaStyle: {
-          color: `${tokens.color.secondary}22`,
+          color: `${tokens.color.primary}22`, // Transparent blue
         },
 
         markLine: {
@@ -135,7 +135,7 @@ export function FacilityHistoryChart({ dataPoints }: Props) {
 
         markArea: {
           itemStyle: {
-            color: `${tokens.color.warning}1A`,
+            color: `${tokens.color.warning}1A`, // #FF9447 with transparency
           },
           label: {
             position: 'inside',
