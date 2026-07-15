@@ -1,62 +1,23 @@
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
-import { vi, describe, it, expect } from 'vitest';
-import AppLayout from '../../main/app/AppLayout.tsx';
+import { describe, expect, it, vi } from 'vitest';
+import App from '../../main/app/App.tsx';
 
-vi.mock('../../main/features/parking/search/SearchBar.tsx', () => ({
-  SearchBar: () => <div>Search Bar</div>,
+vi.mock('../../main/features/parking/pages/OverviewPage.tsx', () => ({
+  default: () => <div>Overview Page</div>,
 }));
 
-vi.mock('../../main/assets/Logo.svg', () => ({
-  default: 'Logo.svg',
+vi.mock('../../main/features/parking/pages/FacilityPage.tsx', () => ({
+  default: () => <div>Facility Page</div>,
 }));
 
-vi.mock('../../main/assets/TFNSW.png', () => ({
-  default: 'TFNSW.png',
+vi.mock('../../main/app/AppLayout.tsx', () => ({
+  default: () => <div>App Layout</div>,
 }));
 
-const Wrapper = ({ children }: { children: React.ReactNode }) => (
-  <MemoryRouter>{children}</MemoryRouter>
-);
+describe('App', () => {
+  it('renders the router', () => {
+    render(<App />);
 
-describe('AppLayout', () => {
-  it('renders app title', () => {
-    render(
-      <Wrapper>
-        <AppLayout />
-      </Wrapper>
-    );
-
-    expect(screen.getByText('A Metro Parking App')).toBeInTheDocument();
-  });
-
-  it('renders description text', () => {
-    render(
-      <Wrapper>
-        <AppLayout />
-      </Wrapper>
-    );
-
-    expect(screen.getByText(/Live parking availability/i)).toBeInTheDocument();
-  });
-
-  it('renders search bar', () => {
-    render(
-      <Wrapper>
-        <AppLayout />
-      </Wrapper>
-    );
-
-    expect(screen.getByText('Search Bar')).toBeInTheDocument();
-  });
-
-  it('renders TFNSW attribution text', () => {
-    render(
-      <Wrapper>
-        <AppLayout />
-      </Wrapper>
-    );
-
-    expect(screen.getByText('Live data from')).toBeInTheDocument();
+    expect(screen.getByText('App Layout')).toBeInTheDocument();
   });
 });

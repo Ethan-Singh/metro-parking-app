@@ -8,14 +8,14 @@ describe('getAvailability', () => {
   it('returns AVAILABLE config', () => {
     const result = getAvailability('AVAILABLE');
 
-    expect(result.color).toBe('#007D66');
+    expect(result.color).toBe('#16A34A');
     expect(result.icon).toBe(CheckCircle);
   });
 
   it('returns ALMOST_FULL config', () => {
     const result = getAvailability('ALMOST_FULL');
 
-    expect(result.color).toBe('#92610A');
+    expect(result.color).toBe('#EA580C');
     expect(result.icon).toBe(WarningAmber);
   });
 

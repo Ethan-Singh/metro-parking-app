@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { SearchBar } from '../../../../main/features/parking/search/SearchBar';
 
 const navigate = vi.fn();
@@ -21,13 +22,17 @@ const parkingData = [
 let query = '';
 let listeners: (() => void)[] = [];
 
-const setQuery = (v: string) => {
-  query = v;
-  listeners.forEach((l) => l());
+const setQuery = (value: string) => {
+  query = value;
+  listeners.forEach((listener) => listener());
 };
 
 vi.mock('react-router-dom', async () => {
-  const actual = await vi.importActual('react-router-dom');
+  const actual =
+    await vi.importActual<typeof import('react-router-dom')>(
+      'react-router-dom'
+    );
+
   return {
     ...actual,
     useNavigate: () => navigate,
@@ -47,10 +52,15 @@ vi.mock('../../../../main/features/parking/search/useSearch', async () => {
     useSearch: () => {
       const [, forceUpdate] = React.useState(0);
 
-      // register re-render trigger
-      if (!listeners.includes(() => forceUpdate((x) => x + 1))) {
-        listeners.push(() => forceUpdate((x) => x + 1));
-      }
+      React.useEffect(() => {
+        const listener = () => forceUpdate((x) => x + 1);
+
+        listeners.push(listener);
+
+        return () => {
+          listeners = listeners.filter((l) => l !== listener);
+        };
+      }, []);
 
       return {
         query,
@@ -85,23 +95,28 @@ describe('SearchBar', () => {
     ).toBeInTheDocument();
   });
 
-  it('updates the search query', () => {
+  it('updates the search query', async () => {
+    const user = userEvent.setup();
+
     render(<SearchBar />);
 
-    fireEvent.change(screen.getByPlaceholderText('Search facilities...'), {
-      target: { value: 'Ash' },
-    });
+    const input = screen.getByPlaceholderText('Search facilities...');
+
+    await user.click(input);
+    await user.type(input, 'Ash');
 
     expect(query).toBe('Ash');
   });
 
   it('shows matching facility results', async () => {
+    const user = userEvent.setup();
+
     render(<SearchBar />);
 
     const input = screen.getByPlaceholderText('Search facilities...');
 
-    fireEvent.focus(input);
-    fireEvent.change(input, { target: { value: 'ash' } });
+    await user.click(input);
+    await user.type(input, 'ash');
 
     await waitFor(() => {
       expect(screen.getByText('Ashfield')).toBeInTheDocument();
@@ -111,16 +126,18 @@ describe('SearchBar', () => {
   });
 
   it('navigates when a result is selected', async () => {
+    const user = userEvent.setup();
+
     render(<SearchBar />);
 
     const input = screen.getByPlaceholderText('Search facilities...');
 
-    fireEvent.focus(input);
-    fireEvent.change(input, { target: { value: 'ash' } });
+    await user.click(input);
+    await user.type(input, 'ash');
 
     const result = await screen.findByText('Ashfield');
 
-    fireEvent.mouseDown(result);
+    await user.click(result);
 
     expect(clear).toHaveBeenCalled();
     expect(navigate).toHaveBeenCalledWith('/facility/park-ride-ashfield');

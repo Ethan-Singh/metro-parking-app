@@ -1,58 +1,57 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { vi, describe, it, expect } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import AppLayout from '../../main/app/AppLayout.tsx';
 
 vi.mock('../../main/features/parking/search/SearchBar.tsx', () => ({
   SearchBar: () => <div>Search Bar</div>,
 }));
 
+vi.mock('../../main/features/parking/components/Footer.tsx', () => ({
+  default: () => <footer>Footer</footer>,
+}));
+
 vi.mock('../../main/assets/Logo.svg', () => ({
   default: 'Logo.svg',
 }));
 
-vi.mock('../../main/assets/TFNSW.png', () => ({
-  default: 'TFNSW.png',
-}));
+const renderLayout = () =>
+  render(
+    <MemoryRouter>
+      <AppLayout />
+    </MemoryRouter>
+  );
 
 describe('AppLayout', () => {
   it('renders app title', () => {
-    render(
-      <MemoryRouter>
-        <AppLayout />
-      </MemoryRouter>
-    );
+    renderLayout();
 
     expect(screen.getByText('A Metro Parking App')).toBeInTheDocument();
   });
 
   it('renders description text', () => {
-    render(
-      <MemoryRouter>
-        <AppLayout />
-      </MemoryRouter>
-    );
+    renderLayout();
 
-    expect(screen.getByText(/Live parking availability/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Live and historical availability/i)
+    ).toBeInTheDocument();
   });
 
   it('renders search bar', () => {
-    render(
-      <MemoryRouter>
-        <AppLayout />
-      </MemoryRouter>
-    );
+    renderLayout();
 
     expect(screen.getByText('Search Bar')).toBeInTheDocument();
   });
 
-  it('renders TFNSW attribution text', () => {
-    render(
-      <MemoryRouter>
-        <AppLayout />
-      </MemoryRouter>
-    );
+  it('renders footer', () => {
+    renderLayout();
 
-    expect(screen.getByText('Live data from')).toBeInTheDocument();
+    expect(screen.getByText('Footer')).toBeInTheDocument();
+  });
+
+  it('renders the logo image', () => {
+    renderLayout();
+
+    expect(screen.getByAltText('Logo')).toBeInTheDocument();
   });
 });
