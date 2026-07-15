@@ -9,6 +9,7 @@ import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
 import { ArrowBack } from '@mui/icons-material';
 import { FacilityHistoryChart } from '../components/FacilityHistoryChart.tsx';
+import { DataCredits } from '../components/DataCredits.tsx';
 import {
   useFacilityHistory,
   useFacilityOverview,
@@ -55,6 +56,15 @@ export default function FacilityPage() {
             {f?.facilityName}
           </Typography>
         </Box>
+      </QueryBoundary>
+
+      {/* DATA CREDITS */}
+      <QueryBoundary isLoading={overview.isLoading} isError={overview.isError}>
+        <DataCredits
+          lastUpdated={f?.timestamp}
+          isFresh={true}
+          isLoading={overview.isLoading}
+        />
       </QueryBoundary>
 
       {/* METRICS */}

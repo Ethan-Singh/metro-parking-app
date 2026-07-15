@@ -1,6 +1,5 @@
 import { Box, Card, CardContent, Container, Typography } from '@mui/material';
 import { Outlet } from 'react-router-dom';
-import TFNSWLogo from '../assets/TFNSW.png';
 import Logo from '../assets/Logo.svg';
 import { SearchBar } from '../features/parking/search/SearchBar.tsx';
 import Footer from '../features/parking/components/Footer.tsx';
@@ -44,33 +43,6 @@ export default function AppLayout() {
                       car parks
                     </Typography>
                   </Box>
-                </Box>
-
-                {/* RIGHT: ATTRIBUTION */}
-                <Box
-                  sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'flex-end',
-                    textAlign: 'right',
-                    gap: 0.5,
-                    opacity: 0.8,
-                  }}
-                >
-                  <Typography variant="caption" color="text.secondary">
-                    Live data from
-                  </Typography>
-
-                  <Box
-                    component="img"
-                    src={TFNSWLogo}
-                    alt="Transport for NSW"
-                    sx={{
-                      height: 34,
-                      width: 'auto',
-                      mt: 0.5,
-                    }}
-                  />
                 </Box>
               </Box>
 

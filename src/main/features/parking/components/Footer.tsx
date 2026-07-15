@@ -54,8 +54,8 @@ export default function Footer() {
                 color="text.secondary"
                 sx={{ display: 'block', mb: 0.5 }}
               >
-                This is a side project of mine, I'll periodically check on it
-                and update if there are any issues.
+                This is a side project of mine (not an official app), I'll
+                periodically check on it and update if there are any issues.
               </Typography>
               <Typography
                 variant="caption"
@@ -152,7 +152,7 @@ export default function Footer() {
             </Typography>
 
             <Typography variant="caption" color="text.secondary">
-              Data updates every 30 seconds
+              Data fetched every 30 seconds
             </Typography>
           </Box>
         </Stack>

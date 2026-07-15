@@ -14,7 +14,10 @@ export const tokens = {
     border: 'rgba(217, 119, 6, 0.08)',
   },
 
-  radius: 14,
+  radius: {
+    primary: 14,
+    secondary: 0.5,
+  },
 
   shadow: {
     base: '0 4px 12px rgba(10,79,166,0.08)',
