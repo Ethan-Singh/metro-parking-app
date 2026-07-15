@@ -62,7 +62,7 @@ export function DataCredits({
         alignItems: 'center',
         py: 3,
         px: 4,
-        backgroundColor: 'rgba(255, 255, 255, 0.3)',
+        backgroundColor: tokens.color.transparent,
         borderRadius: tokens.radius,
         gap: 2,
         flexWrap: 'wrap',

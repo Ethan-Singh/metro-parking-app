@@ -12,6 +12,7 @@ export const tokens = {
     bg: '#FFF3ED',
     surface: 'rgba(255, 255, 255, 0.75)',
     border: 'rgba(217, 119, 6, 0.08)',
+    transparent: 'rgba(255, 255, 255, 0.3)',
   },
 
   radius: {
