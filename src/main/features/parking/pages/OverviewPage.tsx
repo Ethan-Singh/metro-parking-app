@@ -21,7 +21,13 @@ export default function OverviewPage() {
     ) ?? [];
 
   // Get the most recent timestamp from all facilities
-  const lastUpdated = data?.[0]?.timestamp;
+  const lastUpdated =
+    data && data.length > 0
+      ? data.reduce((latest, facility) =>
+          facility.timestamp > latest.timestamp ? facility : latest
+        ).timestamp
+      : undefined;
+
   const hasSearchQuery = q.length > 0;
   const isEmpty = results.length === 0 && hasSearchQuery;
 
