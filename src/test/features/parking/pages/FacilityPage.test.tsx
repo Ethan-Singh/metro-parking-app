@@ -6,6 +6,7 @@ import * as hooks from '../../../../main/features/parking/api/useParkingQueries'
 import type { NavigateFunction } from 'react-router-dom';
 import React from 'react';
 import type {
+  DailyParkingMetrics,
   LiveCarPark,
   ParkingHistory,
 } from '../../../../main/features/parking/types';
@@ -24,6 +25,7 @@ vi.mock('../../../../main/features/parking/api/useParkingQueries', () => ({
   useFacilityLive: vi.fn(),
   useFacilityHistory: vi.fn(),
   useFacilityRecentHistory: vi.fn(),
+  useFacilityDailyMetrics: vi.fn(),
 }));
 
 vi.mock(
@@ -87,6 +89,26 @@ beforeEach(() => {
     isLoading: false,
     isError: false,
   } as unknown as UseQueryResult<typeof mockHistory, Error>);
+
+  vi.mocked(hooks.useFacilityDailyMetrics).mockReturnValue({
+    data: {
+      from: '2026-06-28',
+      to: '2026-06-30',
+      timeZone: 'Australia/Sydney',
+      days: [
+        {
+          date: '2026-06-28',
+          expectedFreeAt7am: 40,
+          expectedFreeAt8am: 30,
+          crossed50AtMs: null,
+          crossed90AtMs: null,
+          fullAtMs: null,
+        },
+      ],
+    },
+    isLoading: false,
+    isError: false,
+  } as unknown as UseQueryResult<DailyParkingMetrics, Error>);
 });
 
 describe('FacilityPage', () => {
@@ -119,7 +141,10 @@ describe('FacilityPage', () => {
     const chart = screen.getByTestId('chart');
     expect(metricsCard).toBeInTheDocument();
     expect(within(metricsCard).getByLabelText('Weekend')).toBeInTheDocument();
-    expect(metricsCard.compareDocumentPosition(chart) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(
+      metricsCard.compareDocumentPosition(chart) &
+        Node.DOCUMENT_POSITION_FOLLOWING
+    ).toBeTruthy();
   });
 
   it('navigates back on click', () => {

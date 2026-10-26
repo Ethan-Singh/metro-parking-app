@@ -1,4 +1,5 @@
 import type {
+  DailyParkingMetrics,
   FacilitySlug,
   LiveCarPark,
   ParkingHistory,
@@ -13,6 +14,17 @@ export const parkingApi = {
 
   getLive: (slug: FacilitySlug): Promise<LiveCarPark> =>
     httpGet<LiveCarPark>(`${BASE}/${encodeURIComponent(slug)}/live`),
+
+  getDailyMetrics: (
+    slug: FacilitySlug,
+    from: string,
+    to: string
+  ): Promise<DailyParkingMetrics> => {
+    const params = new URLSearchParams({ from, to });
+    return httpGet<DailyParkingMetrics>(
+      `${BASE}/${encodeURIComponent(slug)}/metrics/daily?${params}`
+    );
+  },
 
   getHistory: (
     slug: FacilitySlug,

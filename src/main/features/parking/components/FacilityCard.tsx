@@ -9,12 +9,13 @@ import type { LiveCarPark } from '../types.ts';
 import { LineBadge } from './LineBadge.tsx';
 import { getAvailability } from '../utils/availability.ts';
 import { formatSydneyTime } from '../utils/sydneyTime.ts';
-import { useFacilityRecentHistory } from '../api/useParkingQueries.ts';
+import { useFacilityDailyMetrics, useFacilityRecentHistory } from '../api/useParkingQueries.ts';
 import { DailyCommuterMetrics } from './DailyCommuterMetrics.tsx';
 
 export function FacilityCard({ facility, title = facility.facilityName }: { facility: LiveCarPark; title?: string }) {
   const [quickViewOpen, setQuickViewOpen] = useState(false);
   const preview = useFacilityRecentHistory(facility.slug, 1, quickViewOpen);
+  const commuterMetrics = useFacilityDailyMetrics(facility.slug, 1, quickViewOpen);
   const percent = Math.round(facility.occupancyRate * 100);
 
   const availability = getAvailability(facility.availability);
@@ -132,7 +133,7 @@ export function FacilityCard({ facility, title = facility.facilityName }: { faci
       </Button>
       <Collapse in={quickViewOpen} timeout="auto" unmountOnExit>
         <Box id={`quick-view-${facility.slug}`} sx={{ px: 2, pb: 2 }}>
-          <DailyCommuterMetrics history={preview.data} isLoading={preview.isLoading} isError={preview.isError} />
+          <DailyCommuterMetrics metrics={commuterMetrics.data} isLoading={commuterMetrics.isLoading} isError={commuterMetrics.isError} />
           <Typography variant="caption" color="text.secondary">Today&apos;s occupancy | 10-minute detail</Typography>
           {preview.isLoading ? (
             <Box sx={{ height: 180, display: 'grid', placeItems: 'center' }}><CircularProgress size={24} aria-label="Loading quick view" /></Box>

@@ -11,4 +11,6 @@ export type ResolvedHistoryResolution =
 export type HistoryRangeDays = 1 | 3 | 7 | 14 | 31;
 export type HistoryPoint = components['schemas']['HistoryPoint'];
 export type ParkingHistory = components['schemas']['ParkingHistory'];
+export type DailyParkingMetrics = components['schemas']['DailyParkingMetrics'];
+export type DailyParkingMetric = components['schemas']['DailyParkingMetric'];
 export type ApiError = components['schemas']['ErrorResponse'];

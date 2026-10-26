@@ -41,6 +41,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/parking/{slug}/metrics/daily": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get daily commuter metrics for a car park
+         * @description Returns one metrics object per Sydney calendar date in the effective inclusive range, including dates with no observations. The range uses the configured history window and is limited to the most recent 3 dates ending at the effective `to` date. Milestones use source event timestamps and do not clamp upstream occupancy values. Expected-free values use the closest sample within 20 minutes of the target time; equal-distance samples select the earlier event. A range including today returns Cache-Control: no-store.
+         */
+        get: operations["getDailyParkingMetrics"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/parking/{slug}/history": {
         parameters: {
             query?: never;
@@ -140,6 +160,44 @@ export interface components {
              *     ]
              */
             points: components["schemas"]["HistoryPoint"][];
+        };
+        DailyParkingMetrics: {
+            /**
+             * Format: date
+             * @description First date in the effective, clamped range.
+             */
+            from: string;
+            /**
+             * Format: date
+             * @description Last date in the effective, clamped range.
+             */
+            to: string;
+            /** @constant */
+            timeZone: "Australia/Sydney";
+            days: components["schemas"]["DailyParkingMetric"][];
+        };
+        DailyParkingMetric: {
+            /** Format: date */
+            date: string;
+            /** @description Available spaces from the closest sample within 20 minutes of 07:00 Sydney time; null when unavailable. */
+            expectedFreeAt7am: number | null;
+            /** @description Available spaces from the closest sample within 20 minutes of 08:00 Sydney time; null when unavailable. */
+            expectedFreeAt8am: number | null;
+            /**
+             * Format: int64
+             * @description First source sample at or above 50% occupancy, as epoch milliseconds.
+             */
+            crossed50AtMs: number | null;
+            /**
+             * Format: int64
+             * @description First source sample at or above 90% occupancy, as epoch milliseconds.
+             */
+            crossed90AtMs: number | null;
+            /**
+             * Format: int64
+             * @description First source sample at or above capacity (100%), as epoch milliseconds.
+             */
+            fullAtMs: number | null;
         };
         /**
          * @example [
@@ -296,6 +354,81 @@ export interface operations {
                      *     }
                      */
                     "application/json": components["schemas"]["LiveCarPark"];
+                };
+            };
+            400: components["responses"]["BadRequest"];
+            429: components["responses"]["RateLimited"];
+            500: components["responses"]["ServerError"];
+        };
+    };
+    getDailyParkingMetrics: {
+        parameters: {
+            query: {
+                /**
+                 * @description Start Sydney calendar date, inclusive.
+                 * @example 2026-10-25
+                 */
+                from: string;
+                /**
+                 * @description End Sydney calendar date, inclusive.
+                 * @example 2026-10-27
+                 */
+                to: string;
+            };
+            header?: never;
+            path: {
+                /**
+                 * @description Lowercase hyphenated car park name, for example central-station.
+                 * @example central-station
+                 */
+                slug: components["parameters"]["Slug"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Daily metrics, ordered by Sydney calendar date */
+            200: {
+                headers: {
+                    /** @description No-store when the effective date range includes today; otherwise may be cached for one hour. */
+                    "Cache-Control"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    /**
+                     * @example {
+                     *       "from": "2026-10-25",
+                     *       "to": "2026-10-27",
+                     *       "timeZone": "Australia/Sydney",
+                     *       "days": [
+                     *         {
+                     *           "date": "2026-10-25",
+                     *           "expectedFreeAt7am": 179,
+                     *           "expectedFreeAt8am": 136,
+                     *           "crossed50AtMs": 1792964400000,
+                     *           "crossed90AtMs": null,
+                     *           "fullAtMs": null
+                     *         },
+                     *         {
+                     *           "date": "2026-10-26",
+                     *           "expectedFreeAt7am": 163,
+                     *           "expectedFreeAt8am": 121,
+                     *           "crossed50AtMs": 1793051400000,
+                     *           "crossed90AtMs": 1793062200000,
+                     *           "fullAtMs": 1793065800000
+                     *         },
+                     *         {
+                     *           "date": "2026-10-27",
+                     *           "expectedFreeAt7am": null,
+                     *           "expectedFreeAt8am": null,
+                     *           "crossed50AtMs": null,
+                     *           "crossed90AtMs": null,
+                     *           "fullAtMs": null
+                     *         }
+                     *       ]
+                     *     }
+                     */
+                    "application/json": components["schemas"]["DailyParkingMetrics"];
                 };
             };
             400: components["responses"]["BadRequest"];

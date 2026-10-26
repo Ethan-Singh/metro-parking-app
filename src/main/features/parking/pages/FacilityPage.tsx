@@ -14,7 +14,7 @@ import { DataCredits } from '../components/DataCredits.tsx';
 import {
   useFacilityHistory,
   useFacilityLive,
-  useFacilityRecentHistory,
+  useFacilityDailyMetrics,
 } from '../api/useParkingQueries.ts';
 import { QueryBoundary } from '../components/QueryBoundary.tsx';
 import type { FacilitySlug } from '../types.ts';
@@ -33,7 +33,7 @@ export default function FacilityPage() {
 
   const live = useFacilityLive(safeSlug);
   const history = useFacilityHistory(safeSlug, rangeDays, resolution);
-  const commuterHistory = useFacilityRecentHistory(safeSlug, 3, Boolean(slug));
+  const commuterMetrics = useFacilityDailyMetrics(safeSlug, 3, Boolean(slug));
 
   if (!slug) {
     return <Alert severity="error">Missing facility slug</Alert>;
@@ -139,9 +139,9 @@ export default function FacilityPage() {
       <Card data-testid="daily-commuter-metrics-card">
         <CardContent>
           <DailyCommuterMetrics
-            history={commuterHistory.data}
-            isLoading={commuterHistory.isLoading}
-            isError={commuterHistory.isError}
+            metrics={commuterMetrics.data}
+            isLoading={commuterMetrics.isLoading}
+            isError={commuterMetrics.isError}
           />
         </CardContent>
       </Card>

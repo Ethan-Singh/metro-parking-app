@@ -9,7 +9,16 @@ vi.mock('../../../../main/features/parking/utils/availability', () => ({
   getAvailability: vi.fn(),
 }));
 vi.mock('../../../../main/features/parking/api/useParkingQueries.ts', () => ({
-  useFacilityRecentHistory: () => ({ data: undefined, isLoading: false, isError: false }),
+  useFacilityRecentHistory: () => ({
+    data: undefined,
+    isLoading: false,
+    isError: false,
+  }),
+  useFacilityDailyMetrics: () => ({
+    data: undefined,
+    isLoading: false,
+    isError: false,
+  }),
 }));
 
 beforeEach(() => {
@@ -35,37 +44,57 @@ const mockFacility: LiveCarPark = {
 
 describe('FacilityCard', () => {
   it('renders facility name and occupancy', () => {
-    render(<MemoryRouter><FacilityCard facility={mockFacility} /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <FacilityCard facility={mockFacility} />
+      </MemoryRouter>
+    );
 
     expect(screen.getByText('Ashfield Parking')).toBeInTheDocument();
     expect(screen.getByText('40 / 100')).toBeInTheDocument();
   });
 
   it('exposes facility navigation as a semantic link', () => {
-    render(<MemoryRouter><FacilityCard facility={mockFacility} /></MemoryRouter>);
-    expect(screen.getByRole('link', { name: 'Ashfield Parking' })).toHaveAttribute(
-      'href', '/facility/park-ride-ashfield'
+    render(
+      <MemoryRouter>
+        <FacilityCard facility={mockFacility} />
+      </MemoryRouter>
     );
+    expect(
+      screen.getByRole('link', { name: 'Ashfield Parking' })
+    ).toHaveAttribute('href', '/facility/park-ride-ashfield');
   });
 
   it('renders availability label', () => {
-    render(<MemoryRouter><FacilityCard facility={mockFacility} /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <FacilityCard facility={mockFacility} />
+      </MemoryRouter>
+    );
 
     expect(screen.getByText('AVAILABLE')).toBeInTheDocument();
   });
 
   it('opens quick view independently from facility navigation', () => {
-    render(<MemoryRouter><FacilityCard facility={mockFacility} /></MemoryRouter>);
+    render(
+      <MemoryRouter>
+        <FacilityCard facility={mockFacility} />
+      </MemoryRouter>
+    );
 
     const quickView = screen.getByRole('button', { name: /quick view/i });
     fireEvent.click(quickView);
 
     expect(quickView).toHaveAttribute('aria-expanded', 'true');
     expect(screen.getByText('Daily commuter metrics')).toBeInTheDocument();
-    expect(screen.getByText(/No 10-minute commuter samples are available/i)).toBeInTheDocument();
-    expect(screen.getByText(/No 10-minute occupancy samples are available/i)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Ashfield Parking' })).toHaveAttribute(
-      'href', '/facility/park-ride-ashfield'
-    );
+    expect(
+      screen.getByText(/No commuter metrics are available/i)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/No 10-minute occupancy samples are available/i)
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'Ashfield Parking' })
+    ).toHaveAttribute('href', '/facility/park-ride-ashfield');
   });
 });

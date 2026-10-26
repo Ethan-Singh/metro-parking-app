@@ -30,6 +30,7 @@ Contract endpoints and payloads:
 - `GET /api/v1/parking` returns `LiveCarPark[]`.
 - `GET /api/v1/parking/{slug}/live` returns one `LiveCarPark`.
 - `GET /api/v1/parking/{slug}/history?from=YYYY-MM-DD&to=YYYY-MM-DD&resolution=AUTO` returns `{ from, to, resolution, points }`.
+- `GET /api/v1/parking/{slug}/metrics/daily?from=YYYY-MM-DD&to=YYYY-MM-DD` returns daily commuter metrics for the effective Sydney-date range, including expected availability near 7 AM and 8 AM plus 50%, 90%, and full-occupancy timestamps.
 - A history point is `[timeMs, occupancyRate, available]`. `timeMs` is Unix epoch milliseconds, and `resolution` is the actual interval selected by the server.
 - Requested resolutions are `AUTO`, `TEN_MINUTE`, `ONE_HOUR`, `SIX_HOUR`, `TWELVE_HOUR`, and `TWENTY_FOUR_HOUR`.
 - History dates are Sydney calendar dates. The backend clamps the range to its configured 31-day window and caps responses at 200 points.
@@ -43,6 +44,7 @@ Use generated schema types in one API module and avoid duplicate hand-written DT
 - Calculate date-only values in `Australia/Sydney`; do not use browser-local date accessors or `toISOString()` for query ranges.
 - Keep today's history in the selected chart range so it can show newly ingested samples. Default to one Sydney day at `TEN_MINUTE`, which best supports commuters checking morning and evening patterns without the backend coarsening the response. The chart offers 1, 7, 14, and 31 Sydney-day ranges and a stock-chart style interval picker for `AUTO`, `TEN_MINUTE`, `ONE_HOUR`, `SIX_HOUR`, `TWELVE_HOUR`, and `TWENTY_FOUR_HOUR`.
 - Include range and requested resolution in query keys. Poll live and selected history at the shared two-minute cadence, refresh on focus/reconnect, and keep background polling disabled.
+- Query daily metrics independently from chart history using facility slug and date range in the query key. Facility pages request the latest three Sydney dates; overview Quick Views request one date. Quick View intentionally makes a separate history request for its occupancy chart, so metric accuracy does not depend on the chart's selected resolution.
 - Estimate points using the selected date range and interval, disable explicit intervals that would exceed the backend's 200-point cap, and move to the finest supported interval when a longer range is selected. `AUTO` stays available. Show the actual returned resolution and date range because the backend may still coarsen a request. Fine-grained summaries should not imply exact threshold times for coarser data.
 - Handle 400, 429, and 500 errors clearly. Avoid aggressive retries, especially for 429.
 
@@ -60,7 +62,7 @@ Use generated schema types in one API module and avoid duplicate hand-written DT
 - Let the parent control chart height at breakpoints, use ECharts resize handling after rotation/container changes, reduce tick/margin clutter on phones, and avoid requiring horizontal page scrolling.
 - Include a text summary or accessible data alternative for the key values. Preserve rates over 100% and make the 100% threshold visible.
 - Render commuter metrics in a separate card above historical occupancy so changing chart period or resolution never hides the metrics. Compare the latest three Sydney dates, with 7 AM free, 8 AM free, 50% full, 90% full, and the time each day first reached 100% capacity. Calculate every date independently; do not carry one day's milestones into another.
-- The frontend currently derives these rows from ten-minute history samples. The backend daily-metrics endpoint should expose the same per-day values through its OpenAPI contract and service; fetch it independently of the downsampled chart series.
+- Render these rows from the backend daily-metrics endpoint, independently of the downsampled chart series. Keep each date's milestones isolated and display missing metrics as unavailable rather than carrying values forward from another day.
 - Consider a small forecast as a later, explicitly experimental feature. A client-side short-horizon trend can be misleading with sparse/coarsened observations and daily commuter patterns. Only show it when enough recent `TEN_MINUTE` points exist; label it as an estimate, visually separate it from observed data, and omit it when the trend is unstable. A backend forecast with a documented method and uncertainty range is preferable if the feature becomes a product requirement.
 
 ## MUI design system refactor

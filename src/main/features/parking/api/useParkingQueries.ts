@@ -1,6 +1,6 @@
 import { parkingApi } from './parkingApi.ts';
 import { queryDefaults } from './queryDefaults.ts';
-import type { FacilitySlug, HistoryRangeDays, ParkingHistory, RequestedHistoryResolution } from '../types.ts';
+import type { DailyParkingMetrics, FacilitySlug, HistoryRangeDays, ParkingHistory, RequestedHistoryResolution } from '../types.ts';
 import { useQuery } from '@tanstack/react-query';
 import { sydneyDateDaysAgo } from '../utils/sydneyTime.ts';
 
@@ -10,6 +10,8 @@ export const parkingKeys = {
   live: (slug: FacilitySlug) => [...parkingKeys.all(), 'live', slug] as const,
   history: (slug: FacilitySlug, from: string, to: string, rangeDays: HistoryRangeDays, resolution: RequestedHistoryResolution) =>
     [...parkingKeys.all(), 'history', slug, from, to, rangeDays, resolution] as const,
+  dailyMetrics: (slug: FacilitySlug, from: string, to: string) =>
+    [...parkingKeys.all(), 'daily-metrics', slug, from, to] as const,
 };
 
 export function useParkingQueries(enabled = true) {
@@ -46,7 +48,20 @@ export function useFacilityHistory(
   });
 }
 
-/** Load fine-grained daily samples for commuter metrics and the Quick view chart. */
+/** Load Sydney-day commuter metrics from the backend for one or three dates. */
+export function useFacilityDailyMetrics(slug: FacilitySlug | undefined, days: 1 | 3, enabled: boolean) {
+  const to = sydneyDateDaysAgo(0);
+  const from = sydneyDateDaysAgo(days - 1);
+
+  return useQuery<DailyParkingMetrics>({
+    queryKey: parkingKeys.dailyMetrics(slug ?? '', from, to),
+    queryFn: () => parkingApi.getDailyMetrics(slug!, from, to),
+    enabled: Boolean(slug) && enabled,
+    ...queryDefaults.history,
+  });
+}
+
+/** Load fine-grained daily samples for the Quick view chart. */
 export function useFacilityRecentHistory(slug: FacilitySlug | undefined, days: 1 | 3, enabled: boolean) {
   const to = sydneyDateDaysAgo(0);
   const from = sydneyDateDaysAgo(days - 1);

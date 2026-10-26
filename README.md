@@ -16,21 +16,21 @@ A mobile-first dashboard for current and historical Transport for NSW car park o
 
 PlantUML sources and their scope are indexed in [`domain/models`](domain/models/README.md).
 
-| Model | Description |
-| --- | --- |
-| [Frontend data flow](domain/models/frontend-data-flow.puml) | Pages, query cache, API adapter, and backend contract |
-| [Implementation spec](docs/implementation-spec.md) | Contract migration, mobile improvements, and design system direction |
+| Model                                                       | Description                                                          |
+| ----------------------------------------------------------- | -------------------------------------------------------------------- |
+| [Frontend data flow](domain/models/frontend-data-flow.puml) | Pages, query cache, API adapter, and backend contract                |
+| [Implementation spec](docs/implementation-spec.md)          | Contract migration, mobile improvements, and design system direction |
 
 ## Pages and data
 
 - **Overview (`/`)** lists facilities, supports search by name or slug, and shows occupancy, availability, transit lines, and the latest source sample time.
 - **Facility (`/facility/:slug`)** shows live occupancy metrics and a history chart with stock-style period and interval pickers. It defaults to one Sydney day at 10-minute detail; choose 1, 7, 14, or 31 days and `AUTO`, 10-minute, hourly, 6-hour, 12-hour, or 24-hour points. The chart shows local hours for a one-day view and weekday plus hour for longer ranges.
-- API calls use the backend OpenAPI contract: list facilities, fetch `/{slug}/live`, and request compact history points `[timeMs, occupancyRate, available]`.
+- API calls use the backend OpenAPI contract: list facilities, fetch `/{slug}/live`, request compact history points `[timeMs, occupancyRate, available]`, and retrieve dedicated daily commuter metrics from `/{slug}/metrics/daily`.
 - Timestamps are epoch milliseconds and are displayed in `Australia/Sydney`. History dates are also calculated in the Sydney timezone.
 - The backend ingests current-day data by rotating through enabled facilities. Its scheduler runs every 2.2 seconds, but an individual facility updates on a multi-minute sweep. The app polls every two minutes and shows the source sample time because this is the latest stored sample, not a real-time feed.
 - The backend limits API traffic to 60 requests per minute per client IP. Client queries use a shared two-minute cadence, avoid background polling, and retry once.
 
-History responses report the actual resolution used by the backend. The chart displays that resolution and hides fine-grained commuter summaries when the server returns coarser points. Occupancy values are preserved if they exceed facility capacity.
+History responses report the actual resolution used by the backend, which the chart displays. Daily commuter metrics are fetched independently, so they remain exact and available regardless of the selected chart interval. Facility pages request the latest three Sydney dates; overview Quick Views request the latest date and fetch history separately for the chart. Occupancy values are preserved if they exceed facility capacity.
 
 ## OpenAPI types
 
