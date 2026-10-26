@@ -14,13 +14,13 @@ export function DailyCommuterMetrics({ history, isLoading = false, isError = fal
   const days = history?.resolution === 'TEN_MINUTE'
     ? buildDailyHistoryMetrics(history.points, history.from, history.to).slice(-3).reverse()
     : [];
-  const periodLabel = history?.from === history?.to ? 'most recent day' : 'most recent 3 days';
+  const periodLabel = history?.from === history?.to ? 'Most recent day' : 'Most recent 3 days';
 
   return (
     <Box>
       <Typography variant="h6" sx={{ mb: 0.5 }}>Daily commuter metrics</Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-        10-minute observations · Sydney time · {periodLabel}
+        {periodLabel}
       </Typography>
       {isLoading ? (
         <Typography variant="body2" color="text.secondary">Loading commuter metrics…</Typography>

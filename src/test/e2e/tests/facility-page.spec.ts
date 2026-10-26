@@ -59,7 +59,7 @@ test.describe('Facility Page (data-driven)', () => {
     await expect(commuterCard.getByText('50% full').first()).toBeVisible();
     await expect(commuterCard.getByText('90% full').first()).toBeVisible();
     await expect(commuterCard.getByText('Full by').first()).toBeVisible();
-    await expect(commuterCard.getByText(/most recent 3 days/i)).toBeVisible();
+    await expect(commuterCard.getByText(/Most recent 3 days/i)).toBeVisible();
 
     const chartCard = page.locator('.MuiCard-root').filter({ has: page.getByRole('heading', { name: 'Historical Occupancy' }) });
     await expect(chartCard).toBeVisible();
