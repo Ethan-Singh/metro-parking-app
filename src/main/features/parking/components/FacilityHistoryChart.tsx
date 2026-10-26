@@ -5,6 +5,7 @@ import { LoadingSkeleton } from './LoadingSkeleton.tsx';
 import { tokens } from '../../../css/tokens.ts';
 import type { CallbackDataParams } from 'echarts/types/dist/shared';
 import { formatSydneyTime } from '../utils/sydneyTime.ts';
+import { supportedHistoryResolutionOrFallback, supportsHistoryResolution } from '../utils/historyResolution.ts';
 
 interface Props {
   history?: ParkingHistory;
@@ -80,8 +81,8 @@ export function FacilityHistoryChart({
       type: 'line',
       showSymbol: false,
       data: seriesData,
-      lineStyle: { width: 2, color: tokens.color.primary },
-      areaStyle: { color: `${tokens.color.primary}22` },
+      lineStyle: { width: 2, color: tokens.color.grassDark },
+      areaStyle: { color: `${tokens.color.grassDark}22` },
       markLine: {
         symbol: 'none',
         lineStyle: { type: 'dashed', color: tokens.color.error, opacity: 0.9 },
@@ -116,7 +117,11 @@ export function FacilityHistoryChart({
             size="small"
             value={rangeDays}
             aria-label="History period"
-            onChange={(_, value: HistoryRangeDays | null) => value && onRangeDaysChange(value)}
+            onChange={(_, value: HistoryRangeDays | null) => {
+              if (!value) return;
+              onRangeDaysChange(value);
+              onResolutionChange(supportedHistoryResolutionOrFallback(value, resolution));
+            }}
             sx={{ '& .MuiToggleButton-root': { px: 1.5, py: 0.5, textTransform: 'none' } }}
           >
             {([1, 7, 14, 31] as const).map((days) => (
@@ -142,7 +147,12 @@ export function FacilityHistoryChart({
             }}
           >
             {(['AUTO', 'TEN_MINUTE', 'ONE_HOUR', 'SIX_HOUR', 'TWELVE_HOUR', 'TWENTY_FOUR_HOUR'] as const).map((value) => (
-              <ToggleButton key={value} value={value} aria-label={`${resolutionLabel[value]} interval`}>
+              <ToggleButton
+                key={value}
+                value={value}
+                disabled={!supportsHistoryResolution(rangeDays, value)}
+                aria-label={`${resolutionLabel[value]} interval`}
+              >
                 {resolutionLabel[value]}
               </ToggleButton>
             ))}
@@ -158,7 +168,7 @@ export function FacilityHistoryChart({
           notMerge
           lazyUpdate
           autoResize
-          aria-label="Parking occupancy history in Sydney time"
+          aria-label="Historical parking occupancy chart"
         />
       </Box>
     </Box>

@@ -46,4 +46,24 @@ describe('FacilityHistoryChart', () => {
     expect(onRangeDaysChange).toHaveBeenCalledWith(14);
     expect(onResolutionChange).toHaveBeenCalledWith('ONE_HOUR');
   });
+
+  it('disables over-limit intervals and moves to a supported interval when the range grows', () => {
+    const onRangeDaysChange = vi.fn();
+    const onResolutionChange = vi.fn();
+    render(<FacilityHistoryChart
+      {...handlers}
+      rangeDays={7}
+      resolution="ONE_HOUR"
+      onRangeDaysChange={onRangeDaysChange}
+      onResolutionChange={onResolutionChange}
+      history={{ from: '2026-01-01', to: '2026-01-07', resolution: 'ONE_HOUR', points: [[1767225600000, 0.5, 50]] }}
+    />);
+
+    expect(screen.getByRole('button', { name: '10 min interval' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: '1 hour interval' })).toBeEnabled();
+    fireEvent.click(screen.getByRole('button', { name: 'Past 14 days' }));
+
+    expect(onRangeDaysChange).toHaveBeenCalledWith(14);
+    expect(onResolutionChange).toHaveBeenCalledWith('SIX_HOUR');
+  });
 });

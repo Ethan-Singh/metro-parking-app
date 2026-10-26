@@ -13,6 +13,17 @@ function historyForDate(date: string) {
   ];
 }
 
+function datesBetween(from: string, to: string) {
+  const dates: string[] = [];
+  const date = new Date(`${from}T00:00:00Z`);
+  const end = new Date(`${to}T00:00:00Z`);
+  while (date <= end) {
+    dates.push(date.toISOString().slice(0, 10));
+    date.setUTCDate(date.getUTCDate() + 1);
+  }
+  return dates;
+}
+
 test.describe('Facility Page (data-driven)', () => {
   test.beforeEach(async ({ page }) => {
     await page.route('**/api/v1/parking/**/live', async (route) => {
@@ -32,14 +43,14 @@ test.describe('Facility Page (data-driven)', () => {
     });
     await page.route('**/api/v1/parking/**/history?**', async (route) => {
       const query = new URL(route.request().url()).searchParams;
-      expect(query.get('resolution')).toBe('TEN_MINUTE');
-      expect(query.get('from')).toBe(query.get('to'));
-      const date = query.get('from')!;
+      const resolution = query.get('resolution')!;
+      const from = query.get('from')!;
+      const to = query.get('to')!;
       await route.fulfill({ json: {
-        from: date,
-        to: date,
-        resolution: 'TEN_MINUTE',
-        points: historyForDate(date),
+        from,
+        to,
+        resolution,
+        points: datesBetween(from, to).flatMap(historyForDate),
       } });
     });
   });
@@ -73,6 +84,11 @@ test.describe('Facility Page (data-driven)', () => {
     await expect(chartCard.getByRole('group', { name: 'History period' })).toBeVisible();
     await expect(chartCard.getByRole('group', { name: 'History point interval' })).toBeVisible();
     await expect(page.locator('canvas')).toHaveCount(1);
+
+    await chartCard.getByRole('button', { name: 'Past 7 days' }).click();
+    await expect(chartCard.getByRole('button', { name: '10 min interval' })).toBeDisabled();
+    await expect(chartCard.getByRole('button', { name: '1 hour interval' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(chartCard.getByText(/choose a shorter period/i)).toHaveCount(0);
   });
 
   test('back button works', async ({ page }) => {

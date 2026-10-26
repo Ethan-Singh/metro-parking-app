@@ -43,7 +43,7 @@ Use generated schema types in one API module and avoid duplicate hand-written DT
 - Calculate date-only values in `Australia/Sydney`; do not use browser-local date accessors or `toISOString()` for query ranges.
 - Keep today's history in the selected chart range so it can show newly ingested samples. Default to one Sydney day at `TEN_MINUTE`, which best supports commuters checking morning and evening patterns without the backend coarsening the response. The chart offers 1, 7, 14, and 31 Sydney-day ranges and a stock-chart style interval picker for `AUTO`, `TEN_MINUTE`, `ONE_HOUR`, `SIX_HOUR`, `TWELVE_HOUR`, and `TWENTY_FOUR_HOUR`.
 - Include range and requested resolution in query keys. Poll live and selected history at the shared two-minute cadence, refresh on focus/reconnect, and keep background polling disabled.
-- Show the actual returned resolution and date range; the backend may coarsen a requested interval to stay within 200 points. Fine-grained summaries are shown only for `TEN_MINUTE` and should not imply exact threshold times for coarser data.
+- Estimate points using the selected date range and interval, disable explicit intervals that would exceed the backend's 200-point cap, and move to the finest supported interval when a longer range is selected. `AUTO` stays available. Show the actual returned resolution and date range because the backend may still coarsen a request. Fine-grained summaries should not imply exact threshold times for coarser data.
 - Handle 400, 429, and 500 errors clearly. Avoid aggressive retries, especially for 429.
 
 ## Mobile-first interface and search
