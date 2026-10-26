@@ -1,116 +1,73 @@
-import type { DataPoint } from '../types';
+import type { HistoryPoint } from '../types.ts';
+import { sydneyDate } from './sydneyTime.ts';
 
-export interface HistorySummary {
-  availableAt7am: number | null;
-  availableAt8am: number | null;
-
-  halfFullTime: Date | null;
-  threeQuarterFullTime: Date | null;
-  ninetyPercentTime: Date | null;
-
-  peakOccupancyRate: number;
-  peakTime: Date | null;
-
-  lowestAvailable: number | null;
+export interface DailyHistoryMetrics {
+  date: string;
+  expectedFreeAt7am: number | null;
+  expectedFreeAt8am: number | null;
+  crossed50AtMs: number | null;
+  crossed90AtMs: number | null;
+  fullAtMs: number | null;
 }
 
-function getDateParts(ts: string) {
-  const d = new Date(ts);
-  return {
-    dateKey: d.toISOString().slice(0, 10),
-    hour: d.getHours(),
-    minute: d.getMinutes(),
-    date: d,
-  };
+function localMinutes(timeMs: number) {
+  const parts = new Intl.DateTimeFormat('en-AU', {
+    timeZone: 'Australia/Sydney',
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).formatToParts(timeMs);
+  const get = (type: string) => Number(parts.find((part) => part.type === type)?.value ?? 0);
+  return get('hour') * 60 + get('minute');
 }
 
-function isBetter(
-  current: DataPoint | undefined,
-  candidate: DataPoint,
-  targetMinutes: number
-) {
-  if (!current) return true;
-
-  const c = new Date(current.timestamp);
-  const cMinutes = c.getHours() * 60 + c.getMinutes();
-
-  const n = new Date(candidate.timestamp);
-  const nMinutes = n.getHours() * 60 + n.getMinutes();
-
-  return (
-    Math.abs(nMinutes - targetMinutes) < Math.abs(cMinutes - targetMinutes)
-  );
+function expectedFree(points: readonly HistoryPoint[], targetHour: number) {
+  const target = targetHour * 60;
+  const nearest = points
+    .map(([timeMs, , available]) => ({ available, distance: Math.abs(localMinutes(timeMs) - target) }))
+    .filter(({ distance }) => distance <= 20)
+    .sort((left, right) => left.distance - right.distance)[0];
+  return nearest?.available ?? null;
 }
 
-export function buildHistorySummary(
-  dataPoints: readonly DataPoint[]
-): HistorySummary {
-  let halfFullTime: Date | null = null;
-  let threeQuarterFullTime: Date | null = null;
-  let ninetyPercentTime: Date | null = null;
-
-  let peakOccupancyRate = -Infinity;
-  let peakTime: Date | null = null;
-
-  let lowestAvailable = Infinity;
-
-  const best7am: Record<string, DataPoint> = {};
-  const best8am: Record<string, DataPoint> = {};
-
-  for (const point of dataPoints) {
-    const { dateKey, hour, date } = getDateParts(point.timestamp);
-
-    const target7 = 7 * 60;
-    const target8 = 8 * 60;
-
-    // 7AM closest snapshot per day
-    if (hour >= 7 && isBetter(best7am[dateKey], point, target7)) {
-      best7am[dateKey] = point;
-    }
-
-    // 8AM closest snapshot per day
-    if (hour >= 8 && isBetter(best8am[dateKey], point, target8)) {
-      best8am[dateKey] = point;
-    }
-
-    // thresholds
-    if (halfFullTime === null && point.occupancyRate >= 0.5) {
-      halfFullTime = date;
-    }
-
-    if (threeQuarterFullTime === null && point.occupancyRate >= 0.75) {
-      threeQuarterFullTime = date;
-    }
-
-    if (ninetyPercentTime === null && point.occupancyRate >= 0.9) {
-      ninetyPercentTime = date;
-    }
-
-    // peak
-    if (point.occupancyRate > peakOccupancyRate) {
-      peakOccupancyRate = point.occupancyRate;
-      peakTime = date;
-    }
-
-    // lowest availability
-    lowestAvailable = Math.min(lowestAvailable, point.available);
+export function buildDailyHistoryMetrics(points: readonly HistoryPoint[], from?: string, to?: string): DailyHistoryMetrics[] {
+  const byDate = new Map<string, HistoryPoint[]>();
+  for (const point of points) {
+    const date = sydneyDate(point[0]);
+    const dayPoints = byDate.get(date) ?? [];
+    dayPoints.push(point);
+    byDate.set(date, dayPoints);
   }
 
-  const first7am = Object.values(best7am)[0] ?? null;
-  const first8am = Object.values(best8am)[0] ?? null;
+  if (from && to) {
+    const date = new Date(`${from}T00:00:00Z`);
+    const end = new Date(`${to}T00:00:00Z`);
+    while (date <= end) {
+      const key = date.toISOString().slice(0, 10);
+      if (!byDate.has(key)) byDate.set(key, []);
+      date.setUTCDate(date.getUTCDate() + 1);
+    }
+  }
 
-  return {
-    availableAt7am: first7am?.available ?? null,
-    availableAt8am: first8am?.available ?? null,
+  return [...byDate.entries()]
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([date, dayPoints]) => {
+      let crossed50AtMs: number | null = null;
+      let crossed90AtMs: number | null = null;
+      let fullAtMs: number | null = null;
+      for (const [timeMs, rate] of dayPoints.sort(([left], [right]) => left - right)) {
+        if (crossed50AtMs === null && rate >= 0.5) crossed50AtMs = timeMs;
+        if (crossed90AtMs === null && rate >= 0.9) crossed90AtMs = timeMs;
+        if (fullAtMs === null && rate >= 1) fullAtMs = timeMs;
+      }
 
-    halfFullTime,
-    threeQuarterFullTime,
-    ninetyPercentTime,
-
-    peakOccupancyRate: peakOccupancyRate === -Infinity ? 0 : peakOccupancyRate,
-
-    peakTime,
-
-    lowestAvailable: lowestAvailable === Infinity ? null : lowestAvailable,
-  };
+      return {
+        date,
+        expectedFreeAt7am: expectedFree(dayPoints, 7),
+        expectedFreeAt8am: expectedFree(dayPoints, 8),
+        crossed50AtMs,
+        crossed90AtMs,
+        fullAtMs,
+      };
+    });
 }

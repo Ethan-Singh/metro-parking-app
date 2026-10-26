@@ -1,0 +1,40 @@
+@startuml
+title Metro Parking App — frontend data flow
+left to right direction
+skinparam componentStyle rectangle
+
+actor Commuter
+
+package "React application" {
+  [OverviewPage] as Overview
+  [FacilityPage] as Facility
+  [SearchBar] as Search
+  [FacilityCard] as Card
+  [FacilityHistoryChart] as Chart
+  [TanStack Query] as Query
+  [parkingApi] as ApiAdapter
+  [Generated OpenAPI types] as Types
+}
+
+cloud "Metro Parking Web Service\n/api/v1/parking" as Backend
+database "Query cache" as Cache
+
+Commuter --> Overview
+Commuter --> Facility
+Overview --> Search
+Overview --> Card
+Facility --> Chart
+Overview --> Query : facility list
+Facility --> Query : live sample + history
+Query <--> Cache : two-minute refresh policy
+Query --> ApiAdapter
+ApiAdapter ..> Types : request / response shapes
+ApiAdapter --> Backend : list, /live, /history
+Backend --> ApiAdapter : source time in epoch ms\nhistory tuple points
+
+note bottom of Backend
+  Backend rotates current-day ingestion
+  across enabled facilities. The frontend
+  labels sample time as Sydney local time.
+end note
+@enduml

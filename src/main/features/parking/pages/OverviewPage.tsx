@@ -20,12 +20,12 @@ export default function OverviewPage() {
         f.slug.toLowerCase().includes(q)
     ) ?? [];
 
-  // Get the most recent timestamp from all facilities
+  // Get the most recent source sample timestamp from all facilities.
   const lastUpdated =
     data && data.length > 0
       ? data.reduce((latest, facility) =>
-          facility.timestamp > latest.timestamp ? facility : latest
-        ).timestamp
+          facility.timeMs > latest.timeMs ? facility : latest
+        ).timeMs
       : undefined;
 
   const hasSearchQuery = q.length > 0;
@@ -49,7 +49,6 @@ export default function OverviewPage() {
       {/* DATA CREDITS */}
       <DataCredits
         lastUpdated={lastUpdated}
-        isFresh={true}
         isLoading={isLoading}
       />
 

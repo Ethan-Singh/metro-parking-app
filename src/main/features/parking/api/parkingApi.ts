@@ -1,38 +1,28 @@
 import type {
   FacilitySlug,
-  Granularity,
+  LiveCarPark,
   ParkingHistory,
-  ParkingOverview,
+  RequestedHistoryResolution,
 } from '../types.ts';
 import { httpGet } from '../../../services/httpClient.ts';
 
-const BASE = import.meta.env.VITE_API_BASE || '/api/v1/parking';
-
-function toParkingOverview(dto: ParkingOverview): ParkingOverview {
-  return {
-    ...dto,
-    slug: dto.slug as FacilitySlug,
-    facilityName: dto.facilityName.replace(/^Park&Ride\s*-\s*/, ''),
-  };
-}
+const BASE = (import.meta.env.VITE_API_BASE || '/api/v1/parking').replace(/\/$/, '');
 
 export const parkingApi = {
-  getAll: async (): Promise<ParkingOverview[]> => {
-    const facilities = await httpGet<ParkingOverview[]>(BASE);
-    return facilities.map(toParkingOverview);
-  },
+  getAll: (): Promise<LiveCarPark[]> => httpGet<LiveCarPark[]>(BASE),
 
-  getOverview: async (slug: FacilitySlug): Promise<ParkingOverview> => {
-    const facility = await httpGet<ParkingOverview>(`${BASE}/${slug}/overview`);
-    return toParkingOverview(facility);
-  },
+  getLive: (slug: FacilitySlug): Promise<LiveCarPark> =>
+    httpGet<LiveCarPark>(`${BASE}/${encodeURIComponent(slug)}/live`),
+
   getHistory: (
     slug: FacilitySlug,
     from: string,
     to: string,
-    granularity: Granularity = 'TEN_MINUTE'
+    resolution: RequestedHistoryResolution = 'AUTO'
   ): Promise<ParkingHistory> => {
-    const params = new URLSearchParams({ from, to, granularity });
-    return httpGet<ParkingHistory>(`${BASE}/${slug}/history?${params}`);
+    const params = new URLSearchParams({ from, to, resolution });
+    return httpGet<ParkingHistory>(
+      `${BASE}/${encodeURIComponent(slug)}/history?${params}`
+    );
   },
 };

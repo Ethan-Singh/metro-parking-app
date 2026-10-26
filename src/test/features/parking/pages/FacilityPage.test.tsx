@@ -6,7 +6,7 @@ import * as hooks from '../../../../main/features/parking/api/useParkingQueries'
 import type { NavigateFunction } from 'react-router-dom';
 import React from 'react';
 import type {
-  ParkingOverview,
+  LiveCarPark,
   ParkingHistory,
 } from '../../../../main/features/parking/types';
 import type { UseQueryResult } from '@tanstack/react-query';
@@ -21,8 +21,9 @@ vi.mock('react-router-dom', async () => {
 });
 
 vi.mock('../../../../main/features/parking/api/useParkingQueries', () => ({
-  useFacilityOverview: vi.fn(),
+  useFacilityLive: vi.fn(),
   useFacilityHistory: vi.fn(),
+  useFacilityRecentHistory: vi.fn(),
 }));
 
 vi.mock(
@@ -41,7 +42,7 @@ vi.mock('../../../../main/features/parking/components/QueryBoundary', () => ({
 
 const navigateMock: NavigateFunction = vi.fn();
 
-const mockOverview: ParkingOverview = {
+const mockOverview: LiveCarPark = {
   slug: 'park-ride-ashfield',
   facilityName: 'Ashfield',
   spots: 100,
@@ -49,22 +50,15 @@ const mockOverview: ParkingOverview = {
   available: 10,
   occupancyRate: 0.5,
   availability: 'AVAILABLE',
-  timestamp: '2026-01-01T10:00:00Z',
+  timeMs: 1767261600000,
   ariaLabel: '',
 };
 
 const mockHistory: ParkingHistory = {
-  slug: 'park-ride-ashfield',
-  date: '2026-06-24',
-  granularity: 'TEN_MINUTE',
-  dataPoints: [
-    {
-      timestamp: '2026-06-24T00:00:00Z',
-      occupancy: 50,
-      available: 50,
-      occupancyRate: 0.5,
-    },
-  ],
+  from: '2026-06-24',
+  to: '2026-06-30',
+  resolution: 'TEN_MINUTE',
+  points: [[1782230400000, 0.5, 50]],
 };
 
 beforeEach(() => {
@@ -76,13 +70,19 @@ beforeEach(() => {
     slug: 'park-ride-ashfield',
   });
 
-  vi.mocked(hooks.useFacilityOverview).mockReturnValue({
+  vi.mocked(hooks.useFacilityLive).mockReturnValue({
     data: mockOverview,
     isLoading: false,
     isError: false,
   } as unknown as UseQueryResult<typeof mockOverview, Error>);
 
   vi.mocked(hooks.useFacilityHistory).mockReturnValue({
+    data: mockHistory,
+    isLoading: false,
+    isError: false,
+  } as unknown as UseQueryResult<typeof mockHistory, Error>);
+
+  vi.mocked(hooks.useFacilityRecentHistory).mockReturnValue({
     data: mockHistory,
     isLoading: false,
     isError: false,
@@ -106,6 +106,19 @@ describe('FacilityPage', () => {
   it('renders chart', () => {
     render(<FacilityPage />);
     expect(screen.getByTestId('chart')).toBeInTheDocument();
+    expect(hooks.useFacilityHistory).toHaveBeenCalledWith(
+      'park-ride-ashfield',
+      1,
+      'TEN_MINUTE'
+    );
+  });
+
+  it('keeps commuter metrics in their own card above the historical chart', () => {
+    render(<FacilityPage />);
+    const metricsCard = screen.getByTestId('daily-commuter-metrics-card');
+    const chart = screen.getByTestId('chart');
+    expect(metricsCard).toBeInTheDocument();
+    expect(metricsCard.compareDocumentPosition(chart) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it('navigates back on click', () => {

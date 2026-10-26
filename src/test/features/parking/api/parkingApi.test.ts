@@ -1,98 +1,50 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-vi.mock('../../../../main/services/httpClient.ts', () => ({
-  httpGet: vi.fn(),
-}));
+vi.mock('../../../../main/services/httpClient.ts', () => ({ httpGet: vi.fn() }));
 
-import type {
-  ParkingHistory,
-  ParkingOverview,
-} from '../../../../main/features/parking/types.ts';
+import type { LiveCarPark, ParkingHistory } from '../../../../main/features/parking/types.ts';
 import { httpGet } from '../../../../main/services/httpClient.ts';
 import { parkingApi } from '../../../../main/features/parking/api/parkingApi.ts';
 
 const mockedHttpGet = vi.mocked(httpGet);
+const live: LiveCarPark = {
+  slug: 'park-ride-ashfield', facilityName: 'Ashfield', spots: 100,
+  occupancy: 40, available: 60, occupancyRate: 0.4,
+  availability: 'AVAILABLE', timeMs: 1767225600000, ariaLabel: 'Ashfield, 60 of 100 spots available',
+};
 
 describe('parkingApi', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
+  beforeEach(() => vi.clearAllMocks());
 
-  it('getAll calls the correct endpoint and strips the Park&Ride prefix', async () => {
-    mockedHttpGet.mockResolvedValue([
-      {
-        slug: 'park-ride-ashfield',
-        facilityName: 'Park&Ride - Ashfield',
-        spots: 100,
-        occupancy: 40,
-        available: 60,
-        occupancyRate: 0.4,
-        availability: 'AVAILABLE',
-        timestamp: '2026-01-01T00:00:00Z',
-        ariaLabel: '',
-      },
-    ] satisfies ParkingOverview[]);
-
-    const result = await parkingApi.getAll();
-
+  it('fetches the live list using the wire DTO without mutating fields', async () => {
+    mockedHttpGet.mockResolvedValue([live]);
+    await expect(parkingApi.getAll()).resolves.toEqual([live]);
     expect(httpGet).toHaveBeenCalledWith('/api/v1/parking');
-
-    expect(result[0].facilityName).toBe('Ashfield');
   });
 
-  it('getOverview calls the correct endpoint and transforms the facility name', async () => {
-    mockedHttpGet.mockResolvedValue({
-      slug: 'park-ride-ashfield',
-      facilityName: 'Park&Ride - Ashfield',
-      spots: 100,
-      occupancy: 40,
-      available: 60,
-      occupancyRate: 0.4,
-      availability: 'AVAILABLE',
-      timestamp: '2026-01-01T00:00:00Z',
-      ariaLabel: '',
-    } satisfies ParkingOverview);
-
-    const result = await parkingApi.getOverview('park-ride-ashfield' as never);
-
-    expect(httpGet).toHaveBeenCalledWith(
-      '/api/v1/parking/park-ride-ashfield/overview'
-    );
-
-    expect(result.facilityName).toBe('Ashfield');
+  it('uses the live endpoint and encodes the slug', async () => {
+    mockedHttpGet.mockResolvedValue(live);
+    await parkingApi.getLive('park-ride-ashfield');
+    expect(httpGet).toHaveBeenCalledWith('/api/v1/parking/park-ride-ashfield/live');
   });
 
-  it('getHistory builds the correct query string', async () => {
+  it('requests history with the contract resolution parameter', async () => {
     mockedHttpGet.mockResolvedValue({
-      slug: 'park-ride-ashfield',
-      date: '2026-01-01',
-      granularity: 'TEN_MINUTE',
-      dataPoints: [],
+      from: '2026-01-01', to: '2026-01-07', resolution: 'TEN_MINUTE',
+      points: [[1767225600000, 0.4, 60]],
     } satisfies ParkingHistory);
 
-    await parkingApi.getHistory(
-      'park-ride-ashfield' as never,
-      '2026-01-01',
-      '2026-01-07'
-    );
-
+    await parkingApi.getHistory('park-ride-ashfield', '2026-01-01', '2026-01-07');
     expect(httpGet).toHaveBeenCalledWith(
-      '/api/v1/parking/park-ride-ashfield/history?from=2026-01-01&to=2026-01-07&granularity=TEN_MINUTE'
+      '/api/v1/parking/park-ride-ashfield/history?from=2026-01-01&to=2026-01-07&resolution=AUTO'
     );
   });
 
-  it('uses the supplied granularity', async () => {
+  it('uses the selected resolution', async () => {
     mockedHttpGet.mockResolvedValue({} as ParkingHistory);
-
-    await parkingApi.getHistory(
-      'park-ride-ashfield' as never,
-      '2026-01-01',
-      '2026-01-07',
-      'DAILY'
-    );
-
+    await parkingApi.getHistory('park-ride-ashfield', '2026-01-01', '2026-01-07', 'SIX_HOUR');
     expect(httpGet).toHaveBeenCalledWith(
-      '/api/v1/parking/park-ride-ashfield/history?from=2026-01-01&to=2026-01-07&granularity=DAILY'
+      '/api/v1/parking/park-ride-ashfield/history?from=2026-01-01&to=2026-01-07&resolution=SIX_HOUR'
     );
   });
 });

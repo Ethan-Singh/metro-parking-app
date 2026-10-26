@@ -1,81 +1,56 @@
 import { describe, it, expect } from 'vitest';
-import type { DataPoint } from '../../../../main/features/parking/types.ts';
-import { buildHistorySummary } from '../../../../main/features/parking/utils/historySummary.ts';
+import { buildDailyHistoryMetrics } from '../../../../main/features/parking/utils/historySummary.ts';
 
-function dp(
-  timestamp: string,
-  occupancyRate: number,
-  available: number
-): DataPoint {
-  return {
-    timestamp,
-    occupancy: 0,
-    occupancyRate,
-    available,
-  };
-}
+describe('buildDailyHistoryMetrics', () => {
+  it('keeps expected free counts and threshold crossings separate by Sydney day', () => {
+    const monday7am = Date.parse('2026-10-25T20:00:00Z');
+    const monday8am = Date.parse('2026-10-25T21:00:00Z');
+    const mondayHalf = Date.parse('2026-10-25T22:51:00Z');
+    const monday90 = Date.parse('2026-10-26T02:00:00Z');
+    const mondayFull = Date.parse('2026-10-26T02:30:00Z');
+    const tuesday7am = Date.parse('2026-10-26T20:00:00Z');
+    const tuesday8am = Date.parse('2026-10-26T21:00:00Z');
+    const tuesdayHalf = Date.parse('2026-10-26T23:00:00Z');
 
-describe('buildHistorySummary', () => {
-  it('calculates peak occupancy correctly', () => {
-    const data = [
-      dp('2026-01-01T06:00:00Z', 0.2, 100),
-      dp('2026-01-01T10:00:00Z', 0.8, 20),
-      dp('2026-01-01T12:00:00Z', 0.6, 50),
-    ];
+    const [monday, tuesday] = buildDailyHistoryMetrics([
+      [monday7am, 0.2, 179],
+      [monday8am, 0.3, 136],
+      [mondayHalf, 0.5, 100],
+      [monday90, 0.9, 50],
+      [mondayFull, 1, 0],
+      [tuesday7am, 0.2, 163],
+      [tuesday8am, 0.3, 121],
+      [tuesdayHalf, 0.5, 80],
+    ]);
 
-    const result = buildHistorySummary(data);
-
-    expect(result.peakOccupancyRate).toBe(0.8);
-    expect(result.peakTime).toBeInstanceOf(Date);
+    expect(monday).toMatchObject({
+      date: '2026-10-26',
+      expectedFreeAt7am: 179,
+      expectedFreeAt8am: 136,
+      crossed50AtMs: mondayHalf,
+      crossed90AtMs: monday90,
+      fullAtMs: mondayFull,
+    });
+    expect(tuesday).toMatchObject({
+      date: '2026-10-27',
+      expectedFreeAt7am: 163,
+      expectedFreeAt8am: 121,
+      crossed50AtMs: tuesdayHalf,
+      crossed90AtMs: null,
+      fullAtMs: null,
+    });
   });
 
-  it('tracks lowest available spots', () => {
-    const data = [
-      dp('2026-01-01T06:00:00Z', 0.2, 100),
-      dp('2026-01-01T10:00:00Z', 0.8, 10),
-      dp('2026-01-01T12:00:00Z', 0.6, 30),
-    ];
-
-    const result = buildHistorySummary(data);
-
-    expect(result.lowestAvailable).toBe(10);
+  it('returns no commuter metrics for an empty range', () => {
+    expect(buildDailyHistoryMetrics([])).toEqual([]);
   });
 
-  it('detects first half-full, three-quarter, and 90% times', () => {
-    const data = [
-      dp('2026-01-01T06:00:00Z', 0.4, 80),
-      dp('2026-01-01T07:00:00Z', 0.5, 70), // half full
-      dp('2026-01-01T08:00:00Z', 0.75, 40), // three-quarter
-      dp('2026-01-01T09:00:00Z', 0.9, 20), // 90%
-    ];
-
-    const result = buildHistorySummary(data);
-
-    expect(result.halfFullTime).toBeInstanceOf(Date);
-    expect(result.threeQuarterFullTime).toBeInstanceOf(Date);
-    expect(result.ninetyPercentTime).toBeInstanceOf(Date);
-  });
-
-  it('selects correct 7am and 8am closest snapshots per day', () => {
-    const data = [
-      dp('2026-01-01T07:10:00Z', 0.3, 90),
-      dp('2026-01-01T07:50:00Z', 0.4, 80), // closer to 7am target
-      dp('2026-01-01T08:05:00Z', 0.5, 70),
-      dp('2026-01-01T08:30:00Z', 0.6, 60), // closer to 8am target
-    ];
-
-    const result = buildHistorySummary(data);
-
-    expect(result.availableAt7am).toBeDefined();
-    expect(result.availableAt8am).toBeDefined();
-  });
-
-  it('handles empty input safely', () => {
-    const result = buildHistorySummary([]);
-
-    expect(result.peakOccupancyRate).toBe(0);
-    expect(result.lowestAvailable).toBeNull();
-    expect(result.availableAt7am).toBeNull();
-    expect(result.availableAt8am).toBeNull();
+  it('keeps requested dates visible when a day has no samples', () => {
+    const metrics = buildDailyHistoryMetrics([], '2026-10-25', '2026-10-27');
+    expect(metrics.map(({ date, fullAtMs }) => ({ date, fullAtMs }))).toEqual([
+      { date: '2026-10-25', fullAtMs: null },
+      { date: '2026-10-26', fullAtMs: null },
+      { date: '2026-10-27', fullAtMs: null },
+    ]);
   });
 });

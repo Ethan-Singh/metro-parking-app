@@ -2,19 +2,18 @@ import { Box, Chip, Typography, Stack, Skeleton } from '@mui/material';
 import { Info, CheckCircle } from '@mui/icons-material';
 import { tokens } from '../../../css/tokens.ts';
 import TFNSWLogo from '../../../assets/TFNSW.png';
+import { formatSydneyTime } from '../utils/sydneyTime.ts';
 
 interface Props {
-  lastUpdated?: string;
-  isFresh?: boolean;
+  lastUpdated?: number;
   isLoading?: boolean;
 }
 
 export function DataCredits({
   lastUpdated,
-  isFresh = true,
   isLoading = false,
 }: Props) {
-  const getTimeAgo = (timestamp: string) => {
+  const getTimeAgo = (timestamp: number) => {
     const date = new Date(timestamp);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
@@ -23,7 +22,7 @@ export function DataCredits({
     if (diffSecs < 60) return 'Just now';
     if (diffSecs < 3600) return `${Math.floor(diffSecs / 60)}m ago`;
     if (diffSecs < 86400) return `${Math.floor(diffSecs / 3600)}h ago`;
-    return date.toLocaleDateString('en-AU', { month: 'short', day: 'numeric' });
+    return formatSydneyTime(timestamp, { month: 'short', day: 'numeric' });
   };
 
   if (isLoading) {
@@ -84,7 +83,7 @@ export function DataCredits({
       </Stack>
 
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-        {isFresh && (
+        {lastUpdated !== undefined && (
           <Chip
             icon={
               <CheckCircle
@@ -93,7 +92,7 @@ export function DataCredits({
                 }}
               />
             }
-            label="Live Data"
+            label="Latest sample"
             size="small"
             sx={{
               backgroundColor: `${tokens.color.success}15`,

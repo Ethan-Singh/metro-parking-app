@@ -10,23 +10,25 @@ describe('parkingKeys', () => {
     expect(parkingKeys.list()).toEqual(['parking', 'list']);
   });
 
-  it('creates the overview key', () => {
-    expect(parkingKeys.overview('park-ride-ashfield')).toEqual([
+  it('creates the facility live key', () => {
+    expect(parkingKeys.live('park-ride-ashfield')).toEqual([
       'parking',
-      'overview',
+      'live',
       'park-ride-ashfield',
     ]);
   });
 
   it('creates the history key', () => {
     expect(
-      parkingKeys.history('park-ride-ashfield', '2026-01-01', '2026-01-07')
+      parkingKeys.history('park-ride-ashfield', '2026-01-01', '2026-01-07', 7, 'AUTO')
     ).toEqual([
       'parking',
       'history',
       'park-ride-ashfield',
       '2026-01-01',
       '2026-01-07',
+      7,
+      'AUTO',
     ]);
   });
 });

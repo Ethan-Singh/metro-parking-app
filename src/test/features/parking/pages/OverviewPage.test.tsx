@@ -8,19 +8,19 @@ import type { ReactNode } from 'react';
 type Facility = {
   slug: string;
   facilityName: string;
-  timestamp: string;
+  timeMs: number;
 };
 
 const mockData: Facility[] = [
   {
     slug: 'park-ride-ashfield',
     facilityName: 'Ashfield Parking',
-    timestamp: '2026-07-29T08:30:00',
+    timeMs: 1785313800000,
   },
   {
     slug: 'park-ride-bella-vista',
     facilityName: 'Bella Vista Parking',
-    timestamp: '2026-07-29T08:35:00',
+    timeMs: 1785314100000,
   },
 ];
 
@@ -41,7 +41,7 @@ vi.mock('../../../../main/features/parking/components/QueryBoundary', () => ({
 }));
 
 vi.mock('../../../../main/features/parking/components/DataCredits', () => ({
-  DataCredits: ({ lastUpdated }: { lastUpdated?: string }) => (
+  DataCredits: ({ lastUpdated }: { lastUpdated?: number }) => (
     <div data-testid="last-updated">{lastUpdated}</div>
   ),
 }));
@@ -131,7 +131,7 @@ describe('OverviewPage', () => {
     render(<OverviewPage />);
 
     expect(screen.getByTestId('last-updated')).toHaveTextContent(
-      '2026-07-29T08:35:00'
+      '1785314100000'
     );
   });
 });

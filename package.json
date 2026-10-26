@@ -13,7 +13,8 @@
     "check": "eslint . && prettier . --check",
     "test": "vitest",
     "test:run": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "api:sync": "npx --yes --package openapi-typescript@7.13.0 openapi-typescript https://raw.githubusercontent.com/Ethan-Singh/Metro-Parking-Web-Service/main/docs/apis/metro-parking-api-v1.yaml -o src/main/features/parking/api/openapi.generated.d.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -34,6 +35,7 @@
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.61.1",
     "@rolldown/plugin-babel": "^0.2.3",
+    "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",

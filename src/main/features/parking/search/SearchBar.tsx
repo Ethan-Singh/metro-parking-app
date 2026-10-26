@@ -44,17 +44,31 @@ export function SearchBar() {
 
   const handleSelect = (slug: string) => {
     clear();
-    navigate(`/facility/${slug}`);
+    navigate(`/facility/${encodeURIComponent(slug)}`);
   };
 
   return (
     <Box>
       <OutlinedInput
         fullWidth
+        inputProps={{
+          'aria-label': 'Search parking facilities',
+          role: 'combobox',
+          'aria-expanded': show && results.length > 0,
+          'aria-controls': 'facility-search-results',
+          autoComplete: 'off',
+        }}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
+        onKeyDown={(event) => {
+          if (event.key === 'Enter' && results[0]) {
+            event.preventDefault();
+            handleSelect(results[0].slug);
+          }
+          if (event.key === 'Escape') clear();
+        }}
         placeholder="Search facilities..."
         inputRef={setAnchorEl}
         startAdornment={
@@ -87,19 +101,25 @@ export function SearchBar() {
       >
         <Paper
           sx={{
-            bgcolor: '#fff',
-            border: '1px solid rgba(0,0,0,0.08)',
-            boxShadow: '0px 8px 24px rgba(0,0,0,0.12)',
+            bgcolor: 'background.paper',
+            border: 1,
+            borderColor: 'divider',
+            boxShadow: 4,
             borderRadius: 2,
             mt: 1,
-            width: anchorEl?.clientWidth ?? 'auto',
+            width: anchorEl?.clientWidth ?? '100%',
+            maxHeight: 'min(60vh, 24rem)',
+            overflowY: 'auto',
           }}
         >
-          <List dense>
+          <List dense id="facility-search-results" role="listbox" disablePadding>
             {results.slice(0, 3).map((f) => (
               <ListItemButton
                 key={f.slug}
-                onMouseDown={() => handleSelect(f.slug)}
+                role="option"
+                aria-selected={false}
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => handleSelect(f.slug)}
               >
                 <ListItemText
                   primary={f.facilityName}

@@ -9,38 +9,45 @@ import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
 import { ArrowBack } from '@mui/icons-material';
 import { FacilityHistoryChart } from '../components/FacilityHistoryChart.tsx';
+import { DailyCommuterMetrics } from '../components/DailyCommuterMetrics.tsx';
 import { DataCredits } from '../components/DataCredits.tsx';
 import {
   useFacilityHistory,
-  useFacilityOverview,
+  useFacilityLive,
+  useFacilityRecentHistory,
 } from '../api/useParkingQueries.ts';
 import { QueryBoundary } from '../components/QueryBoundary.tsx';
 import type { FacilitySlug } from '../types.ts';
+import type { HistoryRangeDays, RequestedHistoryResolution } from '../types.ts';
+import { useState } from 'react';
 
 export default function FacilityPage() {
   const navigate = useNavigate();
 
   const params = useParams<{ slug: string }>();
   const slug = params.slug;
+  const [rangeDays, setRangeDays] = useState<HistoryRangeDays>(1);
+  const [resolution, setResolution] = useState<RequestedHistoryResolution>('TEN_MINUTE');
 
   const safeSlug = slug as FacilitySlug | undefined;
 
-  const overview = useFacilityOverview(safeSlug as FacilitySlug);
-  const history = useFacilityHistory(safeSlug as FacilitySlug);
+  const live = useFacilityLive(safeSlug);
+  const history = useFacilityHistory(safeSlug, rangeDays, resolution);
+  const commuterHistory = useFacilityRecentHistory(safeSlug, 3, Boolean(slug));
 
   if (!slug) {
     return <Alert severity="error">Missing facility slug</Alert>;
   }
 
-  const f = overview.data;
+  const f = live.data;
   const percent = f ? Math.round(f.occupancyRate * 100) : 0;
 
   return (
     <Stack spacing={3}>
       {/* HEADER */}
       <QueryBoundary
-        isLoading={overview.isLoading}
-        isError={overview.isError}
+        isLoading={live.isLoading}
+        isError={live.isError}
         loading={<Skeleton height={60} />}
       >
         <Box sx={{ mb: 1 }}>
@@ -59,18 +66,17 @@ export default function FacilityPage() {
       </QueryBoundary>
 
       {/* DATA CREDITS */}
-      <QueryBoundary isLoading={overview.isLoading} isError={overview.isError}>
+      <QueryBoundary isLoading={live.isLoading} isError={live.isError}>
         <DataCredits
-          lastUpdated={f?.timestamp}
-          isFresh={true}
-          isLoading={overview.isLoading}
+          lastUpdated={f?.timeMs}
+          isLoading={live.isLoading}
         />
       </QueryBoundary>
 
       {/* METRICS */}
       <QueryBoundary
-        isLoading={overview.isLoading}
-        isError={overview.isError}
+        isLoading={live.isLoading}
+        isError={live.isError}
         loading={<Skeleton height={120} />}
       >
         <Card data-testid="parking-metrics">
@@ -93,6 +99,7 @@ export default function FacilityPage() {
                   sx={{ fontWeight: 700 }}
                 >
                   {percent}%
+                  {f?.occupancyRate !== undefined && f.occupancyRate > 1 ? ' occupied' : ''}
                 </Typography>
               </Box>
 
@@ -128,6 +135,17 @@ export default function FacilityPage() {
         </Card>
       </QueryBoundary>
 
+      {/* DAILY COMMUTER METRICS */}
+      <Card data-testid="daily-commuter-metrics-card">
+        <CardContent>
+          <DailyCommuterMetrics
+            history={commuterHistory.data}
+            isLoading={commuterHistory.isLoading}
+            isError={commuterHistory.isError}
+          />
+        </CardContent>
+      </Card>
+
       {/* CHART */}
       <QueryBoundary
         isLoading={history.isLoading}
@@ -136,7 +154,13 @@ export default function FacilityPage() {
       >
         <Card>
           <CardContent>
-            <FacilityHistoryChart dataPoints={history.data?.dataPoints ?? []} />
+            <FacilityHistoryChart
+              history={history.data}
+              rangeDays={rangeDays}
+              resolution={resolution}
+              onRangeDaysChange={setRangeDays}
+              onResolutionChange={setResolution}
+            />
           </CardContent>
         </Card>
       </QueryBoundary>
