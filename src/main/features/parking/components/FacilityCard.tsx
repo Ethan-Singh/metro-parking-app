@@ -12,7 +12,7 @@ import { formatSydneyTime } from '../utils/sydneyTime.ts';
 import { useFacilityRecentHistory } from '../api/useParkingQueries.ts';
 import { DailyCommuterMetrics } from './DailyCommuterMetrics.tsx';
 
-export function FacilityCard({ facility }: { facility: LiveCarPark }) {
+export function FacilityCard({ facility, title = facility.facilityName }: { facility: LiveCarPark; title?: string }) {
   const [quickViewOpen, setQuickViewOpen] = useState(false);
   const preview = useFacilityRecentHistory(facility.slug, 1, quickViewOpen);
   const percent = Math.round(facility.occupancyRate * 100);
@@ -23,14 +23,14 @@ export function FacilityCard({ facility }: { facility: LiveCarPark }) {
   const Icon = availability?.icon;
 
   return (
-    <Card data-testid="facility-card" sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Card data-testid="facility-card" sx={{ minHeight: 180, display: 'flex', flexDirection: 'column' }}>
       <CardActionArea
         component={RouterLink}
         to={`/facility/${encodeURIComponent(facility.slug)}`}
         aria-label={facility.ariaLabel || facility.facilityName}
         sx={{ flex: 1, alignItems: 'stretch', '& .MuiCardActionArea-focusHighlight': { borderRadius: 2 } }}
       >
-      <CardContent>
+      <CardContent sx={{ pt: 1.5, pb: 0.5, '&:last-child': { pb: 0.5 } }}>
         {/* HEADER */}
         <Box
           sx={{
@@ -41,14 +41,14 @@ export function FacilityCard({ facility }: { facility: LiveCarPark }) {
           }}
         >
           <Typography variant="h6" sx={{ flex: 1 }}>
-            {facility.facilityName}
+            {title}
           </Typography>
 
           <LineBadge slug={facility.slug} />
         </Box>
 
         {/* STATS */}
-        <Box sx={{ mt: 2 }}>
+        <Box sx={{ mt: 1.5 }}>
           <Typography variant="body2" sx={{ fontWeight: 700, color }}>
             {facility.occupancy} / {facility.spots}
           </Typography>
@@ -79,7 +79,7 @@ export function FacilityCard({ facility }: { facility: LiveCarPark }) {
             display: 'flex',
             alignItems: 'center',
             gap: 1,
-            mt: 2,
+            mt: 1.5,
             flexWrap: 'wrap',
           }}
         >
@@ -126,14 +126,14 @@ export function FacilityCard({ facility }: { facility: LiveCarPark }) {
         aria-controls={`quick-view-${facility.slug}`}
         onClick={() => setQuickViewOpen((open) => !open)}
         endIcon={<ExpandMore sx={{ transform: quickViewOpen ? 'rotate(180deg)' : 'none', transition: 'transform 180ms ease' }} />}
-        sx={{ justifyContent: 'space-between', mx: 1, mb: 0.5, px: 1.5, textTransform: 'none', color: 'text.secondary' }}
+        sx={{ justifyContent: 'space-between', mx: 1, mb: 0.25, px: 1.5, py: 0.5, minHeight: 36, textTransform: 'none', color: 'text.secondary' }}
       >
         Quick view
       </Button>
       <Collapse in={quickViewOpen} timeout="auto" unmountOnExit>
         <Box id={`quick-view-${facility.slug}`} sx={{ px: 2, pb: 2 }}>
           <DailyCommuterMetrics history={preview.data} isLoading={preview.isLoading} isError={preview.isError} />
-          <Typography variant="caption" color="text.secondary">Today&apos;s occupancy | 10-minute detail | Sydney time</Typography>
+          <Typography variant="caption" color="text.secondary">Today&apos;s occupancy | 10-minute detail</Typography>
           {preview.isLoading ? (
             <Box sx={{ height: 180, display: 'grid', placeItems: 'center' }}><CircularProgress size={24} aria-label="Loading quick view" /></Box>
           ) : preview.data?.points.length ? (
@@ -180,8 +180,8 @@ function buildQuickViewOption(points: [number, number, number][]) {
     series: [{
       type: 'line', showSymbol: false,
       data: points.map(([timeMs, rate]) => [timeMs, rate * 100]),
-      lineStyle: { width: 2, color: tokens.color.primary },
-      areaStyle: { color: `${tokens.color.primary}22` },
+      lineStyle: { width: 2, color: tokens.color.grassDark },
+      areaStyle: { color: `${tokens.color.grassDark}22` },
     }],
   };
 }

@@ -28,6 +28,17 @@ test.describe('Overview Page', () => {
             ariaLabel: 'Ashfield, 217 of 228 spots available',
           },
           {
+            slug: 'park-ride-bella-vista',
+            facilityName: 'Park&Ride - Bella Vista',
+            spots: 150,
+            occupancy: 45,
+            available: 105,
+            occupancyRate: 0.3,
+            availability: 'AVAILABLE',
+            timeMs: 1783031812000,
+            ariaLabel: 'Bella Vista, 105 of 150 spots available',
+          },
+          {
             slug: 'central-station',
             facilityName: 'Central Station',
             spots: 100,
@@ -61,23 +72,37 @@ test.describe('Overview Page', () => {
     ).toBeVisible();
 
     // The result count is shown as a readable facility label.
-    await expect(page.getByText('2 parking facilities')).toBeVisible();
+    await expect(page.getByText('3 parking facilities')).toBeVisible();
 
     // cards should render
     const cards = page.locator('[data-testid="facility-card"]');
     await expect(cards.first()).toBeVisible();
 
     // sanity check: at least 2 facilities rendered
-    await expect(cards).toHaveCount(2);
+    await expect(cards).toHaveCount(3);
 
     // The dedicated Quick view button expands data without navigating.
-    const ashfieldCard = cards.filter({ hasText: 'Park&Ride - Ashfield' });
-    await ashfieldCard.getByRole('button', { name: /quick view/i }).click();
+    await expect(page.getByRole('button', { name: 'Park & Ride facilities' })).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.getByRole('button', { name: 'Other facilities' })).toHaveAttribute('aria-expanded', 'false');
+    const ashfieldCard = cards.filter({ hasText: 'Ashfield' });
+    const bellaVistaCard = cards.filter({ hasText: 'Bella Vista' });
+    const ashfieldQuickView = ashfieldCard.getByRole('button', { name: /quick view/i });
+    const bellaVistaQuickView = bellaVistaCard.getByRole('button', { name: /quick view/i });
+    const quickViewYBefore = (await ashfieldQuickView.boundingBox())!.y;
+    const bellaVistaQuickViewYBefore = (await bellaVistaQuickView.boundingBox())!.y;
+    expect(Math.abs(quickViewYBefore - bellaVistaQuickViewYBefore)).toBeLessThan(2);
+
+    const bellaVistaHeightBefore = (await bellaVistaCard.boundingBox())!.height;
+    await ashfieldQuickView.click();
     await expect(ashfieldCard.getByText('Daily commuter metrics')).toBeVisible();
     await expect(ashfieldCard.getByText('7 AM free')).toBeVisible();
     await expect(ashfieldCard.getByText('Full by')).toBeVisible();
     await expect(ashfieldCard.locator('canvas')).toHaveCount(1);
     await expect(page).toHaveURL('/');
+
+    expect((await ashfieldCard.boundingBox())!.height).toBeGreaterThan(bellaVistaHeightBefore);
+    expect((await bellaVistaCard.boundingBox())!.height).toBe(bellaVistaHeightBefore);
+    expect(Math.abs((await bellaVistaQuickView.boundingBox())!.y - bellaVistaQuickViewYBefore)).toBeLessThan(2);
 
     // Clicking the rest of the card still opens the facility page.
     await ashfieldCard.getByRole('link', { name: /Ashfield, 217 of 228 spots available/i }).click();

@@ -14,19 +14,19 @@ type Facility = {
 const mockData: Facility[] = [
   {
     slug: 'park-ride-ashfield',
-    facilityName: 'Ashfield Parking',
+    facilityName: 'Park&Ride - Ashfield Parking',
     timeMs: 1785313800000,
   },
   {
     slug: 'park-ride-bella-vista',
-    facilityName: 'Bella Vista Parking',
+    facilityName: 'Park&Ride - Bella Vista Parking',
     timeMs: 1785314100000,
   },
 ];
 
 vi.mock('../../../../main/features/parking/components/FacilityCard', () => ({
-  FacilityCard: ({ facility }: { facility: Facility }) => (
-    <div data-testid="facility-card">{facility.facilityName}</div>
+  FacilityCard: ({ facility, title }: { facility: Facility; title?: string }) => (
+    <div data-testid="facility-card">{title ?? facility.facilityName}</div>
   ),
 }));
 
@@ -81,6 +81,23 @@ describe('OverviewPage', () => {
     render(<OverviewPage />);
 
     expect(screen.getAllByTestId('facility-card')).toHaveLength(2);
+    expect(screen.getByRole('button', { name: 'Park & Ride facilities' })).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.queryByRole('button', { name: 'Other facilities' })).not.toBeInTheDocument();
+    expect(screen.getByText('Ashfield Parking')).toBeInTheDocument();
+    expect(screen.queryByText(/^Park&Ride/)).not.toBeInTheDocument();
+  });
+
+  it('shows a collapsed Others group only when a facility is not Park & Ride', () => {
+    vi.spyOn(hooks, 'useParkingQueries').mockReturnValue({
+      data: [...mockData, { slug: 'central-station', facilityName: 'Central Station', timeMs: 1785314400000 }],
+      isLoading: false,
+      isError: false,
+    } as unknown as ReturnType<typeof hooks.useParkingQueries>);
+    vi.spyOn(search, 'useSearch').mockReturnValue({ query: '' } as ReturnType<typeof search.useSearch>);
+
+    render(<OverviewPage />);
+
+    expect(screen.getByRole('button', { name: 'Other facilities' })).toHaveAttribute('aria-expanded', 'false');
   });
 
   it('filters by facility name', () => {

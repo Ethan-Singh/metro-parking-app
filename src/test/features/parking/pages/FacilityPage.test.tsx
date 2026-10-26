@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, within } from '@testing-library/react';
 import FacilityPage from '../../../../main/features/parking/pages/FacilityPage';
 import * as router from 'react-router-dom';
 import * as hooks from '../../../../main/features/parking/api/useParkingQueries';
@@ -118,6 +118,7 @@ describe('FacilityPage', () => {
     const metricsCard = screen.getByTestId('daily-commuter-metrics-card');
     const chart = screen.getByTestId('chart');
     expect(metricsCard).toBeInTheDocument();
+    expect(within(metricsCard).getByLabelText('Weekend')).toBeInTheDocument();
     expect(metricsCard.compareDocumentPosition(chart) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 

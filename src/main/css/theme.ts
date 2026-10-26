@@ -36,8 +36,7 @@ export const theme = createTheme({
     MuiCssBaseline: {
       styleOverrides: {
         body: {
-          background:
-            'linear-gradient(180deg, #91CCFF 0%, #FFE7D6 35%, #CFE4C9 100%)',
+          background: tokens.gradient.app,
           backgroundAttachment: 'fixed',
           fontVariantNumeric: 'tabular-nums',
         },

@@ -1,11 +1,15 @@
 import Grid from '@mui/material/Grid';
-import { Typography, Box, Stack } from '@mui/material';
+import { Typography, Box, Stack, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import ExpandMore from '@mui/icons-material/ExpandMore';
+import ParkRideLogo from '../../../assets/Park&Ride.png';
+import { tokens } from '../../../css/tokens.ts';
 import { useParkingQueries } from '../api/useParkingQueries.ts';
 import { FacilityCard } from '../components/FacilityCard.tsx';
 import { QueryBoundary } from '../components/QueryBoundary.tsx';
 import { useSearch } from '../search/useSearch.tsx';
 import { DataCredits } from '../components/DataCredits.tsx';
 import { SearchBarEmpty } from '../search/SearchBarEmpty.tsx';
+import type { LiveCarPark } from '../types.ts';
 
 export default function OverviewPage() {
   const { data, isLoading, isError } = useParkingQueries();
@@ -30,6 +34,8 @@ export default function OverviewPage() {
 
   const hasSearchQuery = q.length > 0;
   const isEmpty = results.length === 0 && hasSearchQuery;
+  const parkAndRide = results.filter((facility) => isParkAndRide(facility.facilityName));
+  const others = results.filter((facility) => !isParkAndRide(facility.facilityName));
 
   return (
     <Stack spacing={3}>
@@ -64,15 +70,71 @@ export default function OverviewPage() {
             }}
           />
         ) : (
-          <Grid container spacing={2} sx={{ width: '100%' }}>
-            {results.map((f) => (
-              <Grid key={f.slug} size={{ xs: 12, sm: 6, md: 4 }}>
-                <FacilityCard facility={f} />
-              </Grid>
-            ))}
-          </Grid>
+          <Stack spacing={2} sx={{ width: '100%' }}>
+            {parkAndRide.length > 0 && (
+              <Accordion
+                defaultExpanded
+                disableGutters
+                sx={{
+                  overflow: 'hidden',
+                  borderRadius: `${tokens.radius.primary}px`,
+                  border: `1px solid ${tokens.color.primaryBorder}`,
+                  backgroundColor: 'transparent',
+                  '&:before': { display: 'none' },
+                }}
+              >
+                <AccordionSummary
+                  expandIcon={<ExpandMore sx={{ color: 'common.white' }} />}
+                  aria-label="Park & Ride facilities"
+                  sx={{ minHeight: 56, bgcolor: tokens.color.primary, color: 'common.white', '&.Mui-expanded': { minHeight: 56 } }}
+                >
+                  <Box sx={{ display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'space-between', gap: 1, pr: 1 }}>
+                    <Box component="img" src={ParkRideLogo} alt="Park & Ride" sx={{ display: 'block', width: { xs: 142, sm: 170 }, height: 'auto', borderRadius: `${tokens.radius.primary * tokens.radius.secondary}px` }} />
+                    <Typography variant="body2" sx={{ color: 'common.white', fontWeight: 600 }}>
+                      {parkAndRide.length} {parkAndRide.length === 1 ? 'facility' : 'facilities'}
+                    </Typography>
+                  </Box>
+                </AccordionSummary>
+                <AccordionDetails sx={{ p: 0, pt: 2 }}>
+                  <FacilityGrid facilities={parkAndRide} />
+                </AccordionDetails>
+              </Accordion>
+            )}
+
+            {others.length > 0 && (
+              <Accordion disableGutters sx={{ borderRadius: `${tokens.radius.primary}px`, overflow: 'hidden' }}>
+                <AccordionSummary expandIcon={<ExpandMore />} aria-label="Other facilities">
+                  <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>Others ({others.length})</Typography>
+                </AccordionSummary>
+                <AccordionDetails sx={{ p: 0, pt: 2 }}>
+                  <FacilityGrid facilities={others} />
+                </AccordionDetails>
+              </Accordion>
+            )}
+          </Stack>
         )}
       </QueryBoundary>
     </Stack>
   );
+}
+
+function FacilityGrid({ facilities }: { facilities: LiveCarPark[] }) {
+  return (
+    <Grid container spacing={2} sx={{ width: '100%', alignItems: 'start' }}>
+      {facilities.map((facility) => (
+        <Grid key={facility.slug} size={{ xs: 12, sm: 6, md: 4 }}>
+          <FacilityCard facility={facility} title={cardTitle(facility.facilityName)} />
+        </Grid>
+      ))}
+    </Grid>
+  );
+}
+
+function isParkAndRide(name: string) {
+  const normalized = name.toLowerCase().replace(/[\s&-]/g, '');
+  return normalized.includes('parkride') || normalized.includes('parkandride');
+}
+
+function cardTitle(name: string) {
+  return name.replace(/^\s*park\s*(?:&|and)\s*ride\s*(?:[-:]\s*)?/i, '').trim();
 }
