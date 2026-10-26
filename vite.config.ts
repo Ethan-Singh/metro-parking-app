@@ -19,6 +19,6 @@ export default defineConfig({
 
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
 
-    exclude: ['e2e/**', 'node_modules/**'],
+    exclude: ['src/test/e2e/**', 'e2e/**', 'node_modules/**'],
   },
 });
