@@ -9,7 +9,7 @@ import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
 import ArrowBack from '@mui/icons-material/ArrowBack';
 import { FacilityHistoryChart } from '../components/FacilityHistoryChart.tsx';
-import { DailyCommuterMetrics } from '../components/DailyCommuterMetrics.tsx';
+import { DailyMetrics } from '../components/DailyMetrics.tsx';
 import { DataCredits } from '../components/DataCredits.tsx';
 import {
   useFacilityHistory,
@@ -161,7 +161,7 @@ export default function FacilityPage() {
       {/* DAILY COMMUTER METRICS */}
       <Card data-testid="daily-commuter-metrics-card">
         <CardContent>
-          <DailyCommuterMetrics
+          <DailyMetrics
             metrics={commuterMetrics.data}
             facilitySlug={slug}
             isLoading={commuterMetrics.isLoading}

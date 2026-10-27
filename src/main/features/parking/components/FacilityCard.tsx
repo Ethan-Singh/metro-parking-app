@@ -22,7 +22,7 @@ import {
   useFacilityDailyMetrics,
   useFacilityRecentHistory,
 } from '../api/useParkingQueries.ts';
-import { DailyCommuterMetrics } from './DailyCommuterMetrics.tsx';
+import { DailyMetrics } from './DailyMetrics.tsx';
 import { LazyECharts } from './LazyECharts.ts';
 import { summarizeOccupancyHistory } from '../utils/chartSummary.ts';
 import { getFacilityAccent } from '../utils/facilityAccent.ts';
@@ -206,7 +206,7 @@ export function FacilityCard({
       </Button>
       <Collapse in={quickViewOpen} timeout="auto" unmountOnExit>
         <Box id={`quick-view-${facility.slug}`} sx={{ px: 2, pb: 2 }}>
-          <DailyCommuterMetrics
+          <DailyMetrics
             metrics={commuterMetrics.data}
             facilitySlug={facility.slug}
             isLoading={commuterMetrics.isLoading}

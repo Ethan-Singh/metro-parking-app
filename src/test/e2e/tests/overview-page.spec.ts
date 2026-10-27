@@ -194,9 +194,7 @@ test.describe('Overview Page', () => {
 
     const bellaVistaHeightBefore = (await bellaVistaCard.boundingBox())!.height;
     await ashfieldQuickView.click();
-    await expect(
-      ashfieldCard.getByText('Daily commuter metrics')
-    ).toBeVisible();
+    await expect(ashfieldCard.getByText('Daily metrics')).toBeVisible();
     await expect(ashfieldCard.getByText('7 AM free')).toBeVisible();
     await expect(ashfieldCard.getByText('Full', { exact: true })).toBeVisible();
     await expect(

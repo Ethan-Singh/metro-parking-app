@@ -13,7 +13,7 @@ interface Props {
   isError?: boolean;
 }
 
-export function DailyCommuterMetrics({
+export function DailyMetrics({
   metrics,
   facilitySlug,
   isLoading = false,
@@ -48,7 +48,7 @@ export function DailyCommuterMetrics({
             variant="h6"
             sx={{ color: accent.heading, fontWeight: 700, lineHeight: 1.2 }}
           >
-            Daily commuter metrics
+            Daily metrics
           </Typography>
           <Typography variant="body2" sx={{ color: accent.heading }}>
             {periodLabel}

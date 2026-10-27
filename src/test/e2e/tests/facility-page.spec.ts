@@ -136,7 +136,7 @@ test.describe('Facility Page (data-driven)', () => {
     await expect(page).toHaveURL('/facility/park-ride-bella-vista');
   });
 
-  test('renders live facility data and a separate three-day commuter metrics card', async ({
+  test('renders live facility data and a separate three-day Daily metrics card', async ({
     page,
   }) => {
     await page.goto(`/facility/${slug}`);

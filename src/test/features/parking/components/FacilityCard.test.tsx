@@ -101,7 +101,7 @@ describe('FacilityCard', () => {
     fireEvent.click(quickView);
 
     expect(quickView).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.getByText('Daily commuter metrics')).toBeInTheDocument();
+    expect(screen.getByText('Daily metrics')).toBeInTheDocument();
     expect(
       screen.getByText(/No commuter metrics are available/i)
     ).toBeInTheDocument();

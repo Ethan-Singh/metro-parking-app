@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
-import { DailyCommuterMetrics } from '../../../../main/features/parking/components/DailyCommuterMetrics';
+import { DailyMetrics } from '../../../../main/features/parking/components/DailyMetrics';
 import type { DailyParkingMetrics } from '../../../../main/features/parking/types';
 
 const metrics: DailyParkingMetrics = {
@@ -19,13 +19,10 @@ const metrics: DailyParkingMetrics = {
   ],
 };
 
-describe('DailyCommuterMetrics', () => {
+describe('DailyMetrics', () => {
   it('shows the 7 AM and 8 AM free-space callouts and a milestone timeline', () => {
     render(
-      <DailyCommuterMetrics
-        metrics={metrics}
-        facilitySlug="park-ride-ashfield"
-      />
+      <DailyMetrics metrics={metrics} facilitySlug="park-ride-ashfield" />
     );
 
     expect(screen.getByText('7 AM free: 179 spaces')).toBeInTheDocument();
@@ -47,7 +44,7 @@ describe('DailyCommuterMetrics', () => {
       ...metrics,
       days: [{ ...metrics.days[0], crossed50AtMs: null, fullAtMs: null }],
     };
-    render(<DailyCommuterMetrics metrics={missingMilestones} />);
+    render(<DailyMetrics metrics={missingMilestones} />);
 
     expect(screen.getByText('50% full')).toBeInTheDocument();
     expect(screen.getByText('90% full')).toBeInTheDocument();

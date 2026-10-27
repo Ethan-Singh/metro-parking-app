@@ -138,7 +138,7 @@ describe('FacilityPage', () => {
     );
   });
 
-  it('keeps commuter metrics in their own card above the historical chart', () => {
+  it('keeps Daily metrics in its own card above the historical chart', () => {
     render(<FacilityPage />);
     const metricsCard = screen.getByTestId('daily-commuter-metrics-card');
     const chart = screen.getByTestId('chart');
