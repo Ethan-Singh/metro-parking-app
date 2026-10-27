@@ -15,6 +15,8 @@ Bring the React app in line with the current backend contract and its rolling da
 
 The frontend currently polls list, facility live data, selected history, and daily metrics every two minutes. This is a practical cadence for the rotating ingestion loop and rate limit; it is not a guarantee that every facility has a new sample every two minutes. Revisit it if the enabled-facility count, ingestion schedule, or backend rate limit changes. Keep the source sample time visible and format it in `Australia/Sydney`.
 
+Freshness indicators should be presented by the frontend from source `timeMs` and the current time; show a stale state after one hour without implying that the backend poll itself failed. The backend owns the meaning and accuracy of the source timestamp. If freshness must be authoritative and consistent across clients, add an explicit server-calculated freshness field to the API contract. Do not infer staleness from when the browser received or cached the response.
+
 ## API contract
 
 The backend repository publishes `docs/apis/metro-parking-api-v1.yaml`. Frontend types are generated from the live `main` branch URL using `openapi-typescript`:
@@ -51,7 +53,8 @@ Use generated schema types in one API module and avoid duplicate hand-written DT
 ## Mobile-first interface and search
 
 - Keep one-column facility cards on phones; use two or three columns only when names, availability, and update times remain readable.
-- Make each facility card a semantic link with visible keyboard focus and a comfortable touch area. Keep occupancy counts readable when occupancy exceeds capacity; never hide overflow in the source data.
+- Make each facility card a semantic link with visible keyboard focus and a comfortable touch area. Show occupied spaces / total parking spaces with the occupancy percentage in parentheses; keep counts readable when occupancy exceeds capacity and never hide upstream overflow.
+- On the facility page, show current occupancy as a plain percentage, available spaces as a whole count, and total capacity under the label “Parking spaces”. Color occupancy and availability with the existing success, warning, and error tokens, and retain text labels so status is not conveyed by color alone.
 - Keep the shared MUI autocomplete searchable by facility name and slug, with ArrowUp/ArrowDown/Enter selection, Escape dismissal, touch-sized suggestions, visible result count, and a compact no-results state. Keep suggestions inside the viewport on narrow screens and avoid obscuring page actions.
 - Let the content breathe on mobile: compact header and page padding, clear section headings, stable card spacing, and no horizontal overflow at 320, 360, and 390 px.
 - Use semantic status labels and icons as well as color. Do not rely on hover-only details.
@@ -76,8 +79,9 @@ Use generated schema types in one API module and avoid duplicate hand-written DT
 - Plot epoch milliseconds against occupancy rate on an ECharts time axis. For a one-day range, label ticks with local hours (including AM/PM); for longer ranges, show both the Sydney weekday and hour so morning and evening patterns remain readable. Format tooltips and summaries explicitly in `Australia/Sydney`.
 - Let the parent control chart height at breakpoints, use ECharts resize handling after rotation/container changes, reduce tick/margin clutter on phones, and avoid requiring horizontal page scrolling.
 - Include a text summary or accessible data alternative for the key values. Preserve rates over 100% and make the 100% threshold visible.
-- Render commuter metrics in a separate card above historical occupancy so changing chart period or resolution never hides the metrics. Compare the latest three Sydney dates, with 7 AM free, 8 AM free, 50% full, 90% full, and the time each day first reached 100% capacity. Calculate every date independently; do not carry one day's milestones into another.
-- Style commuter metrics like a rail departure board: infer the section accent from each facility's primary transit badge, use a hollow parking symbol, clear date strips, and aligned high-contrast metric cells. Keep older days visually quieter and mark today and weekends without relying on color alone.
+- Render commuter metrics in a separate card above historical occupancy so changing chart period or resolution never hides them. Compare the latest three Sydney dates, with 7 AM free, 8 AM free, and the times each day first crossed 50%, crossed 90%, and reached full capacity. Calculate each date independently; never carry one day's milestones into another.
+- Show the three occupancy milestones on a 24-hour horizontal timeline, with their time labels directly beneath the track. Use the existing semantic success, warning, and error tokens for the 50%, 90%, and full markers. Keep 7 AM and 8 AM expected free-space values as concise callouts, and show missing milestones as unavailable.
+- Style commuter metrics like a rail departure board: infer the section accent from each facility's primary transit badge, use a hollow parking symbol, and keep clear date strips. Keep older days visually quieter and mark today and weekends without relying on color alone.
 - Render these rows from the backend daily-metrics endpoint, independently of the downsampled chart series. Keep each date's milestones isolated and display missing metrics as unavailable rather than carrying values forward from another day.
 - Consider a small forecast as a later, explicitly experimental feature. A client-side short-horizon trend can be misleading with sparse/coarsened observations and daily commuter patterns. Only show it when enough recent `TEN_MINUTE` points exist; label it as an estimate, visually separate it from observed data, and omit it when the trend is unstable. A backend forecast with a documented method and uncertainty range is preferable if the feature becomes a product requirement.
 
@@ -94,7 +98,7 @@ Refactor the current scattered styling into a small, semantic token layer used b
 ## Test organization and acceptance
 
 - Keep Vitest component/unit tests in `src/test`; keep Playwright scenarios in `src/test/e2e`. The Playwright config targets that directory, and Vitest excludes it.
-- Update API mocks and fixtures from generated contract types. Unit tests cover metadata updates, keyboard search behavior, occupancy progress semantics, and chart text summaries. Playwright covers overview and facility navigation, skip navigation and landmarks, dynamic page metadata, crawl files, keyboard search, Quick View expansion/alignment, chart controls, and commuter metrics.
+- Update API mocks and fixtures from generated contract types. Unit tests cover metadata updates, keyboard search behavior, occupancy progress semantics and percent labels, the commuter timeline's expected-free callouts and color-coded milestone markers, and chart text summaries. Playwright covers overview and facility navigation, skip navigation and landmarks, dynamic page metadata, crawl files, keyboard search, Quick View expansion/alignment, chart controls, and commuter timeline rendering and marker colors.
 - Verify that no frontend API call uses the old endpoint or payload fields.
 - Confirm that Sydney date/time is stable on devices configured for other time zones.
 - Confirm that list/live/history polling reflects the two-minute policy and that current-day history refreshes while historical ranges remain cacheable.
@@ -102,3 +106,8 @@ Refactor the current scattered styling into a small, semantic token layer used b
 - Run the Vitest suite and Playwright projects in Chromium, Firefox, and WebKit. Keep accessibility assertions focused on user-visible keyboard and semantic behavior; add an automated axe scan if an accessibility engine is introduced as a project dependency.
 - Re-run Lighthouse with browser extensions disabled and compare FCP/LCP, TBT, CLS, image transfer size, and the initial JavaScript payload against `docs/lighthouse/10272026.json`.
 - Check generated OpenAPI type changes as a reviewed diff after running `npm run api:sync`.
+
+## Follow-up product work
+
+- Add a visible stale-sample indicator when `timeMs` is more than one hour old. The frontend should calculate and present this from the source timestamp; the backend should continue to define and document the timestamp's meaning. If freshness must be authoritative across clients, extend the API with a server-calculated freshness field.
+- Design a trip-planner scaffold after its backend contract and ownership are agreed. Until then, avoid inventing frontend DTOs or implying that trip planning is available.

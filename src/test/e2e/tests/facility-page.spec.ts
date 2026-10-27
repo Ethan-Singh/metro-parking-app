@@ -96,9 +96,9 @@ test.describe('Facility Page (data-driven)', () => {
             date,
             expectedFreeAt7am: 179,
             expectedFreeAt8am: 136,
-            crossed50AtMs: null,
-            crossed90AtMs: null,
-            fullAtMs: null,
+            crossed50AtMs: Date.parse(`${date}T09:51:00+11:00`),
+            crossed90AtMs: Date.parse(`${date}T12:38:00+11:00`),
+            fullAtMs: Date.parse(`${date}T15:10:00+11:00`),
           })),
         },
       });
@@ -154,11 +154,27 @@ test.describe('Facility Page (data-driven)', () => {
     await expect(commuterCard.getByText('8 AM free').first()).toBeVisible();
     await expect(commuterCard.getByText('50% full').first()).toBeVisible();
     await expect(commuterCard.getByText('90% full').first()).toBeVisible();
-    await expect(commuterCard.getByText('Full by').first()).toBeVisible();
+    await expect(commuterCard.getByText('Full').first()).toBeVisible();
     await expect(commuterCard.getByText(/Most recent 3 days/i)).toBeVisible();
     await expect(
       commuterCard.getByText('Today').locator('xpath=../..')
     ).toContainText(/Today.*[A-Z][a-z]{2}, \d{1,2} [A-Z][a-z]{2}/);
+    const milestoneTimeline = commuterCard
+      .getByRole('img', { name: /Daily occupancy milestones/ })
+      .first();
+    await expect(milestoneTimeline).toBeVisible();
+    await expect(milestoneTimeline.getByTitle('50% full: 9:51 am')).toHaveCSS(
+      'background-color',
+      'rgb(22, 163, 74)'
+    );
+    await expect(milestoneTimeline.getByTitle('90% full: 12:38 pm')).toHaveCSS(
+      'background-color',
+      'rgb(234, 88, 12)'
+    );
+    await expect(milestoneTimeline.getByTitle('Full: 3:10 pm')).toHaveCSS(
+      'background-color',
+      'rgb(155, 28, 28)'
+    );
 
     const chartCard = page.locator('.MuiCard-root').filter({
       has: page.getByRole('heading', { name: 'Historical Occupancy' }),

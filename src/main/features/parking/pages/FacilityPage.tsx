@@ -21,6 +21,20 @@ import type { FacilitySlug } from '../types.ts';
 import type { HistoryRangeDays, RequestedHistoryResolution } from '../types.ts';
 import { useState } from 'react';
 import { PageMetadata } from '../../../app/PageMetadata.tsx';
+import { tokens } from '../../../css/tokens.ts';
+
+function occupancyColor(percent: number) {
+  if (percent <= 50) return tokens.color.success;
+  if (percent <= 80) return tokens.color.warning;
+  return tokens.color.error;
+}
+
+function availabilityColor(available: number, spaces: number) {
+  const percentAvailable = spaces > 0 ? (available / spaces) * 100 : 0;
+  if (percentAvailable >= 50) return tokens.color.success;
+  if (percentAvailable >= 20) return tokens.color.warning;
+  return tokens.color.error;
+}
 
 export default function FacilityPage() {
   const navigate = useNavigate();
@@ -43,6 +57,11 @@ export default function FacilityPage() {
 
   const f = live.data;
   const percent = f ? Math.round(f.occupancyRate * 100) : 0;
+  const occupancyValueColor = occupancyColor(percent);
+  const availableValueColor = availabilityColor(
+    f?.available ?? 0,
+    f?.spots ?? 0
+  );
   const facilityName = f?.facilityName ?? 'Parking facility';
 
   return (
@@ -101,24 +120,21 @@ export default function FacilityPage() {
                 <Typography
                   data-testid="metric-occupancy-value"
                   variant="h4"
-                  sx={{ fontWeight: 700 }}
+                  sx={{ fontWeight: 700, color: occupancyValueColor }}
                 >
                   {percent}%
-                  {f?.occupancyRate !== undefined && f.occupancyRate > 1
-                    ? ' occupied'
-                    : ''}
                 </Typography>
               </Box>
 
               {/* AVAILABLE */}
               <Box data-testid="metric-available">
                 <Typography variant="caption" color="text.secondary">
-                  Current Available
+                  Available spaces
                 </Typography>
                 <Typography
                   data-testid="metric-available-value"
                   variant="h4"
-                  sx={{ fontWeight: 700, color: 'success.main' }}
+                  sx={{ fontWeight: 700, color: availableValueColor }}
                 >
                   {f?.available ?? 0}
                 </Typography>
@@ -127,7 +143,7 @@ export default function FacilityPage() {
               {/* TOTAL */}
               <Box data-testid="metric-total">
                 <Typography variant="caption" color="text.secondary">
-                  Current Total
+                  Parking spaces
                 </Typography>
                 <Typography
                   data-testid="metric-total-value"

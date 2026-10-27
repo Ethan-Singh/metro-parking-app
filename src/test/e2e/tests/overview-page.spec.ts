@@ -198,7 +198,12 @@ test.describe('Overview Page', () => {
       ashfieldCard.getByText('Daily commuter metrics')
     ).toBeVisible();
     await expect(ashfieldCard.getByText('7 AM free')).toBeVisible();
-    await expect(ashfieldCard.getByText('Full by')).toBeVisible();
+    await expect(ashfieldCard.getByText('Full', { exact: true })).toBeVisible();
+    await expect(
+      ashfieldCard
+        .getByRole('img', { name: /Daily occupancy milestones/ })
+        .first()
+    ).toBeVisible();
     await expect(ashfieldCard.locator('canvas')).toHaveCount(1);
     await expect(page).toHaveURL('/');
 

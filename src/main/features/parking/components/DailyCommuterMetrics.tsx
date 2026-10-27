@@ -55,6 +55,7 @@ export function DailyCommuterMetrics({
           </Typography>
         </Box>
       </Box>
+
       {isLoading ? (
         <Typography variant="body2" color="text.secondary">
           Loading commuter metrics...
@@ -97,6 +98,15 @@ function DailyMetricsDay({
   const gridColor = isToday
     ? tokens.color.railBoardGrid
     : tokens.color.railBoardPastGrid;
+  const expectedFree = [
+    { label: '7 AM free', value: day.expectedFreeAt7am },
+    { label: '8 AM free', value: day.expectedFreeAt8am },
+  ];
+  const milestones = [
+    { label: '50% full', value: day.crossed50AtMs },
+    { label: '90% full', value: day.crossed90AtMs },
+    { label: 'Full', value: day.fullAtMs },
+  ];
 
   return (
     <Paper
@@ -115,11 +125,9 @@ function DailyMetricsDay({
         sx={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'flex-start',
           gap: 1,
           px: 1.5,
           py: 0.9,
-          mb: 0,
           color: isToday ? accent.heading : tokens.color.textMuted,
           bgcolor: isToday ? accent.background : tokens.color.railBoardPast,
         }}
@@ -127,7 +135,6 @@ function DailyMetricsDay({
         {isWeekend && (
           <Chip
             size="small"
-            color="primary"
             icon={<Weekend sx={{ fontSize: 16 }} />}
             aria-label="Weekend"
             title="Weekend"
@@ -171,103 +178,144 @@ function DailyMetricsDay({
           })}
         </Typography>
       </Box>
+
+      <MilestoneTimeline
+        expectedFree={expectedFree}
+        milestones={milestones}
+        gridColor={gridColor}
+      />
+    </Paper>
+  );
+}
+
+function MilestoneTimeline({
+  expectedFree,
+  milestones,
+  gridColor,
+}: {
+  expectedFree: { label: string; value: number | null }[];
+  milestones: { label: string; value: number | null }[];
+  gridColor: string;
+}) {
+  const present = milestones.filter((item) => item.value !== null);
+
+  return (
+    <Box sx={{ px: 1.5, py: 1.5, borderTop: `1px solid ${gridColor}` }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexWrap: 'wrap',
+          gap: 0.75,
+          mb: 1.5,
+        }}
+      >
+        {expectedFree.map(({ label, value }) => (
+          <Chip
+            key={label}
+            size="small"
+            variant="outlined"
+            label={`${label}: ${value ?? '—'} spaces`}
+            sx={{ borderColor: gridColor, fontWeight: 600 }}
+          />
+        ))}
+      </Box>
+
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+        <Typography variant="caption">12 AM</Typography>
+        <Typography variant="caption">6 AM</Typography>
+        <Typography variant="caption">12 PM</Typography>
+        <Typography variant="caption">6 PM</Typography>
+        <Typography variant="caption">12 AM</Typography>
+      </Box>
+      <Box
+        role="img"
+        aria-label={`Daily occupancy milestones: ${milestones.map(({ label, value }) => `${label} ${formatMetricTime(value)}`).join(', ')}`}
+        sx={{
+          position: 'relative',
+          height: 16,
+          mb: 1.5,
+          borderRadius: 99,
+          bgcolor: gridColor,
+        }}
+      >
+        {present.map((item) => {
+          const left = Math.min(
+            100,
+            Math.max(0, (sydneyHour(item.value!) / 24) * 100)
+          );
+          return (
+            <Box
+              key={item.label}
+              title={`${item.label}: ${formatMetricTime(item.value)}`}
+              sx={{
+                position: 'absolute',
+                left: `${left}%`,
+                top: -3,
+                width: 4,
+                height: 22,
+                borderRadius: 99,
+                bgcolor: milestoneColor(item.label),
+                transform: 'translateX(-50%)',
+              }}
+            />
+          );
+        })}
+      </Box>
       <Box
         sx={{
           display: 'grid',
-          gridTemplateColumns: {
-            xs: 'repeat(2, minmax(0, 1fr))',
-            sm: 'repeat(5, minmax(0, 1fr))',
-          },
-          gap: 0,
-          borderTop: `1px solid ${gridColor}`,
-          '& > :last-child:nth-of-type(odd)': {
-            gridColumn: { xs: '1 / -1', sm: 'auto' },
-          },
+          gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
+          gap: 0.75,
         }}
       >
-        <MetricValue
-          label="7 AM free"
-          value={day.expectedFreeAt7am ?? '\u2014'}
-          accent={accent.background}
-          gridColor={gridColor}
-        />
-        <MetricValue
-          label="8 AM free"
-          value={day.expectedFreeAt8am ?? '\u2014'}
-          accent={accent.background}
-          gridColor={gridColor}
-        />
-        <MetricValue
-          label="50% full"
-          value={formatMetricTime(day.crossed50AtMs)}
-          accent={accent.background}
-          gridColor={gridColor}
-        />
-        <MetricValue
-          label="90% full"
-          value={formatMetricTime(day.crossed90AtMs)}
-          accent={accent.background}
-          gridColor={gridColor}
-        />
-        <MetricValue
-          label="Full by"
-          value={formatMetricTime(day.fullAtMs)}
-          accent={accent.background}
-          gridColor={gridColor}
-        />
+        {milestones.map((item) => (
+          <Box key={item.label} sx={{ minWidth: 0, textAlign: 'center' }}>
+            <Typography
+              variant="caption"
+              noWrap
+              sx={{
+                display: 'block',
+                fontWeight: 700,
+                color: milestoneColor(item.label),
+              }}
+            >
+              {item.label}
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}
+            >
+              {formatMetricTime(item.value)}
+            </Typography>
+          </Box>
+        ))}
       </Box>
-    </Paper>
+    </Box>
   );
+}
+
+function milestoneColor(label: string) {
+  if (label === '50% full') return tokens.color.success;
+  if (label === '90% full') return tokens.color.warning;
+  return tokens.color.error;
+}
+
+function sydneyHour(timeMs: number) {
+  const parts = new Intl.DateTimeFormat('en-AU', {
+    timeZone: 'Australia/Sydney',
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: false,
+  }).formatToParts(timeMs);
+  const hour = Number(parts.find((part) => part.type === 'hour')?.value ?? 0);
+  const minute = Number(
+    parts.find((part) => part.type === 'minute')?.value ?? 0
+  );
+  return hour + minute / 60;
 }
 
 function formatMetricTime(timeMs: number | null) {
   return timeMs === null
     ? '\u2014'
     : formatSydneyTime(timeMs, { hour: 'numeric', minute: '2-digit' });
-}
-
-function MetricValue({
-  label,
-  value,
-  accent,
-  gridColor,
-}: {
-  label: string;
-  value: string | number;
-  accent: string;
-  gridColor: string;
-}) {
-  return (
-    <Box
-      sx={{
-        minWidth: 0,
-        px: 1,
-        py: 1,
-        minHeight: 64,
-        borderRight: `1px solid ${gridColor}`,
-        borderBottom: `1px solid ${gridColor}`,
-        bgcolor: 'common.white',
-      }}
-    >
-      <Typography
-        variant="caption"
-        color="text.secondary"
-        noWrap
-        sx={{ display: 'block', fontWeight: 600 }}
-      >
-        {label}
-      </Typography>
-      <Typography
-        variant="body2"
-        sx={{
-          color: accent,
-          fontWeight: 700,
-          fontSize: '1.05rem',
-          fontVariantNumeric: 'tabular-nums',
-        }}
-      >
-        {value}
-      </Typography>
-    </Box>
-  );
 }

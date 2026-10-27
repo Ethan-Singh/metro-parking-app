@@ -51,7 +51,7 @@ describe('FacilityCard', () => {
     );
 
     expect(screen.getByText('Ashfield Parking')).toBeInTheDocument();
-    expect(screen.getByText('40 / 100')).toBeInTheDocument();
+    expect(screen.getByText('40 / 100 (40%)')).toBeInTheDocument();
   });
 
   it('exposes facility navigation as a semantic link', () => {

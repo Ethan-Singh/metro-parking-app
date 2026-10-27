@@ -42,6 +42,12 @@ export function FacilityCard({
     quickViewOpen
   );
   const percent = Math.round(facility.occupancyRate * 100);
+  const occupancyColor =
+    percent <= 50
+      ? tokens.color.success
+      : percent <= 80
+        ? tokens.color.warning
+        : tokens.color.error;
 
   const availability = getAvailability(facility.availability);
 
@@ -82,8 +88,11 @@ export function FacilityCard({
 
           {/* STATS */}
           <Box sx={{ mt: 1.5 }}>
-            <Typography variant="body2" sx={{ fontWeight: 700, color }}>
-              {facility.occupancy} / {facility.spots}
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: 700, color: occupancyColor }}
+            >
+              {facility.occupancy} / {facility.spots} ({percent}%)
             </Typography>
 
             <Box

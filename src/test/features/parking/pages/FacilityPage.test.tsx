@@ -123,6 +123,9 @@ describe('FacilityPage', () => {
     expect(screen.getByText('50%')).toBeInTheDocument();
     expect(screen.getByText('10')).toBeInTheDocument();
     expect(screen.getByText('100')).toBeInTheDocument();
+    expect(screen.getByText('Available spaces')).toBeInTheDocument();
+    expect(screen.getByText('Parking spaces')).toBeInTheDocument();
+    expect(screen.queryByText('50% occupied')).not.toBeInTheDocument();
   });
 
   it('renders chart', () => {
