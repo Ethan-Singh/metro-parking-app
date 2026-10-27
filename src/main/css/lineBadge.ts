@@ -16,8 +16,11 @@ export const lineBadge = {
     T7: { color: '#6F818E' },
     T8: { color: '#00954C' },
     T9: { color: '#D11F2F' },
-    B: { color: '#00ADE9', textColor: '#1F2937' },
-    B1: { color: '#00ADE9', textColor: '#1F2937' },
+    B: {
+      color: '#00ADE9',
+      accentColor: '#007DAE',
+      textColor: '#fff',
+    },
     BMT: { color: '#F99D1C' },
     CCN: { color: '#D11F2F' },
   },

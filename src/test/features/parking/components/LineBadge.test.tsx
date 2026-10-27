@@ -6,7 +6,7 @@ vi.mock('../../../../main/features/parking/config/lineConfig', () => ({
   facilityLines: {
     'park-ride-ashfield': ['T1', 'T2'],
     'park-ride-metro-train': ['M', 'T'],
-    'park-ride-bus': ['B', 'B1'],
+    'park-ride-bus': ['B'],
     'park-ride-empty': [],
   },
 }));
@@ -22,7 +22,6 @@ vi.mock('../../../../main/css/lineBadge', () => ({
       M: { color: 'teal' },
       T: { color: 'orange' },
       B: { color: 'blue' },
-      B1: { color: 'blue' },
     },
   },
 }));
@@ -68,8 +67,6 @@ describe('LineBadge', () => {
     expect(
       screen.getByRole('img', { name: 'Bus service' })
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole('img', { name: 'B-Line bus service' })
-    ).toBeInTheDocument();
+    expect(screen.getAllByRole('img')).toHaveLength(1);
   });
 });

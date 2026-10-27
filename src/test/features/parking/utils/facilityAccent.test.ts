@@ -22,10 +22,10 @@ describe('getFacilityAccent', () => {
 
   it('uses the bus badge color when the facility has no rail connection', () => {
     expect(getFacilityAccent('park-ride-brookvale')).toEqual({
-      background: '#00ADE9',
-      foreground: '#1F2937',
-      icon: '#1F2937',
-      heading: '#1F2937',
+      background: '#007DAE',
+      foreground: '#fff',
+      icon: '#fff',
+      heading: '#fff',
     });
   });
 

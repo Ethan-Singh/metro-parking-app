@@ -18,27 +18,30 @@ export function getFacilityAccent(slug?: string): Accent {
     lines?.find((line) => line === 'T' || line === 'M') ?? lines?.[0];
   const config = primaryLine ? lineBadge.map[primaryLine] : undefined;
 
-  return config
-    ? {
-        background: config.color,
-        foreground: 'textColor' in config ? config.textColor : '#fff',
-        icon:
-          primaryLine === 'T'
-            ? '#fff'
-            : 'textColor' in config
-              ? config.textColor
-              : '#fff',
-        heading:
-          primaryLine === 'T'
-            ? '#fff'
-            : 'textColor' in config
-              ? config.textColor
-              : '#fff',
-      }
-    : {
-        background: tokens.color.grassDark,
-        foreground: '#fff',
-        icon: '#fff',
-        heading: '#fff',
-      };
+  if (config) {
+    const isTrain = primaryLine === 'T';
+    return {
+      background: 'accentColor' in config ? config.accentColor : config.color,
+      foreground: 'textColor' in config ? config.textColor : '#fff',
+      icon:
+        isTrain || primaryLine === 'B'
+          ? '#fff'
+          : 'textColor' in config
+            ? config.textColor
+            : '#fff',
+      heading:
+        isTrain || primaryLine === 'B'
+          ? '#fff'
+          : 'textColor' in config
+            ? config.textColor
+            : '#fff',
+    };
+  }
+
+  return {
+    background: tokens.color.grassDark,
+    foreground: '#fff',
+    icon: '#fff',
+    heading: '#fff',
+  };
 }

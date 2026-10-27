@@ -9,7 +9,6 @@ const modeSymbols = {
   T: { src: TrainModeSymbol, alt: 'Sydney Trains', scale: 1.15 },
   M: { src: MetroModeSymbol, alt: 'Sydney Metro', scale: 1 },
   B: { src: BusModeSymbol, alt: 'Bus service', scale: 1.15 },
-  B1: { src: BusModeSymbol, alt: 'B-Line bus service', scale: 1.15 },
 } as const;
 
 type Line = keyof typeof lineBadge.map;
