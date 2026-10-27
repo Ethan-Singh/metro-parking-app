@@ -147,6 +147,7 @@ export default function FacilityPage() {
         <CardContent>
           <DailyCommuterMetrics
             metrics={commuterMetrics.data}
+            facilitySlug={slug}
             isLoading={commuterMetrics.isLoading}
             isError={commuterMetrics.isError}
           />

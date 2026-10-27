@@ -1,18 +1,21 @@
 import { Box, Chip, Paper, Typography } from '@mui/material';
 import Weekend from '@mui/icons-material/Weekend';
+import LocalParkingOutlined from '@mui/icons-material/LocalParkingOutlined';
 import type { DailyParkingMetric, DailyParkingMetrics } from '../types.ts';
 import { formatSydneyTime, sydneyDate } from '../utils/sydneyTime.ts';
 import { tokens } from '../../../css/tokens.ts';
-import ParkingSymbol from '../../../assets/ParkingSymbol.png';
+import { getFacilityAccent } from '../utils/facilityAccent.ts';
 
 interface Props {
   metrics?: DailyParkingMetrics;
+  facilitySlug?: string;
   isLoading?: boolean;
   isError?: boolean;
 }
 
 export function DailyCommuterMetrics({
   metrics,
+  facilitySlug,
   isLoading = false,
   isError = false,
 }: Props) {
@@ -20,6 +23,7 @@ export function DailyCommuterMetrics({
   const today = sydneyDate();
   const periodLabel =
     metrics?.from === metrics?.to ? 'Most recent day' : 'Most recent 3 days';
+  const accent = getFacilityAccent(facilitySlug);
 
   return (
     <Box>
@@ -32,20 +36,21 @@ export function DailyCommuterMetrics({
           mb: 1.5,
           borderRadius: `${tokens.radius.primary}px`,
           color: 'common.white',
-          bgcolor: tokens.color.railBoard,
+          bgcolor: accent.background,
         }}
       >
-        <Box
-          component="img"
-          src={ParkingSymbol}
-          alt=""
-          sx={{ width: 32, height: 32, display: 'block', flex: '0 0 auto' }}
+        <LocalParkingOutlined
+          aria-hidden="true"
+          sx={{ color: accent.icon, fontSize: 34, flex: '0 0 auto' }}
         />
         <Box sx={{ minWidth: 0, flex: 1 }}>
-          <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
+          <Typography
+            variant="h6"
+            sx={{ color: accent.heading, fontWeight: 700, lineHeight: 1.2 }}
+          >
             Daily commuter metrics
           </Typography>
-          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.82)' }}>
+          <Typography variant="body2" sx={{ color: accent.heading }}>
             {periodLabel}
           </Typography>
         </Box>
@@ -65,6 +70,7 @@ export function DailyCommuterMetrics({
               key={day.date}
               day={day}
               isToday={day.date === today}
+              accent={accent}
             />
           ))}
         </Box>
@@ -80,9 +86,11 @@ export function DailyCommuterMetrics({
 function DailyMetricsDay({
   day,
   isToday,
+  accent,
 }: {
   day: DailyParkingMetric;
   isToday: boolean;
+  accent: ReturnType<typeof getFacilityAccent>;
 }) {
   const dateMs = Date.parse(`${day.date}T12:00:00Z`);
   const isWeekend = [0, 6].includes(new Date(dateMs).getUTCDay());
@@ -108,9 +116,7 @@ function DailyMetricsDay({
           py: 0.9,
           mb: 0,
           color: 'common.white',
-          bgcolor: isToday
-            ? tokens.color.railBoard
-            : tokens.color.railBoardMuted,
+          bgcolor: isToday ? accent.background : tokens.color.railBoardMuted,
         }}
       >
         {isWeekend && (
@@ -125,7 +131,7 @@ function DailyMetricsDay({
               height: 22,
               bgcolor: 'common.white',
               '& .MuiChip-icon': {
-                color: tokens.color.railBoard,
+                color: accent.background,
                 ml: 0,
                 mr: 0,
               },
@@ -139,8 +145,8 @@ function DailyMetricsDay({
             label="Today"
             sx={{
               height: 22,
-              bgcolor: tokens.color.trainYellow,
-              color: tokens.color.text,
+              bgcolor: 'common.white',
+              color: accent.background,
               fontWeight: 700,
               '& .MuiChip-label': { px: 1 },
             }}
@@ -177,20 +183,28 @@ function DailyMetricsDay({
         <MetricValue
           label="7 AM free"
           value={day.expectedFreeAt7am ?? '\u2014'}
+          accent={accent.background}
         />
         <MetricValue
           label="8 AM free"
           value={day.expectedFreeAt8am ?? '\u2014'}
+          accent={accent.background}
         />
         <MetricValue
           label="50% full"
           value={formatMetricTime(day.crossed50AtMs)}
+          accent={accent.background}
         />
         <MetricValue
           label="90% full"
           value={formatMetricTime(day.crossed90AtMs)}
+          accent={accent.background}
         />
-        <MetricValue label="Full by" value={formatMetricTime(day.fullAtMs)} />
+        <MetricValue
+          label="Full by"
+          value={formatMetricTime(day.fullAtMs)}
+          accent={accent.background}
+        />
       </Box>
     </Paper>
   );
@@ -205,9 +219,11 @@ function formatMetricTime(timeMs: number | null) {
 function MetricValue({
   label,
   value,
+  accent,
 }: {
   label: string;
   value: string | number;
+  accent: string;
 }) {
   return (
     <Box
@@ -232,7 +248,7 @@ function MetricValue({
       <Typography
         variant="body2"
         sx={{
-          color: tokens.color.railBoard,
+          color: accent,
           fontWeight: 700,
           fontSize: '1.05rem',
           fontVariantNumeric: 'tabular-nums',

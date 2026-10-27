@@ -3,10 +3,13 @@ import { facilityLines } from '../config/lineConfig';
 import { lineBadge } from '../../../css/lineBadge.ts';
 import TrainModeSymbol from '../../../assets/TrainModeSymbol.png';
 import MetroModeSymbol from '../../../assets/MetroModeSymbol.png';
+import BusModeSymbol from '../../../assets/BusModeSymbol.png';
 
 const modeSymbols = {
-  T: { src: TrainModeSymbol, alt: 'Sydney Trains' },
-  M: { src: MetroModeSymbol, alt: 'Sydney Metro' },
+  T: { src: TrainModeSymbol, alt: 'Sydney Trains', scale: 1.15 },
+  M: { src: MetroModeSymbol, alt: 'Sydney Metro', scale: 1 },
+  B: { src: BusModeSymbol, alt: 'Bus service', scale: 1.15 },
+  B1: { src: BusModeSymbol, alt: 'B-Line bus service', scale: 1.15 },
 } as const;
 
 type Line = keyof typeof lineBadge.map;
@@ -32,20 +35,35 @@ export function LineBadge({ slug }: { slug: string }) {
           return (
             <Box
               key={line}
-              component="img"
-              src={modeSymbol.src}
-              alt={modeSymbol.alt}
+              role="img"
+              aria-label={modeSymbol.alt}
               sx={{
                 width: lineBadge.size,
                 height: lineBadge.size,
+                position: 'relative',
                 display: 'block',
+                overflow: 'hidden',
                 borderRadius: '50%',
-                border: `${lineBadge.border}px solid #fff`,
+                border: '2px solid #fff',
                 boxShadow:
                   '0 0 0 1px rgba(0, 0, 0, 0.18), 0 1px 2px rgba(0, 0, 0, 0.15)',
                 flexShrink: 0,
               }}
-            />
+            >
+              <Box
+                component="img"
+                src={modeSymbol.src}
+                alt=""
+                sx={{
+                  position: 'absolute',
+                  width: `${modeSymbol.scale * 100}%`,
+                  height: `${modeSymbol.scale * 100}%`,
+                  maxWidth: 'none',
+                  top: `${((1 - modeSymbol.scale) / 2) * 100}%`,
+                  left: `${((1 - modeSymbol.scale) / 2) * 100}%`,
+                }}
+              />
+            </Box>
           );
         }
 
@@ -63,7 +81,7 @@ export function LineBadge({ slug }: { slug: string }) {
               border: `${lineBadge.border}px solid #fff`,
               boxShadow:
                 '0 0 0 1px rgba(0, 0, 0, 0.18), 0 1px 2px rgba(0, 0, 0, 0.15)',
-              color: '#fff',
+              color: 'textColor' in config ? config.textColor : '#fff',
               fontSize: lineBadge.fontSize,
               fontWeight: 700,
               lineHeight: 1,

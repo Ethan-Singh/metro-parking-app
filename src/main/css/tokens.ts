@@ -26,8 +26,6 @@ export const tokens = {
     primaryBorder: 'rgba(0, 132, 209, 0.14)',
     primaryBorderStrong: 'rgba(0, 132, 209, 0.24)',
     primaryBorderSubtle: 'rgba(0, 132, 209, 0.08)',
-    trainYellow: palette.sunrise,
-    railBoard: '#075B88',
     railBoardMuted: '#52616B',
     railBoardSurface: '#F3F6F8',
     railBoardGrid: '#D6E0E5',

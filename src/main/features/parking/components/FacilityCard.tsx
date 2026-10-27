@@ -142,7 +142,7 @@ export function FacilityCard({ facility, title = facility.facilityName }: { faci
       </Button>
       <Collapse in={quickViewOpen} timeout="auto" unmountOnExit>
         <Box id={`quick-view-${facility.slug}`} sx={{ px: 2, pb: 2 }}>
-          <DailyCommuterMetrics metrics={commuterMetrics.data} isLoading={commuterMetrics.isLoading} isError={commuterMetrics.isError} />
+          <DailyCommuterMetrics metrics={commuterMetrics.data} facilitySlug={facility.slug} isLoading={commuterMetrics.isLoading} isError={commuterMetrics.isError} />
           <Typography variant="caption" color="text.secondary">Today&apos;s occupancy | 10-minute detail</Typography>
           {preview.isLoading ? (
             <Box sx={{ height: 180, display: 'grid', placeItems: 'center' }}><CircularProgress size={24} aria-label="Loading quick view" /></Box>
