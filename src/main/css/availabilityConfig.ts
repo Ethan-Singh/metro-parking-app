@@ -1,4 +1,6 @@
-import { Cancel, CheckCircle, WarningAmber } from '@mui/icons-material';
+import Cancel from '@mui/icons-material/Cancel';
+import CheckCircle from '@mui/icons-material/CheckCircle';
+import WarningAmber from '@mui/icons-material/WarningAmber';
 import { tokens } from './tokens.ts';
 
 export const availabilityConfig = {

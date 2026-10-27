@@ -9,7 +9,8 @@ import {
   Popper,
   IconButton,
 } from '@mui/material';
-import { Search, Close } from '@mui/icons-material';
+import Search from '@mui/icons-material/Search';
+import Close from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 import { useParkingQueries } from '../api/useParkingQueries';
 import { useSearchMode } from './useSearchMode';
@@ -24,6 +25,8 @@ export function SearchBar() {
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const [focused, setFocused] = useState(false);
+  const [suggestionsDismissed, setSuggestionsDismissed] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const { data } = useParkingQueries(focused);
 
@@ -39,8 +42,16 @@ export function SearchBar() {
   const q = query.trim();
 
   const results = q ? fuse.search(q).map((result) => result.item) : [];
+  const visibleResults = results.slice(0, 3);
 
-  const show = isFacilityPage && focused && q.length > 0;
+  const show = isFacilityPage && focused && q.length > 0 && !suggestionsDismissed;
+  const suggestionsOpen = show && visibleResults.length > 0;
+  const activeOptionIndex = suggestionsOpen
+    ? activeIndex % visibleResults.length
+    : -1;
+  const activeOption = activeOptionIndex >= 0
+    ? visibleResults[activeOptionIndex]
+    : undefined;
 
   const handleSelect = (slug: string) => {
     clear();
@@ -54,20 +65,45 @@ export function SearchBar() {
         inputProps={{
           'aria-label': 'Search parking facilities',
           role: 'combobox',
-          'aria-expanded': show && results.length > 0,
-          'aria-controls': 'facility-search-results',
+          'aria-autocomplete': 'list',
+          'aria-haspopup': 'listbox',
+          'aria-expanded': suggestionsOpen,
+          'aria-controls': suggestionsOpen ? 'facility-search-results' : undefined,
+          'aria-activedescendant': activeOption
+            ? `facility-search-option-${activeIndex}`
+            : undefined,
           autoComplete: 'off',
         }}
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        onFocus={() => setFocused(true)}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          setActiveIndex(0);
+          setSuggestionsDismissed(false);
+        }}
+        onFocus={() => {
+          setFocused(true);
+          setSuggestionsDismissed(false);
+        }}
         onBlur={() => setFocused(false)}
         onKeyDown={(event) => {
-          if (event.key === 'Enter' && results[0]) {
+          if (event.key === 'ArrowDown' && suggestionsOpen) {
             event.preventDefault();
-            handleSelect(results[0].slug);
+            setActiveIndex((index) => (index + 1) % visibleResults.length);
           }
-          if (event.key === 'Escape') clear();
+          if (event.key === 'ArrowUp' && suggestionsOpen) {
+            event.preventDefault();
+            setActiveIndex(
+              (index) => (index - 1 + visibleResults.length) % visibleResults.length
+            );
+          }
+          if (event.key === 'Enter' && activeOption) {
+            event.preventDefault();
+            handleSelect(activeOption.slug);
+          }
+          if (event.key === 'Escape' && show) {
+            event.preventDefault();
+            setSuggestionsDismissed(true);
+          }
         }}
         placeholder="Search facilities..."
         inputRef={setAnchorEl}
@@ -92,7 +128,7 @@ export function SearchBar() {
       />
 
       <Popper
-        open={show && results.length > 0}
+        open={suggestionsOpen}
         anchorEl={anchorEl}
         placement="bottom-start"
         style={{
@@ -113,12 +149,14 @@ export function SearchBar() {
           }}
         >
           <List dense id="facility-search-results" role="listbox" disablePadding>
-            {results.slice(0, 3).map((f) => (
+            {visibleResults.map((f, index) => (
               <ListItemButton
                 key={f.slug}
+                id={`facility-search-option-${index}`}
                 role="option"
-                aria-selected={false}
+                aria-selected={activeOptionIndex === index}
                 onMouseDown={(event) => event.preventDefault()}
+                onMouseEnter={() => setActiveIndex(index)}
                 onClick={() => handleSelect(f.slug)}
               >
                 <ListItemText
@@ -130,6 +168,11 @@ export function SearchBar() {
           </List>
         </Paper>
       </Popper>
+      {show && results.length === 0 && (
+        <Box role="status" aria-live="polite" sx={{ mt: 1 }}>
+          No matching facilities.
+        </Box>
+      )}
     </Box>
   );
 }

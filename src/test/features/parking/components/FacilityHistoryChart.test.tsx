@@ -3,10 +3,21 @@ import { describe, it, expect, vi } from 'vitest';
 import { FacilityHistoryChart } from '../../../../main/features/parking/components/FacilityHistoryChart.tsx';
 import type { ParkingHistory } from '../../../../main/features/parking/types.ts';
 
-vi.mock('echarts-for-react', () => ({ default: () => <div data-testid="echarts" /> }));
-vi.mock('../../../../main/css/tokens.ts', () => ({ tokens: { color: {
-  border: '#000', textMuted: '#666', primary: '#00f', error: '#f00', warning: '#ff0',
-}, radius: { primary: 14, secondary: 0.5 } } }));
+vi.mock('../../../../main/features/parking/components/LazyECharts.ts', () => ({
+  LazyECharts: () => <div data-testid="echarts" />,
+}));
+vi.mock('../../../../main/css/tokens.ts', () => ({
+  tokens: {
+    color: {
+      border: '#000',
+      textMuted: '#666',
+      primary: '#00f',
+      error: '#f00',
+      warning: '#ff0',
+    },
+    radius: { primary: 14, secondary: 0.5 },
+  },
+}));
 
 describe('FacilityHistoryChart', () => {
   const handlers = {
@@ -17,28 +28,56 @@ describe('FacilityHistoryChart', () => {
   };
 
   it('shows an empty state when the returned point list is empty', () => {
-    render(<FacilityHistoryChart {...handlers} history={{ from: '2026-01-01', to: '2026-01-07', resolution: 'ONE_HOUR', points: [] }} />);
-    expect(screen.getByText('No historical data available')).toBeInTheDocument();
+    render(
+      <FacilityHistoryChart
+        {...handlers}
+        history={{
+          from: '2026-01-01',
+          to: '2026-01-07',
+          resolution: 'ONE_HOUR',
+          points: [],
+        }}
+      />
+    );
+    expect(
+      screen.getByText('No historical data available')
+    ).toBeInTheDocument();
   });
 
-  it('renders a single chart for ten minute data', () => {
+  it('renders a single chart for ten minute data', async () => {
     const history: ParkingHistory = {
-      from: '2026-01-01', to: '2026-01-07', resolution: 'TEN_MINUTE',
-      points: [[1767225600000, 0.5, 50], [1767229200000, 0.75, 25]],
+      from: '2026-01-01',
+      to: '2026-01-07',
+      resolution: 'TEN_MINUTE',
+      points: [
+        [1767225600000, 0.5, 50],
+        [1767229200000, 0.75, 25],
+      ],
     };
     render(<FacilityHistoryChart {...handlers} history={history} />);
-    expect(screen.getAllByTestId('echarts')).toHaveLength(1);
-    expect(screen.getByText('2026-01-01 – 2026-01-07 · Sydney time')).toBeInTheDocument();
+    expect(await screen.findAllByTestId('echarts')).toHaveLength(1);
+    expect(
+      screen.getByText('2026-01-01 – 2026-01-07 · Sydney time')
+    ).toBeInTheDocument();
     expect(screen.getByText('Each point: 10 min')).toBeInTheDocument();
   });
 
   it('lets the user choose a history period and point interval', () => {
     const onRangeDaysChange = vi.fn();
     const onResolutionChange = vi.fn();
-    render(<FacilityHistoryChart {...handlers} onRangeDaysChange={onRangeDaysChange} onResolutionChange={onResolutionChange} history={{
-      from: '2026-01-01', to: '2026-01-07', resolution: 'SIX_HOUR',
-      points: [[1767225600000, 0.5, 50]],
-    }} />);
+    render(
+      <FacilityHistoryChart
+        {...handlers}
+        onRangeDaysChange={onRangeDaysChange}
+        onResolutionChange={onResolutionChange}
+        history={{
+          from: '2026-01-01',
+          to: '2026-01-07',
+          resolution: 'SIX_HOUR',
+          points: [[1767225600000, 0.5, 50]],
+        }}
+      />
+    );
     expect(screen.queryByText(/7 AM expected free:/i)).not.toBeInTheDocument();
     expect(screen.getByText('Each point: 6 hours')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Past 14 days' }));
@@ -50,17 +89,28 @@ describe('FacilityHistoryChart', () => {
   it('disables over-limit intervals and moves to a supported interval when the range grows', () => {
     const onRangeDaysChange = vi.fn();
     const onResolutionChange = vi.fn();
-    render(<FacilityHistoryChart
-      {...handlers}
-      rangeDays={7}
-      resolution="ONE_HOUR"
-      onRangeDaysChange={onRangeDaysChange}
-      onResolutionChange={onResolutionChange}
-      history={{ from: '2026-01-01', to: '2026-01-07', resolution: 'ONE_HOUR', points: [[1767225600000, 0.5, 50]] }}
-    />);
+    render(
+      <FacilityHistoryChart
+        {...handlers}
+        rangeDays={7}
+        resolution="ONE_HOUR"
+        onRangeDaysChange={onRangeDaysChange}
+        onResolutionChange={onResolutionChange}
+        history={{
+          from: '2026-01-01',
+          to: '2026-01-07',
+          resolution: 'ONE_HOUR',
+          points: [[1767225600000, 0.5, 50]],
+        }}
+      />
+    );
 
-    expect(screen.getByRole('button', { name: '10 min interval' })).toBeDisabled();
-    expect(screen.getByRole('button', { name: '1 hour interval' })).toBeEnabled();
+    expect(
+      screen.getByRole('button', { name: '10 min interval' })
+    ).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: '1 hour interval' })
+    ).toBeEnabled();
     fireEvent.click(screen.getByRole('button', { name: 'Past 14 days' }));
 
     expect(onRangeDaysChange).toHaveBeenCalledWith(14);

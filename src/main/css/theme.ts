@@ -23,7 +23,7 @@ export const theme = createTheme({
   },
 
   typography: {
-    fontFamily: 'Inter, system-ui, sans-serif',
+    fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
   },
 
   shape: {
@@ -39,6 +39,14 @@ export const theme = createTheme({
           background: tokens.gradient.app,
           backgroundAttachment: 'fixed',
           fontVariantNumeric: 'tabular-nums',
+        },
+        '@media (prefers-reduced-motion: reduce)': {
+          '*, *::before, *::after': {
+            scrollBehavior: 'auto !important',
+            animationDuration: '0.01ms !important',
+            animationIterationCount: '1 !important',
+            transitionDuration: '0.01ms !important',
+          },
         },
       },
     },

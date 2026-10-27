@@ -53,12 +53,12 @@ describe('Footer', () => {
     ).toBeInTheDocument();
   });
 
-  it('opens privacy policy dialog', () => {
+  it('opens privacy policy dialog', async () => {
     render(<Footer />);
 
     fireEvent.click(screen.getByRole('button', { name: 'Privacy Policy' }));
 
-    const dialog = screen.getByRole('dialog');
+    const dialog = await screen.findByRole('dialog');
 
     expect(dialog).toBeInTheDocument();
 
@@ -71,12 +71,12 @@ describe('Footer', () => {
     ).toBeInTheDocument();
   });
 
-  it('opens terms of service dialog', () => {
+  it('opens terms of service dialog', async () => {
     render(<Footer />);
 
     fireEvent.click(screen.getByRole('button', { name: 'Terms of Service' }));
 
-    const dialog = screen.getByRole('dialog');
+    const dialog = await screen.findByRole('dialog');
 
     expect(dialog).toBeInTheDocument();
 
@@ -89,12 +89,12 @@ describe('Footer', () => {
     ).toBeInTheDocument();
   });
 
-  it('opens disclaimer dialog', () => {
+  it('opens disclaimer dialog', async () => {
     render(<Footer />);
 
     fireEvent.click(screen.getByRole('button', { name: 'Disclaimer' }));
 
-    const dialog = screen.getByRole('dialog');
+    const dialog = await screen.findByRole('dialog');
 
     expect(dialog).toBeInTheDocument();
 
@@ -119,7 +119,7 @@ describe('Footer', () => {
     render(<Footer />);
 
     expect(
-      screen.getByText('Data fetched every 30 seconds')
+      screen.getByText('Availability refreshes every 2 minutes')
     ).toBeInTheDocument();
   });
 });

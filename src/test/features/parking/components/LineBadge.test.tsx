@@ -5,6 +5,7 @@ import { LineBadge } from '../../../../main/features/parking/components/LineBadg
 vi.mock('../../../../main/features/parking/config/lineConfig', () => ({
   facilityLines: {
     'park-ride-ashfield': ['T1', 'T2'],
+    'park-ride-metro-train': ['M', 'T'],
     'park-ride-empty': [],
   },
 }));
@@ -17,6 +18,8 @@ vi.mock('../../../../main/css/lineBadge', () => ({
     map: {
       T1: { color: 'red' },
       T2: { color: 'blue' },
+      M: { color: 'teal' },
+      T: { color: 'orange' },
     },
   },
 }));
@@ -43,5 +46,16 @@ describe('LineBadge', () => {
 
     const badges = screen.getAllByText(/T1|T2/);
     expect(badges).toHaveLength(2);
+  });
+
+  it('uses the official Transport pictograms for Metro and Sydney Trains', () => {
+    render(<LineBadge slug="park-ride-metro-train" />);
+
+    expect(
+      screen.getByRole('img', { name: 'Sydney Metro' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('img', { name: 'Sydney Trains' })
+    ).toBeInTheDocument();
   });
 });

@@ -58,9 +58,98 @@ test.describe('Overview Page', () => {
       const date = query.get('from')!;
       expect(query.get('to')).toBe(date);
       await route.fulfill({
-        json: { from: date, to: date, resolution: 'TEN_MINUTE', points: historyForDate(date) },
+        json: {
+          from: date,
+          to: date,
+          resolution: 'TEN_MINUTE',
+          points: historyForDate(date),
+        },
       });
     });
+    await page.route('**/api/v1/parking/**/metrics/daily?**', async (route) => {
+      const query = new URL(route.request().url()).searchParams;
+      const from = query.get('from')!;
+      const to = query.get('to')!;
+      await route.fulfill({
+        json: {
+          from,
+          to,
+          timeZone: 'Australia/Sydney',
+          days: [
+            {
+              date: to,
+              expectedFreeAt7am: 179,
+              expectedFreeAt8am: 136,
+              crossed50AtMs: null,
+              crossed90AtMs: null,
+              fullAtMs: null,
+            },
+          ],
+        },
+      });
+    });
+  });
+
+  test('provides accessible landmarks, skip navigation, SEO metadata, and crawl files', async ({
+    page,
+    request,
+    browserName,
+  }) => {
+    await page.goto('/');
+
+    await expect(page).toHaveTitle(
+      'Sydney Metro Parking Availability | A Metro Parking App'
+    );
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Overview' })
+    ).toBeVisible();
+    await expect(page.getByRole('banner')).toBeVisible();
+    await expect(
+      page.getByRole('search', { name: 'Find a parking facility' })
+    ).toBeVisible();
+    await expect(page.getByRole('main')).toHaveAttribute('id', 'main-content');
+    await expect(page.getByRole('contentinfo')).toBeVisible();
+    await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+      'content',
+      /live parking availability and historical occupancy/i
+    );
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      'href',
+      'https://www.ethansingh.com/'
+    );
+
+    const skipLink = page.getByRole('link', { name: 'Skip to main content' });
+    if (browserName === 'webkit') {
+      // WebKit automation defaults to tabbing through text controls only.
+      await skipLink.evaluate((element: HTMLAnchorElement) => element.focus());
+    } else {
+      for (let index = 0; index < 10; index += 1) {
+        if (
+          await skipLink.evaluate(
+            (element) => element === document.activeElement
+          )
+        ) {
+          break;
+        }
+        await page.keyboard.press('Tab');
+      }
+    }
+    await expect(skipLink).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(page).toHaveURL(/#main-content$/);
+    await expect(page.getByRole('main')).toBeFocused();
+
+    const robots = await request.get('/robots.txt');
+    expect(robots.ok()).toBeTruthy();
+    expect(await robots.text()).toContain(
+      'Sitemap: https://www.ethansingh.com/sitemap.xml'
+    );
+
+    const sitemap = await request.get('/sitemap.xml');
+    expect(sitemap.ok()).toBeTruthy();
+    expect(await sitemap.text()).toContain(
+      '<loc>https://www.ethansingh.com/</loc>'
+    );
   });
 
   test('renders overview page and facility cards', async ({ page }) => {
@@ -82,30 +171,54 @@ test.describe('Overview Page', () => {
     await expect(cards).toHaveCount(3);
 
     // The dedicated Quick view button expands data without navigating.
-    await expect(page.getByRole('button', { name: 'Park & Ride facilities' })).toHaveAttribute('aria-expanded', 'true');
-    await expect(page.getByRole('button', { name: 'Other facilities' })).toHaveAttribute('aria-expanded', 'false');
+    await expect(
+      page.getByRole('button', { name: 'Park & Ride facilities' })
+    ).toHaveAttribute('aria-expanded', 'true');
+    await expect(
+      page.getByRole('button', { name: 'Other facilities' })
+    ).toHaveAttribute('aria-expanded', 'false');
     const ashfieldCard = cards.filter({ hasText: 'Ashfield' });
     const bellaVistaCard = cards.filter({ hasText: 'Bella Vista' });
-    const ashfieldQuickView = ashfieldCard.getByRole('button', { name: /quick view/i });
-    const bellaVistaQuickView = bellaVistaCard.getByRole('button', { name: /quick view/i });
+    const ashfieldQuickView = ashfieldCard.getByRole('button', {
+      name: /quick view/i,
+    });
+    const bellaVistaQuickView = bellaVistaCard.getByRole('button', {
+      name: /quick view/i,
+    });
     const quickViewYBefore = (await ashfieldQuickView.boundingBox())!.y;
-    const bellaVistaQuickViewYBefore = (await bellaVistaQuickView.boundingBox())!.y;
-    expect(Math.abs(quickViewYBefore - bellaVistaQuickViewYBefore)).toBeLessThan(2);
+    const bellaVistaQuickViewYBefore =
+      (await bellaVistaQuickView.boundingBox())!.y;
+    expect(
+      Math.abs(quickViewYBefore - bellaVistaQuickViewYBefore)
+    ).toBeLessThan(2);
 
     const bellaVistaHeightBefore = (await bellaVistaCard.boundingBox())!.height;
     await ashfieldQuickView.click();
-    await expect(ashfieldCard.getByText('Daily commuter metrics')).toBeVisible();
+    await expect(
+      ashfieldCard.getByText('Daily commuter metrics')
+    ).toBeVisible();
     await expect(ashfieldCard.getByText('7 AM free')).toBeVisible();
     await expect(ashfieldCard.getByText('Full by')).toBeVisible();
     await expect(ashfieldCard.locator('canvas')).toHaveCount(1);
     await expect(page).toHaveURL('/');
 
-    expect((await ashfieldCard.boundingBox())!.height).toBeGreaterThan(bellaVistaHeightBefore);
-    expect((await bellaVistaCard.boundingBox())!.height).toBe(bellaVistaHeightBefore);
-    expect(Math.abs((await bellaVistaQuickView.boundingBox())!.y - bellaVistaQuickViewYBefore)).toBeLessThan(2);
+    expect((await ashfieldCard.boundingBox())!.height).toBeGreaterThan(
+      bellaVistaHeightBefore
+    );
+    expect((await bellaVistaCard.boundingBox())!.height).toBe(
+      bellaVistaHeightBefore
+    );
+    expect(
+      Math.abs(
+        (await bellaVistaQuickView.boundingBox())!.y -
+          bellaVistaQuickViewYBefore
+      )
+    ).toBeLessThan(2);
 
     // Clicking the rest of the card still opens the facility page.
-    await ashfieldCard.getByRole('link', { name: /Ashfield, 217 of 228 spots available/i }).click();
+    await ashfieldCard
+      .getByRole('link', { name: /Ashfield, 217 of 228 spots available/i })
+      .click();
     await expect(page).toHaveURL(/\/facility\//);
   });
 });

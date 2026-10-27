@@ -1,9 +1,8 @@
-import { Card, CardActionArea, CardContent, Typography, Box, Button, Collapse, CircularProgress } from '@mui/material';
+import { Card, CardActionArea, CardContent, Typography, Box, Button, Collapse, CircularProgress, Skeleton } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 import AccessTime from '@mui/icons-material/AccessTime';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import ReactECharts from 'echarts-for-react';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { tokens } from '../../../css/tokens.ts';
 import type { LiveCarPark } from '../types.ts';
 import { LineBadge } from './LineBadge.tsx';
@@ -11,6 +10,8 @@ import { getAvailability } from '../utils/availability.ts';
 import { formatSydneyTime } from '../utils/sydneyTime.ts';
 import { useFacilityDailyMetrics, useFacilityRecentHistory } from '../api/useParkingQueries.ts';
 import { DailyCommuterMetrics } from './DailyCommuterMetrics.tsx';
+import { LazyECharts } from './LazyECharts.ts';
+import { summarizeOccupancyHistory } from '../utils/chartSummary.ts';
 
 export function FacilityCard({ facility, title = facility.facilityName }: { facility: LiveCarPark; title?: string }) {
   const [quickViewOpen, setQuickViewOpen] = useState(false);
@@ -55,6 +56,12 @@ export function FacilityCard({ facility, title = facility.facilityName }: { faci
           </Typography>
 
           <Box
+            role="progressbar"
+            aria-label={`${title} occupancy`}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={Math.max(0, Math.min(100, percent))}
+            aria-valuetext={`${facility.occupancy} of ${facility.spots} spaces occupied (${percent}% full)`}
             sx={{
               mt: 1,
               height: 6,
@@ -85,6 +92,7 @@ export function FacilityCard({ facility, title = facility.facilityName }: { faci
           }}
         >
           <AccessTime
+            aria-hidden="true"
             style={{
               fontSize: 14,
               color: tokens.color.textMuted,
@@ -100,11 +108,12 @@ export function FacilityCard({ facility, title = facility.facilityName }: { faci
             })}
           </Typography>
 
-          <Box sx={{ mx: 0.5, color: tokens.color.textMuted }}>·</Box>
+          <Box aria-hidden="true" sx={{ mx: 0.5, color: tokens.color.textMuted }}>·</Box>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             {Icon && (
               <Icon
+                aria-hidden="true"
                 style={{
                   fontSize: 14,
                   color: color,
@@ -138,15 +147,27 @@ export function FacilityCard({ facility, title = facility.facilityName }: { faci
           {preview.isLoading ? (
             <Box sx={{ height: 180, display: 'grid', placeItems: 'center' }}><CircularProgress size={24} aria-label="Loading quick view" /></Box>
           ) : preview.data?.points.length ? (
-            <ReactECharts
-              option={buildQuickViewOption(preview.data.points)}
-              style={{ height: 180, width: '100%' }}
-              opts={{ renderer: 'canvas' }}
-              notMerge
-              lazyUpdate
-              autoResize
-              aria-label={`${facility.facilityName} today's occupancy quick view`}
-            />
+            <>
+              <Typography
+                id={`quick-view-summary-${facility.slug}`}
+                sx={{ position: 'absolute', width: 1, height: 1, p: 0, m: -1, overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0 }}
+              >
+                {summarizeOccupancyHistory(preview.data.points)}
+              </Typography>
+              <Suspense fallback={<Skeleton variant="rounded" width="100%" height={180} />}>
+              <LazyECharts
+                option={buildQuickViewOption(preview.data.points)}
+                role="img"
+                aria-describedby={`quick-view-summary-${facility.slug}`}
+                style={{ height: 180, width: '100%' }}
+                opts={{ renderer: 'canvas' }}
+                notMerge
+                lazyUpdate
+                autoResize
+                aria-label={`${facility.facilityName} today's occupancy quick view`}
+              />
+              </Suspense>
+            </>
           ) : (
             <Typography variant="body2" color="text.secondary" sx={{ py: 2 }}>
               {preview.isError ? 'Could not load the occupancy preview.' : 'No 10-minute occupancy samples are available for these days yet.'}

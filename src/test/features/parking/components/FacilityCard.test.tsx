@@ -75,6 +75,21 @@ describe('FacilityCard', () => {
     expect(screen.getByText('AVAILABLE')).toBeInTheDocument();
   });
 
+  it('exposes occupancy as a labelled progress indicator', () => {
+    render(
+      <MemoryRouter>
+        <FacilityCard facility={mockFacility} />
+      </MemoryRouter>
+    );
+
+    expect(
+      screen.getByRole('progressbar', { name: 'Ashfield Parking occupancy' })
+    ).toHaveAttribute('aria-valuenow', '40');
+    expect(
+      screen.getByRole('progressbar', { name: 'Ashfield Parking occupancy' })
+    ).toHaveAttribute('aria-valuetext', '40 of 100 spaces occupied (40% full)');
+  });
+
   it('opens quick view independently from facility navigation', () => {
     render(
       <MemoryRouter>

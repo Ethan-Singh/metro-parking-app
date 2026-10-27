@@ -6,9 +6,10 @@ import {
   Divider,
   Stack,
 } from '@mui/material';
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { tokens } from '../../../css/tokens.ts';
-import LegalDialog from './LegalDialog.tsx';
+
+const LegalDialog = lazy(() => import('./LegalDialog.tsx'));
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
@@ -217,20 +218,24 @@ export default function Footer() {
               </Typography>
 
               <Typography variant="caption" color="text.secondary">
-                Data fetched every 30 seconds
+                Availability refreshes every 2 minutes
               </Typography>
             </Box>
           </Stack>
         </Container>
       </Box>
 
-      <LegalDialog
-        open={legalOpen !== null}
-        title={getLegalTitle()}
-        onClose={closeLegal}
-      >
-        {getLegalContent()}
-      </LegalDialog>
+      {legalOpen !== null && (
+        <Suspense fallback={null}>
+          <LegalDialog
+            open
+            title={getLegalTitle()}
+            onClose={closeLegal}
+          >
+            {getLegalContent()}
+          </LegalDialog>
+        </Suspense>
+      )}
     </>
   );
 }

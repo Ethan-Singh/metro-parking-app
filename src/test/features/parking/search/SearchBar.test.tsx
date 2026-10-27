@@ -142,4 +142,47 @@ describe('SearchBar', () => {
     expect(clear).toHaveBeenCalled();
     expect(navigate).toHaveBeenCalledWith('/facility/park-ride-ashfield');
   });
+
+  it('supports listbox keyboard navigation and exposes the active option', async () => {
+    const user = userEvent.setup();
+    render(<SearchBar />);
+
+    const input = screen.getByRole('combobox', {
+      name: 'Search parking facilities',
+    });
+    await user.click(input);
+    await user.type(input, 'park-ride');
+
+    expect(input).toHaveAttribute('aria-autocomplete', 'list');
+    expect(input).toHaveAttribute('aria-expanded', 'true');
+    expect(input).toHaveAttribute('aria-activedescendant', 'facility-search-option-0');
+
+    await user.keyboard('{ArrowDown}');
+    expect(input).toHaveAttribute('aria-activedescendant', 'facility-search-option-1');
+    expect(screen.getByRole('option', { name: /Bella Vista/ })).toHaveAttribute(
+      'aria-selected',
+      'true'
+    );
+
+    await user.keyboard('{Enter}');
+    expect(navigate).toHaveBeenCalledWith('/facility/park-ride-bella-vista');
+  });
+
+  it('lets Escape dismiss suggestions without clearing the typed query', async () => {
+    const user = userEvent.setup();
+    render(<SearchBar />);
+
+    const input = screen.getByRole('combobox', {
+      name: 'Search parking facilities',
+    });
+    await user.click(input);
+    await user.type(input, 'ash');
+    expect(screen.getByRole('option', { name: /Ashfield/ })).toBeInTheDocument();
+
+    await user.keyboard('{Escape}');
+
+    expect(input).toHaveValue('ash');
+    expect(input).toHaveAttribute('aria-expanded', 'false');
+    expect(screen.queryByRole('option', { name: /Ashfield/ })).not.toBeInTheDocument();
+  });
 });

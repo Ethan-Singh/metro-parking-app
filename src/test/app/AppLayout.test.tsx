@@ -52,6 +52,22 @@ describe('AppLayout', () => {
   it('renders the logo image', () => {
     renderLayout();
 
-    expect(screen.getByAltText('Logo')).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'A Metro Parking App home' })
+    ).toBeInTheDocument();
+    expect(document.querySelector('header img')).toHaveAttribute('alt', '');
+  });
+
+  it('provides skip navigation and page landmarks', () => {
+    renderLayout();
+
+    expect(screen.getByRole('link', { name: 'Skip to main content' })).toHaveAttribute(
+      'href',
+      '#main-content'
+    );
+    expect(screen.getByRole('banner')).toBeInTheDocument();
+    expect(screen.getByRole('search', { name: 'Find a parking facility' })).toBeInTheDocument();
+    expect(screen.getByRole('main')).toHaveAttribute('id', 'main-content');
+    expect(screen.getByRole('contentinfo')).toBeInTheDocument();
   });
 });

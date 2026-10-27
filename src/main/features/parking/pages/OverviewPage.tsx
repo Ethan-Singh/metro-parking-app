@@ -1,7 +1,7 @@
 import Grid from '@mui/material/Grid';
-import { Typography, Box, Stack, Accordion, AccordionSummary, AccordionDetails } from '@mui/material';
+import { Typography, Box, Stack, Accordion, AccordionSummary, AccordionDetails, Skeleton } from '@mui/material';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import ParkRideLogo from '../../../assets/Park&Ride.png';
+import ParkRideLogo from '../../../assets/Park&Ride.webp';
 import { tokens } from '../../../css/tokens.ts';
 import { useParkingQueries } from '../api/useParkingQueries.ts';
 import { FacilityCard } from '../components/FacilityCard.tsx';
@@ -10,6 +10,7 @@ import { useSearch } from '../search/useSearch.tsx';
 import { DataCredits } from '../components/DataCredits.tsx';
 import { SearchBarEmpty } from '../search/SearchBarEmpty.tsx';
 import type { LiveCarPark } from '../types.ts';
+import { PageMetadata } from '../../../app/PageMetadata.tsx';
 
 export default function OverviewPage() {
   const { data, isLoading, isError } = useParkingQueries();
@@ -39,9 +40,14 @@ export default function OverviewPage() {
 
   return (
     <Stack spacing={3}>
+      <PageMetadata
+        title="Sydney Metro Parking Availability | A Metro Parking App"
+        description="Check live parking availability and historical occupancy at Sydney Metro Park&Ride facilities. Plan your commute with daily parking metrics and interactive charts."
+        path="/"
+      />
       {/* HEADER */}
       <Box>
-        <Typography variant="h4" sx={{ fontWeight: 700 }}>
+        <Typography component="h1" variant="h4" sx={{ fontWeight: 700 }}>
           Overview
         </Typography>
 
@@ -59,7 +65,7 @@ export default function OverviewPage() {
       />
 
       {/* CONTENT */}
-      <QueryBoundary isLoading={isLoading} isError={isError}>
+      <QueryBoundary isLoading={isLoading} isError={isError} loading={<FacilityListLoading />}>
         {isEmpty ? (
           <SearchBarEmpty
             title="No facilities match your search"
@@ -89,7 +95,7 @@ export default function OverviewPage() {
                   sx={{ minHeight: 56, bgcolor: tokens.color.primary, color: 'common.white', '&.Mui-expanded': { minHeight: 56 } }}
                 >
                   <Box sx={{ display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'space-between', gap: 1, pr: 1 }}>
-                    <Box component="img" src={ParkRideLogo} alt="Park & Ride" sx={{ display: 'block', width: { xs: 142, sm: 170 }, height: 'auto', borderRadius: `${tokens.radius.primary * tokens.radius.secondary}px` }} />
+                    <Box component="img" src={ParkRideLogo} alt="Park & Ride" width={600} height={149} sx={{ display: 'block', width: { xs: 142, sm: 170 }, height: 'auto', borderRadius: `${tokens.radius.primary * tokens.radius.secondary}px` }} />
                     <Typography variant="body2" sx={{ color: 'common.white', fontWeight: 600 }}>
                       {parkAndRide.length} {parkAndRide.length === 1 ? 'facility' : 'facilities'}
                     </Typography>
@@ -127,6 +133,31 @@ function FacilityGrid({ facilities }: { facilities: LiveCarPark[] }) {
         </Grid>
       ))}
     </Grid>
+  );
+}
+
+function FacilityListLoading() {
+  return (
+    <Box
+      role="status"
+      aria-label="Loading parking facilities"
+      aria-busy="true"
+      sx={{ overflow: 'hidden', borderRadius: `${tokens.radius.primary}px`, border: `1px solid ${tokens.color.primaryBorder}` }}
+    >
+      <Box aria-hidden="true" sx={{ minHeight: 56, bgcolor: tokens.color.primary, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1, px: 2 }}>
+        <Box component="img" src={ParkRideLogo} alt="" width={600} height={149} sx={{ display: 'block', width: { xs: 142, sm: 170 }, height: 'auto', borderRadius: `${tokens.radius.primary * tokens.radius.secondary}px` }} />
+        <Typography variant="body2" sx={{ color: 'common.white', fontWeight: 600 }}>Loading facilities</Typography>
+      </Box>
+      <Box aria-hidden="true" sx={{ pt: 2 }}>
+        <Grid container spacing={2} sx={{ width: '100%', alignItems: 'start' }}>
+          {Array.from({ length: 41 }, (_, index) => (
+            <Grid key={index} size={{ xs: 12, sm: 6, md: 4 }}>
+              <Skeleton variant="rounded" height={180} />
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
+    </Box>
   );
 }
 

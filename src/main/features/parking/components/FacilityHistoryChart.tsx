@@ -1,11 +1,13 @@
-import ReactECharts from 'echarts-for-react';
-import { Typography, Chip, Box, Stack, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Suspense } from 'react';
+import { Typography, Chip, Box, Stack, ToggleButton, ToggleButtonGroup, Skeleton } from '@mui/material';
 import type { HistoryRangeDays, ParkingHistory, RequestedHistoryResolution } from '../types.ts';
 import { LoadingSkeleton } from './LoadingSkeleton.tsx';
 import { tokens } from '../../../css/tokens.ts';
 import type { CallbackDataParams } from 'echarts/types/dist/shared';
 import { formatSydneyTime } from '../utils/sydneyTime.ts';
 import { supportedHistoryResolutionOrFallback, supportsHistoryResolution } from '../utils/historyResolution.ts';
+import { LazyECharts } from './LazyECharts.ts';
+import { summarizeOccupancyHistory } from '../utils/chartSummary.ts';
 
 interface Props {
   history?: ParkingHistory;
@@ -161,15 +163,25 @@ export function FacilityHistoryChart({
       </Stack>
 
       <Box sx={{ width: '100%', height: { xs: 280, sm: 320 }, minWidth: 0 }}>
-        <ReactECharts
-          option={option}
-          style={{ width: '100%', height: '100%' }}
-          opts={{ renderer: 'canvas' }}
-          notMerge
-          lazyUpdate
-          autoResize
-          aria-label="Historical parking occupancy chart"
-        />
+        <Typography
+          id="history-chart-summary"
+          sx={{ position: 'absolute', width: 1, height: 1, p: 0, m: -1, overflow: 'hidden', clip: 'rect(0, 0, 0, 0)', whiteSpace: 'nowrap', border: 0 }}
+        >
+          {summarizeOccupancyHistory(points)}
+        </Typography>
+        <Suspense fallback={<Skeleton variant="rounded" width="100%" height="100%" />}>
+          <LazyECharts
+            option={option}
+            role="img"
+            aria-describedby="history-chart-summary"
+            style={{ width: '100%', height: '100%' }}
+            opts={{ renderer: 'canvas' }}
+            notMerge
+            lazyUpdate
+            autoResize
+            aria-label="Historical parking occupancy chart"
+          />
+        </Suspense>
       </Box>
     </Box>
   );

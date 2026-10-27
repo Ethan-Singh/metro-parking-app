@@ -1,7 +1,8 @@
 import { Box, Chip, Typography, Stack, Skeleton } from '@mui/material';
-import { Info, CheckCircle } from '@mui/icons-material';
+import Info from '@mui/icons-material/Info';
+import CheckCircle from '@mui/icons-material/CheckCircle';
 import { tokens } from '../../../css/tokens.ts';
-import TFNSWLogo from '../../../assets/TFNSW.png';
+import TFNSWLogo from '../../../assets/TFNSW.webp';
 import { formatSydneyTime } from '../utils/sydneyTime.ts';
 
 interface Props {
@@ -105,6 +106,8 @@ export function DataCredits({
           component="img"
           src={TFNSWLogo}
           alt="Transport for NSW"
+          width={432}
+          height={112}
           sx={{
             height: 28,
             width: 'auto',

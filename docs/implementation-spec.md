@@ -8,12 +8,12 @@ Bring the React app in line with the current backend contract and its rolling da
 
 - React, TypeScript, Vite, MUI, TanStack Query, and Apache ECharts.
 - Routes: overview (`/`) and facility detail (`/facility/:slug`).
-- The backend reads the upstream service on a scheduled loop every 2.2 seconds. Four out of each five turns refresh one enabled facility's current Sydney day; the fifth turn advances historical backfill. The current facility rotates each time.
+- The backend polls one enabled facility on a scheduled loop every 2.2 seconds. Four out of each five turns fetch a live snapshot from the upstream car-park endpoint; the fifth turn advances historical backfill through the upstream history endpoint. The facility rotates between turns.
 - Therefore, a facility's refresh interval is approximately `enabled facility count × 2.75 seconds`, plus upstream request and processing time. The 2.2 second scheduler delay is not the refresh interval for each facility.
 - The API exposes the latest stored upstream sample. Its `timeMs` is the source event time, so it can lag the current time.
 - The backend API rate limit is 60 requests per minute per client IP. Overview and facility queries should use a shared, conservative refresh cadence and avoid rapid retries.
 
-The frontend currently polls list, facility live data, and current-day history every two minutes. This is a practical cadence for the rotating ingestion loop and rate limit; it is not a guarantee that every facility has a new sample every two minutes. Revisit it if the enabled-facility count, ingestion schedule, or backend rate limit changes. Keep the source sample time visible and format it in `Australia/Sydney`.
+The frontend currently polls list, facility live data, selected history, and daily metrics every two minutes. This is a practical cadence for the rotating ingestion loop and rate limit; it is not a guarantee that every facility has a new sample every two minutes. Revisit it if the enabled-facility count, ingestion schedule, or backend rate limit changes. Keep the source sample time visible and format it in `Australia/Sydney`.
 
 ## API contract
 
@@ -52,9 +52,24 @@ Use generated schema types in one API module and avoid duplicate hand-written DT
 
 - Keep one-column facility cards on phones; use two or three columns only when names, availability, and update times remain readable.
 - Make each facility card a semantic link with visible keyboard focus and a comfortable touch area. Keep occupancy counts readable when occupancy exceeds capacity; never hide overflow in the source data.
-- Refine the shared search into a MUI autocomplete-style control: searchable facility name and slug, clear keyboard selection, touch-sized suggestions, visible result count, and a compact no-results state. Keep suggestions inside the viewport on narrow screens and avoid obscuring page actions.
+- Keep the shared MUI autocomplete searchable by facility name and slug, with ArrowUp/ArrowDown/Enter selection, Escape dismissal, touch-sized suggestions, visible result count, and a compact no-results state. Keep suggestions inside the viewport on narrow screens and avoid obscuring page actions.
 - Let the content breathe on mobile: compact header and page padding, clear section headings, stable card spacing, and no horizontal overflow at 320, 360, and 390 px.
 - Use semantic status labels and icons as well as color. Do not rely on hover-only details.
+
+## Accessibility, metadata, and crawlability
+
+- Keep the document language set to English and provide a descriptive page title and meta description. Facility routes update title, description, canonical URL, Open Graph, and Twitter metadata when navigation changes.
+- Keep a visible-on-focus skip link to the main landmark, semantic header/main/footer landmarks, one page-level `h1`, and visible keyboard focus. The facility search exposes combobox/listbox semantics and supports keyboard-only selection and dismissal.
+- Give occupancy indicators accessible progress values and text equivalents. Give charts an accessible name and a concise text summary so the observed range and latest sample are available without interpreting the graphic. Respect reduced-motion preferences.
+- Publish `robots.txt` and an XML sitemap. The sitemap currently lists the overview page; facility pages are data-driven and should be added only when a reliable canonical facility inventory is available.
+- Treat client-updated metadata as useful for browser history and sharing after navigation, but remember that crawlers that do not execute JavaScript only see the static metadata in `index.html`. If search indexing of individual facilities becomes important, add server-side rendering or prerendered route metadata.
+
+## Performance improvements
+
+- Keep Apache ECharts tree-shaken and load its React/chart modules on demand when a Quick View or facility chart is opened. Lazy-load route-level facility and legal content where it reduces the initial bundle.
+- Serve the Park&Ride and Transport for NSW marks as WebP with explicit intrinsic dimensions; retain meaningful alt text for informative images and empty alt text for decorative branding.
+- Use the system font stack to avoid blocking first render on remote font downloads. Keep the overview loading skeleton dimensionally close to the facility list to reduce layout shifts while data loads.
+- Recheck Lighthouse in a clean browser profile after changes. Separate API time-to-first-byte from client render time; the compact response payload alone does not explain a slow API response.
 
 ## Chart and optional prediction
 
@@ -62,12 +77,13 @@ Use generated schema types in one API module and avoid duplicate hand-written DT
 - Let the parent control chart height at breakpoints, use ECharts resize handling after rotation/container changes, reduce tick/margin clutter on phones, and avoid requiring horizontal page scrolling.
 - Include a text summary or accessible data alternative for the key values. Preserve rates over 100% and make the 100% threshold visible.
 - Render commuter metrics in a separate card above historical occupancy so changing chart period or resolution never hides the metrics. Compare the latest three Sydney dates, with 7 AM free, 8 AM free, 50% full, 90% full, and the time each day first reached 100% capacity. Calculate every date independently; do not carry one day's milestones into another.
+- Style commuter metrics like a rail departure board: a solid blue section banner, clear date strips, and aligned high-contrast metric cells. Keep older days visually quieter and mark today and weekends without relying on color alone.
 - Render these rows from the backend daily-metrics endpoint, independently of the downsampled chart series. Keep each date's milestones isolated and display missing metrics as unavailable rather than carrying values forward from another day.
 - Consider a small forecast as a later, explicitly experimental feature. A client-side short-horizon trend can be misleading with sparse/coarsened observations and daily commuter patterns. Only show it when enough recent `TEN_MINUTE` points exist; label it as an estimate, visually separate it from observed data, and omit it when the trend is unstable. A backend forecast with a documented method and uncertainty range is preferable if the feature becomes a product requirement.
 
 ## MUI design system refactor
 
-Refactor the current scattered styling into a small, semantic token layer used by both the MUI theme and components. Keep the three brand colors as the core identity: blue for primary actions/data, sunrise amber for secondary emphasis, and warm cream for the page/surface base. Treat success, warning, and error colors as semantic status roles, not extra brand colors.
+Refactor the current scattered styling into a small, semantic token layer used by both the MUI theme and components. Keep the sunrise warmth and use the supplied Transport for NSW pictograms for Sydney Trains, Sydney Metro, and parking. Grade page backgrounds through light sky, sunrise, and grassy neutrals so normal text maintains WCAG AA contrast. Treat warning and error colors as semantic status roles.
 
 - Define tokens for semantic palette roles, typography scale, spacing, shape, elevation, focus ring, and motion. Avoid repeating raw hex, rgba, pixel, and shadow values in feature components.
 - Map tokens into MUI `createTheme` palette, typography, shape, and component defaults/variants. Prefer `sx` theme keys such as `primary.main`, `text.secondary`, `divider`, and spacing values over hard-coded styles.
@@ -78,9 +94,11 @@ Refactor the current scattered styling into a small, semantic token layer used b
 ## Test organization and acceptance
 
 - Keep Vitest component/unit tests in `src/test`; keep Playwright scenarios in `src/test/e2e`. The Playwright config targets that directory, and Vitest excludes it.
-- Update API mocks and fixtures from generated contract types. Playwright scenarios are present but can be expanded in the later responsive implementation pass.
+- Update API mocks and fixtures from generated contract types. Unit tests cover metadata updates, keyboard search behavior, occupancy progress semantics, and chart text summaries. Playwright covers overview and facility navigation, skip navigation and landmarks, dynamic page metadata, crawl files, keyboard search, Quick View expansion/alignment, chart controls, and commuter metrics.
 - Verify that no frontend API call uses the old endpoint or payload fields.
 - Confirm that Sydney date/time is stable on devices configured for other time zones.
 - Confirm that list/live/history polling reflects the two-minute policy and that current-day history refreshes while historical ranges remain cacheable.
 - Review overview and facility layouts at phone, tablet, and desktop sizes; check chart resizing after rotation and container changes.
+- Run the Vitest suite and Playwright projects in Chromium, Firefox, and WebKit. Keep accessibility assertions focused on user-visible keyboard and semantic behavior; add an automated axe scan if an accessibility engine is introduced as a project dependency.
+- Re-run Lighthouse with browser extensions disabled and compare FCP/LCP, TBT, CLS, image transfer size, and the initial JavaScript payload against `docs/lighthouse/10272026.json`.
 - Check generated OpenAPI type changes as a reviewed diff after running `npm run api:sync`.

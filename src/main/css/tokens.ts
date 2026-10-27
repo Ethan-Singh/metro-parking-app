@@ -5,12 +5,6 @@ const palette = {
   grass: '#CFE4C9',
   grassDark: '#3F7047',
   blue: '#0084D1',
-  blueMist: '#F5FBFE',
-  blueMistEdge: '#E9F6FC',
-  blueMistWeekend: '#EDF8FD',
-  blueMistWeekendEdge: '#DCF1FB',
-  blueMistPast: '#FBFDFE',
-  blueMistPastEdge: '#F3F8FB',
 } as const;
 
 export const tokens = {
@@ -32,14 +26,16 @@ export const tokens = {
     primaryBorder: 'rgba(0, 132, 209, 0.14)',
     primaryBorderStrong: 'rgba(0, 132, 209, 0.24)',
     primaryBorderSubtle: 'rgba(0, 132, 209, 0.08)',
+    trainYellow: palette.sunrise,
+    railBoard: '#075B88',
+    railBoardMuted: '#52616B',
+    railBoardSurface: '#F3F6F8',
+    railBoardGrid: '#D6E0E5',
     transparent: 'rgba(255, 255, 255, 0.3)',
   },
 
   gradient: {
     app: `linear-gradient(180deg, ${palette.sky} 0%, ${palette.sunrise} 35%, ${palette.grass} 100%)`,
-    commuterMetrics: `linear-gradient(125deg, ${palette.blueMist} 0%, #FFFFFF 58%, ${palette.blueMistEdge} 100%)`,
-    commuterMetricsWeekend: `linear-gradient(125deg, ${palette.blueMistWeekend} 0%, #FFFFFF 58%, ${palette.blueMistWeekendEdge} 100%)`,
-    commuterMetricsPast: `linear-gradient(125deg, #FFFFFF 0%, #FFFFFF 58%, ${palette.blueMistPast} 100%)`,
   },
 
   radius: {

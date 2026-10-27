@@ -7,7 +7,7 @@ import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Skeleton from '@mui/material/Skeleton';
-import { ArrowBack } from '@mui/icons-material';
+import ArrowBack from '@mui/icons-material/ArrowBack';
 import { FacilityHistoryChart } from '../components/FacilityHistoryChart.tsx';
 import { DailyCommuterMetrics } from '../components/DailyCommuterMetrics.tsx';
 import { DataCredits } from '../components/DataCredits.tsx';
@@ -20,6 +20,7 @@ import { QueryBoundary } from '../components/QueryBoundary.tsx';
 import type { FacilitySlug } from '../types.ts';
 import type { HistoryRangeDays, RequestedHistoryResolution } from '../types.ts';
 import { useState } from 'react';
+import { PageMetadata } from '../../../app/PageMetadata.tsx';
 
 export default function FacilityPage() {
   const navigate = useNavigate();
@@ -41,9 +42,15 @@ export default function FacilityPage() {
 
   const f = live.data;
   const percent = f ? Math.round(f.occupancyRate * 100) : 0;
+  const facilityName = f?.facilityName ?? 'Parking facility';
 
   return (
     <Stack spacing={3}>
+      <PageMetadata
+        title={`${facilityName} Availability | A Metro Parking App`}
+        description={`Check live parking availability, daily commuter metrics, and historical occupancy for ${facilityName} in Sydney.`}
+        path={`/facility/${encodeURIComponent(slug)}`}
+      />
       {/* HEADER */}
       <QueryBoundary
         isLoading={live.isLoading}
@@ -59,7 +66,7 @@ export default function FacilityPage() {
             Back
           </Button>
 
-          <Typography variant="h4" sx={{ fontWeight: 700 }}>
+          <Typography component="h1" variant="h4" sx={{ fontWeight: 700 }}>
             {f?.facilityName}
           </Typography>
         </Box>

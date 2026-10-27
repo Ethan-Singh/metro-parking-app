@@ -1,8 +1,8 @@
 export const lineBadge = {
-  size: 28,
-  fontSize: 15,
+  size: 36,
+  fontSize: 16,
   gap: 4,
-  border: 3,
+  border: 2,
 
   map: {
     M: { color: '#168388' },

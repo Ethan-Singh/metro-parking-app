@@ -1,5 +1,5 @@
 import { Box, Typography, Button } from '@mui/material';
-import { Search } from '@mui/icons-material';
+import Search from '@mui/icons-material/Search';
 import { tokens } from '../../../css/tokens.ts';
 
 interface Props {

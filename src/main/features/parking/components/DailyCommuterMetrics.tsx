@@ -3,6 +3,7 @@ import Weekend from '@mui/icons-material/Weekend';
 import type { DailyParkingMetric, DailyParkingMetrics } from '../types.ts';
 import { formatSydneyTime, sydneyDate } from '../utils/sydneyTime.ts';
 import { tokens } from '../../../css/tokens.ts';
+import ParkingSymbol from '../../../assets/ParkingSymbol.png';
 
 interface Props {
   metrics?: DailyParkingMetrics;
@@ -22,12 +23,33 @@ export function DailyCommuterMetrics({
 
   return (
     <Box>
-      <Typography variant="h6" sx={{ mb: 0.5 }}>
-        Daily commuter metrics
-      </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
-        {periodLabel}
-      </Typography>
+      <Box
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 1.25,
+          p: 1.5,
+          mb: 1.5,
+          borderRadius: `${tokens.radius.primary}px`,
+          color: 'common.white',
+          bgcolor: tokens.color.railBoard,
+        }}
+      >
+        <Box
+          component="img"
+          src={ParkingSymbol}
+          alt=""
+          sx={{ width: 32, height: 32, display: 'block', flex: '0 0 auto' }}
+        />
+        <Box sx={{ minWidth: 0, flex: 1 }}>
+          <Typography variant="h6" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
+            Daily commuter metrics
+          </Typography>
+          <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.82)' }}>
+            {periodLabel}
+          </Typography>
+        </Box>
+      </Box>
       {isLoading ? (
         <Typography variant="body2" color="text.secondary">
           Loading commuter metrics...
@@ -69,18 +91,11 @@ function DailyMetricsDay({
     <Paper
       variant="outlined"
       sx={{
-        p: 1.5,
-        borderColor: !isToday
-          ? tokens.color.primaryBorderSubtle
-          : isWeekend
-            ? tokens.color.primaryBorderStrong
-            : tokens.color.primaryBorder,
+        p: 0,
+        borderColor: tokens.color.railBoardGrid,
         borderRadius: `${tokens.radius.primary}px`,
-        background: !isToday
-          ? tokens.gradient.commuterMetricsPast
-          : isWeekend
-            ? tokens.gradient.commuterMetricsWeekend
-            : tokens.gradient.commuterMetrics,
+        overflow: 'hidden',
+        backgroundColor: tokens.color.railBoardSurface,
       }}
     >
       <Box
@@ -89,7 +104,13 @@ function DailyMetricsDay({
           alignItems: 'center',
           justifyContent: 'flex-start',
           gap: 1,
-          mb: 0.75,
+          px: 1.5,
+          py: 0.9,
+          mb: 0,
+          color: 'common.white',
+          bgcolor: isToday
+            ? tokens.color.railBoard
+            : tokens.color.railBoardMuted,
         }}
       >
         {isWeekend && (
@@ -100,17 +121,35 @@ function DailyMetricsDay({
             aria-label="Weekend"
             title="Weekend"
             sx={{
-              width: 24,
-              height: 24,
-              '& .MuiChip-icon': { color: 'common.white', ml: 0, mr: 0 },
+              width: 22,
+              height: 22,
+              bgcolor: 'common.white',
+              '& .MuiChip-icon': {
+                color: tokens.color.railBoard,
+                ml: 0,
+                mr: 0,
+              },
               '& .MuiChip-label': { display: 'none' },
+            }}
+          />
+        )}
+        {isToday && (
+          <Chip
+            size="small"
+            label="Today"
+            sx={{
+              height: 22,
+              bgcolor: tokens.color.trainYellow,
+              color: tokens.color.text,
+              fontWeight: 700,
+              '& .MuiChip-label': { px: 1 },
             }}
           />
         )}
         <Typography
           variant="subtitle2"
           sx={{
-            color: isToday ? tokens.color.primary : 'text.secondary',
+            color: 'common.white',
             fontWeight: 700,
           }}
         >
@@ -128,7 +167,11 @@ function DailyMetricsDay({
             xs: 'repeat(2, minmax(0, 1fr))',
             sm: 'repeat(5, minmax(0, 1fr))',
           },
-          gap: 1,
+          gap: 0,
+          borderTop: `1px solid ${tokens.color.railBoardGrid}`,
+          '& > :last-child:nth-of-type(odd)': {
+            gridColumn: { xs: '1 / -1', sm: 'auto' },
+          },
         }}
       >
         <MetricValue
@@ -171,17 +214,29 @@ function MetricValue({
       sx={{
         minWidth: 0,
         px: 1,
-        py: 0.75,
-        borderRadius: `${tokens.radius.primary * tokens.radius.secondary}px`,
-        bgcolor: tokens.color.surfaceRaised,
+        py: 1,
+        minHeight: 64,
+        borderRight: `1px solid ${tokens.color.railBoardGrid}`,
+        borderBottom: `1px solid ${tokens.color.railBoardGrid}`,
+        bgcolor: 'common.white',
       }}
     >
-      <Typography variant="caption" color="text.secondary" noWrap>
+      <Typography
+        variant="caption"
+        color="text.secondary"
+        noWrap
+        sx={{ display: 'block', fontWeight: 600 }}
+      >
         {label}
       </Typography>
       <Typography
         variant="body2"
-        sx={{ fontWeight: 700, fontVariantNumeric: 'tabular-nums' }}
+        sx={{
+          color: tokens.color.railBoard,
+          fontWeight: 700,
+          fontSize: '1.05rem',
+          fontVariantNumeric: 'tabular-nums',
+        }}
       >
         {value}
       </Typography>
