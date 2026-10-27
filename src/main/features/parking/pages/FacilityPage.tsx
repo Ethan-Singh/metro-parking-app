@@ -28,7 +28,8 @@ export default function FacilityPage() {
   const params = useParams<{ slug: string }>();
   const slug = params.slug;
   const [rangeDays, setRangeDays] = useState<HistoryRangeDays>(1);
-  const [resolution, setResolution] = useState<RequestedHistoryResolution>('TEN_MINUTE');
+  const [resolution, setResolution] =
+    useState<RequestedHistoryResolution>('TEN_MINUTE');
 
   const safeSlug = slug as FacilitySlug | undefined;
 
@@ -74,10 +75,7 @@ export default function FacilityPage() {
 
       {/* DATA CREDITS */}
       <QueryBoundary isLoading={live.isLoading} isError={live.isError}>
-        <DataCredits
-          lastUpdated={f?.timeMs}
-          isLoading={live.isLoading}
-        />
+        <DataCredits lastUpdated={f?.timeMs} isLoading={live.isLoading} />
       </QueryBoundary>
 
       {/* METRICS */}
@@ -106,7 +104,9 @@ export default function FacilityPage() {
                   sx={{ fontWeight: 700 }}
                 >
                   {percent}%
-                  {f?.occupancyRate !== undefined && f.occupancyRate > 1 ? ' occupied' : ''}
+                  {f?.occupancyRate !== undefined && f.occupancyRate > 1
+                    ? ' occupied'
+                    : ''}
                 </Typography>
               </Box>
 
@@ -164,6 +164,7 @@ export default function FacilityPage() {
           <CardContent>
             <FacilityHistoryChart
               history={history.data}
+              facilitySlug={slug}
               rangeDays={rangeDays}
               resolution={resolution}
               onRangeDaysChange={setRangeDays}

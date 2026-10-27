@@ -4,7 +4,16 @@ import { FacilityHistoryChart } from '../../../../main/features/parking/componen
 import type { ParkingHistory } from '../../../../main/features/parking/types.ts';
 
 vi.mock('../../../../main/features/parking/components/LazyECharts.ts', () => ({
-  LazyECharts: () => <div data-testid="echarts" />,
+  LazyECharts: ({
+    option,
+  }: {
+    option: { series: { lineStyle: { color: string } }[] };
+  }) => (
+    <div
+      data-testid="echarts"
+      data-line-color={option.series[0].lineStyle.color}
+    />
+  ),
 }));
 vi.mock('../../../../main/css/tokens.ts', () => ({
   tokens: {
@@ -14,6 +23,7 @@ vi.mock('../../../../main/css/tokens.ts', () => ({
       primary: '#00f',
       error: '#f00',
       warning: '#ff0',
+      grassDark: '#3F7047',
     },
     radius: { primary: 14, secondary: 0.5 },
   },
@@ -54,8 +64,18 @@ describe('FacilityHistoryChart', () => {
         [1767229200000, 0.75, 25],
       ],
     };
-    render(<FacilityHistoryChart {...handlers} history={history} />);
+    render(
+      <FacilityHistoryChart
+        {...handlers}
+        facilitySlug="park-ride-ashfield"
+        history={history}
+      />
+    );
     expect(await screen.findAllByTestId('echarts')).toHaveLength(1);
+    expect(screen.getByTestId('echarts')).toHaveAttribute(
+      'data-line-color',
+      '#F18500'
+    );
     expect(
       screen.getByText('2026-01-01 – 2026-01-07 · Sydney time')
     ).toBeInTheDocument();

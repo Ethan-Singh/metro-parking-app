@@ -94,13 +94,18 @@ function DailyMetricsDay({
 }) {
   const dateMs = Date.parse(`${day.date}T12:00:00Z`);
   const isWeekend = [0, 6].includes(new Date(dateMs).getUTCDay());
+  const gridColor = isToday
+    ? tokens.color.railBoardGrid
+    : tokens.color.railBoardPastGrid;
 
   return (
     <Paper
       variant="outlined"
       sx={{
         p: 0,
-        borderColor: tokens.color.railBoardGrid,
+        borderColor: isToday
+          ? tokens.color.railBoardGrid
+          : tokens.color.railBoardPastBorder,
         borderRadius: `${tokens.radius.primary}px`,
         overflow: 'hidden',
         backgroundColor: tokens.color.railBoardSurface,
@@ -174,7 +179,7 @@ function DailyMetricsDay({
             sm: 'repeat(5, minmax(0, 1fr))',
           },
           gap: 0,
-          borderTop: `1px solid ${tokens.color.railBoardGrid}`,
+          borderTop: `1px solid ${gridColor}`,
           '& > :last-child:nth-of-type(odd)': {
             gridColumn: { xs: '1 / -1', sm: 'auto' },
           },
@@ -184,26 +189,31 @@ function DailyMetricsDay({
           label="7 AM free"
           value={day.expectedFreeAt7am ?? '\u2014'}
           accent={accent.background}
+          gridColor={gridColor}
         />
         <MetricValue
           label="8 AM free"
           value={day.expectedFreeAt8am ?? '\u2014'}
           accent={accent.background}
+          gridColor={gridColor}
         />
         <MetricValue
           label="50% full"
           value={formatMetricTime(day.crossed50AtMs)}
           accent={accent.background}
+          gridColor={gridColor}
         />
         <MetricValue
           label="90% full"
           value={formatMetricTime(day.crossed90AtMs)}
           accent={accent.background}
+          gridColor={gridColor}
         />
         <MetricValue
           label="Full by"
           value={formatMetricTime(day.fullAtMs)}
           accent={accent.background}
+          gridColor={gridColor}
         />
       </Box>
     </Paper>
@@ -220,10 +230,12 @@ function MetricValue({
   label,
   value,
   accent,
+  gridColor,
 }: {
   label: string;
   value: string | number;
   accent: string;
+  gridColor: string;
 }) {
   return (
     <Box
@@ -232,8 +244,8 @@ function MetricValue({
         px: 1,
         py: 1,
         minHeight: 64,
-        borderRight: `1px solid ${tokens.color.railBoardGrid}`,
-        borderBottom: `1px solid ${tokens.color.railBoardGrid}`,
+        borderRight: `1px solid ${gridColor}`,
+        borderBottom: `1px solid ${gridColor}`,
         bgcolor: 'common.white',
       }}
     >
