@@ -2,6 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import { FacilityHistoryChart } from '../../../../main/features/parking/components/FacilityHistoryChart.tsx';
 import type { ParkingHistory } from '../../../../main/features/parking/types.ts';
+import { sydneyDate } from '../../../../main/features/parking/utils/sydneyTime.ts';
 
 vi.mock('../../../../main/features/parking/components/LazyECharts.ts', () => ({
   LazyECharts: ({
@@ -37,10 +38,12 @@ describe('FacilityHistoryChart', () => {
     onResolutionChange: vi.fn(),
   };
 
-  it('shows an empty state when the returned point list is empty', () => {
+  it('keeps query controls visible and suggests a longer range for an empty historical period', () => {
+    const onRangeDaysChange = vi.fn();
     render(
       <FacilityHistoryChart
         {...handlers}
+        onRangeDaysChange={onRangeDaysChange}
         history={{
           from: '2026-01-01',
           to: '2026-01-07',
@@ -49,9 +52,49 @@ describe('FacilityHistoryChart', () => {
         }}
       />
     );
+
     expect(
-      screen.getByText('No historical data available')
+      screen.getByText('No samples found for this period.')
     ).toBeInTheDocument();
+    expect(
+      screen.getByText('Try a longer date range to view earlier occupancy.')
+    ).toBeInTheDocument();
+    expect(screen.getByRole('group', { name: 'History period' })).toBeVisible();
+    expect(
+      screen.getByRole('group', { name: 'History point interval' })
+    ).toBeVisible();
+    expect(screen.getByText('Each point: 1 hour')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Past 14 days' }));
+    expect(onRangeDaysChange).toHaveBeenCalledWith(14);
+  });
+
+  it('explains an empty current-day query without hiding the interval controls', () => {
+    render(
+      <FacilityHistoryChart
+        {...handlers}
+        rangeDays={1}
+        resolution="TEN_MINUTE"
+        history={{
+          from: sydneyDate(),
+          to: sydneyDate(),
+          resolution: 'TEN_MINUTE',
+          points: [],
+        }}
+      />
+    );
+
+    expect(
+      screen.getByText('No samples recorded for today yet.')
+    ).toBeVisible();
+    expect(
+      screen.getByText(
+        'Occupancy history will appear after samples are recorded.'
+      )
+    ).toBeVisible();
+    expect(
+      screen.getByRole('group', { name: 'History point interval' })
+    ).toBeVisible();
   });
 
   it('renders a single chart for ten minute data', async () => {

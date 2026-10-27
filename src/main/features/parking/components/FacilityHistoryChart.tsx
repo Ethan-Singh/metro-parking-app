@@ -16,7 +16,7 @@ import type {
 import { LoadingSkeleton } from './LoadingSkeleton.tsx';
 import { tokens } from '../../../css/tokens.ts';
 import type { CallbackDataParams } from 'echarts/types/dist/shared';
-import { formatSydneyTime } from '../utils/sydneyTime.ts';
+import { formatSydneyTime, sydneyDate } from '../utils/sydneyTime.ts';
 import {
   supportedHistoryResolutionOrFallback,
   supportsHistoryResolution,
@@ -56,18 +56,11 @@ export function FacilityHistoryChart({
 
   if (!history) return <LoadingSkeleton height={300} />;
 
-  if (points.length === 0) {
-    return (
-      <Box sx={{ minHeight: 280, display: 'grid', placeItems: 'center' }}>
-        <Typography variant="body2" color="text.secondary">
-          No historical data available
-        </Typography>
-      </Box>
-    );
-  }
-
   const seriesData = points.map(([timeMs, rate]) => [timeMs, rate * 100]);
   const maxRate = Math.max(100, ...points.map(([, rate]) => rate * 100));
+  const isEmpty = points.length === 0;
+  const isEmptyToday =
+    history.from === sydneyDate() && history.to === sydneyDate();
 
   const option = {
     grid: {
@@ -272,39 +265,65 @@ export function FacilityHistoryChart({
         </Box>
       </Stack>
 
-      <Box sx={{ width: '100%', height: { xs: 280, sm: 320 }, minWidth: 0 }}>
-        <Typography
-          id="history-chart-summary"
+      {isEmpty ? (
+        <Box
+          role="status"
           sx={{
-            position: 'absolute',
-            width: 1,
-            height: 1,
-            p: 0,
-            m: -1,
-            overflow: 'hidden',
-            clip: 'rect(0, 0, 0, 0)',
-            whiteSpace: 'nowrap',
-            border: 0,
+            minHeight: { xs: 220, sm: 260 },
+            display: 'grid',
+            placeItems: 'center',
+            px: 2,
+            textAlign: 'center',
           }}
         >
-          {summarizeOccupancyHistory(points)}
-        </Typography>
-        <Suspense
-          fallback={<Skeleton variant="rounded" width="100%" height="100%" />}
-        >
-          <LazyECharts
-            option={option}
-            role="img"
-            aria-describedby="history-chart-summary"
-            style={{ width: '100%', height: '100%' }}
-            opts={{ renderer: 'canvas' }}
-            notMerge
-            lazyUpdate
-            autoResize
-            aria-label="Historical parking occupancy chart"
-          />
-        </Suspense>
-      </Box>
+          <Stack spacing={0.75} sx={{ alignItems: 'center' }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+              {isEmptyToday
+                ? 'No samples recorded for today yet.'
+                : 'No samples found for this period.'}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {isEmptyToday
+                ? 'Occupancy history will appear after samples are recorded.'
+                : 'Try a longer date range to view earlier occupancy.'}
+            </Typography>
+          </Stack>
+        </Box>
+      ) : (
+        <Box sx={{ width: '100%', height: { xs: 280, sm: 320 }, minWidth: 0 }}>
+          <Typography
+            id="history-chart-summary"
+            sx={{
+              position: 'absolute',
+              width: 1,
+              height: 1,
+              p: 0,
+              m: -1,
+              overflow: 'hidden',
+              clip: 'rect(0, 0, 0, 0)',
+              whiteSpace: 'nowrap',
+              border: 0,
+            }}
+          >
+            {summarizeOccupancyHistory(points)}
+          </Typography>
+          <Suspense
+            fallback={<Skeleton variant="rounded" width="100%" height="100%" />}
+          >
+            <LazyECharts
+              option={option}
+              role="img"
+              aria-describedby="history-chart-summary"
+              style={{ width: '100%', height: '100%' }}
+              opts={{ renderer: 'canvas' }}
+              notMerge
+              lazyUpdate
+              autoResize
+              aria-label="Historical parking occupancy chart"
+            />
+          </Suspense>
+        </Box>
+      )}
     </Box>
   );
 }

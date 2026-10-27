@@ -211,6 +211,64 @@ test.describe('Facility Page (data-driven)', () => {
     );
   });
 
+  test('keeps history controls available and recovers from an empty current-day query', async ({
+    page,
+  }) => {
+    const historyRequests: string[] = [];
+    await page.route('**/api/v1/parking/**/history?**', async (route) => {
+      const url = new URL(route.request().url());
+      historyRequests.push(url.toString());
+      await route.fulfill({
+        json: {
+          from: url.searchParams.get('from'),
+          to: url.searchParams.get('to'),
+          resolution: url.searchParams.get('resolution'),
+          points: [],
+        },
+      });
+    });
+
+    await page.goto(`/facility/${slug}`);
+
+    const chartCard = page.locator('.MuiCard-root').filter({
+      has: page.getByRole('heading', { name: 'Historical Occupancy' }),
+    });
+    await expect(
+      chartCard.getByText('No samples recorded for today yet.')
+    ).toBeVisible();
+    await expect(
+      chartCard.getByRole('group', { name: 'History period' })
+    ).toBeVisible();
+    await expect(
+      chartCard.getByRole('group', { name: 'History point interval' })
+    ).toBeVisible();
+
+    const initialRequest = new URL(historyRequests[0]);
+    expect(initialRequest.searchParams.get('from')).toBe(
+      initialRequest.searchParams.get('to')
+    );
+    expect(initialRequest.searchParams.get('resolution')).toBe('TEN_MINUTE');
+
+    await chartCard.getByRole('button', { name: 'Past 7 days' }).click();
+    await expect(
+      chartCard.getByText('No samples found for this period.')
+    ).toBeVisible();
+    await expect(
+      chartCard.getByRole('button', { name: '1 hour interval' })
+    ).toHaveAttribute('aria-pressed', 'true');
+    await expect
+      .poll(() =>
+        historyRequests.some((request) => {
+          const url = new URL(request);
+          return (
+            url.searchParams.get('resolution') === 'ONE_HOUR' &&
+            url.searchParams.get('from') !== url.searchParams.get('to')
+          );
+        })
+      )
+      .toBeTruthy();
+  });
+
   test('back button works', async ({ page }) => {
     await page.goto(`/facility/${slug}`);
     await page.getByRole('button', { name: /back/i }).click();

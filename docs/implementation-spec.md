@@ -79,6 +79,8 @@ Use generated schema types in one API module and avoid duplicate hand-written DT
 - Plot epoch milliseconds against occupancy rate on an ECharts time axis. For a one-day range, label ticks with local hours (including AM/PM); for longer ranges, show both the Sydney weekday and hour so morning and evening patterns remain readable. Format tooltips and summaries explicitly in `Australia/Sydney`.
 - Let the parent control chart height at breakpoints, use ECharts resize handling after rotation/container changes, reduce tick/margin clutter on phones, and avoid requiring horizontal page scrolling.
 - Include a text summary or accessible data alternative for the key values. Preserve rates over 100% and make the 100% threshold visible.
+- When a history response contains no points, keep the chart heading, selected date range, actual resolution, period controls, and interval controls visible. The empty state must not imply that no history exists globally or hide the controls needed to adjust the query.
+- For an empty query covering only the current Sydney date, say that no samples have been recorded for today yet. For other empty ranges, say no samples were found for the selected period and suggest expanding the date range. Changing interval can only summarize samples that exist; expanding the range is the useful next step when the selected date has no samples.
 - Render concise **Daily metrics** in a separate card above historical occupancy so changing chart period or resolution never hides them. Compare the latest three Sydney dates, with 7 AM free, 8 AM free, and the times each day first crossed 50%, crossed 90%, and reached full capacity. Calculate each date independently; never carry one day's milestones into another.
 - Show the three occupancy milestones on a 24-hour horizontal timeline, with their time labels directly beneath the track. Use the existing semantic success, warning, and error tokens for the 50%, 90%, and full markers. Keep 7 AM and 8 AM expected free-space values as concise callouts, and show missing milestones as unavailable.
 - Style Daily metrics like a rail departure board: infer the section accent from each facility's primary transit badge, use a hollow parking symbol, and keep clear date strips. Keep older days visually quieter and mark today and weekends without relying on color alone.
@@ -98,7 +100,7 @@ Refactor the current scattered styling into a small, semantic token layer used b
 ## Test organization and acceptance
 
 - Keep Vitest component/unit tests in `src/test`; keep Playwright scenarios in `src/test/e2e`. The Playwright config targets that directory, and Vitest excludes it.
-- Update API mocks and fixtures from generated contract types. Unit tests cover metadata updates, keyboard search behavior, occupancy progress semantics and percent labels, the commuter timeline's expected-free callouts and color-coded milestone markers, and chart text summaries. Playwright covers overview and facility navigation, skip navigation and landmarks, dynamic page metadata, crawl files, keyboard search, Quick View expansion/alignment, chart controls, and commuter timeline rendering and marker colors.
+- Update API mocks and fixtures from generated contract types. Unit tests cover metadata updates, keyboard search behavior, occupancy progress semantics and percent labels, the commuter timeline's expected-free callouts and color-coded milestone markers, chart text summaries, and empty-history messaging with controls still available. Playwright covers overview and facility navigation, skip navigation and landmarks, dynamic page metadata, crawl files, keyboard search, Quick View expansion/alignment, chart controls, commuter timeline rendering and marker colors, and the empty-history recovery path.
 - Verify that no frontend API call uses the old endpoint or payload fields.
 - Confirm that Sydney date/time is stable on devices configured for other time zones.
 - Confirm that list/live/history polling reflects the two-minute policy and that current-day history refreshes while historical ranges remain cacheable.
@@ -107,7 +109,9 @@ Refactor the current scattered styling into a small, semantic token layer used b
 - Re-run Lighthouse with browser extensions disabled and compare FCP/LCP, TBT, CLS, image transfer size, and the initial JavaScript payload against `docs/lighthouse/10272026.json`.
 - Check generated OpenAPI type changes as a reviewed diff after running `npm run api:sync`.
 
-## Follow-up product work
+## Deferred product work
+
+These items are intentionally out of scope for the current implementation pass.
 
 - Add a visible stale-sample indicator when `timeMs` is more than one hour old. The frontend should calculate and present this from the source timestamp; the backend should continue to define and document the timestamp's meaning. If freshness must be authoritative across clients, extend the API with a server-calculated freshness field.
 - Design a trip-planner scaffold after its backend contract and ownership are agreed. Until then, avoid inventing frontend DTOs or implying that trip planning is available.
