@@ -115,8 +115,8 @@ function DailyMetricsDay({
           px: 1.5,
           py: 0.9,
           mb: 0,
-          color: 'common.white',
-          bgcolor: isToday ? accent.background : tokens.color.railBoardMuted,
+          color: isToday ? accent.heading : tokens.color.textMuted,
+          bgcolor: isToday ? accent.background : tokens.color.railBoardPast,
         }}
       >
         {isWeekend && (
@@ -155,7 +155,7 @@ function DailyMetricsDay({
         <Typography
           variant="subtitle2"
           sx={{
-            color: 'common.white',
+            color: isToday ? accent.heading : tokens.color.textMuted,
             fontWeight: 700,
           }}
         >

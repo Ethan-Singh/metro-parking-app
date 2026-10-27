@@ -26,7 +26,7 @@ export const tokens = {
     primaryBorder: 'rgba(0, 132, 209, 0.14)',
     primaryBorderStrong: 'rgba(0, 132, 209, 0.24)',
     primaryBorderSubtle: 'rgba(0, 132, 209, 0.08)',
-    railBoardMuted: '#52616B',
+    railBoardPast: '#F1F8FB',
     railBoardSurface: '#F3F6F8',
     railBoardGrid: '#D6E0E5',
     transparent: 'rgba(255, 255, 255, 0.3)',
