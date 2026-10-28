@@ -73,6 +73,10 @@ Playwright scenarios live under `src/test/e2e`; their directory is configured in
 npm run test:e2e
 ```
 
+## Secret scanning
+
+This repository uses Gitleaks to check staged changes for credentials. Install the local hook with `pre-commit install`; manual redacted scan commands and configuration details are in [docs/security/gitleaks.md](docs/security/gitleaks.md).
+
 ## Design direction
 
 The visual identity uses blue for primary actions and data, sunrise amber for secondary emphasis, and warm neutral surfaces. The implementation spec describes the next design-system pass: semantic design tokens mapped into MUI theme values and component variants, plus responsive search, cards, and charts.

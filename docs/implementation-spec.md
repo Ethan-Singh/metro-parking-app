@@ -1,5 +1,7 @@
 # Metro Parking web app implementation spec
 
+Ideas that are not part of the active implementation scope are tracked in [`planned-work-spec.md`](planned-work-spec.md).
+
 ## Goal
 
 Bring the React app in line with the current backend contract and its rolling data ingestion, then refine the mobile experience around a modern MUI design system. Keep the existing blue, sunrise amber, and warm neutral identity. Do not imply that stored samples are real-time observations.
@@ -109,9 +111,8 @@ Refactor the current scattered styling into a small, semantic token layer used b
 - Re-run Lighthouse with browser extensions disabled and compare FCP/LCP, TBT, CLS, image transfer size, and the initial JavaScript payload against `docs/lighthouse/10272026.json`.
 - Check generated OpenAPI type changes as a reviewed diff after running `npm run api:sync`.
 
-## Deferred product work
+## Security and secret scanning
 
-These items are intentionally out of scope for the current implementation pass.
-
-- Add a visible stale-sample indicator when `timeMs` is more than one hour old. The frontend should calculate and present this from the source timestamp; the backend should continue to define and document the timestamp's meaning. If freshness must be authoritative across clients, extend the API with a server-calculated freshness field.
-- Design a trip-planner scaffold after its backend contract and ownership are agreed. Until then, avoid inventing frontend DTOs or implying that trip planning is available.
+- Keep credentials out of browser code, source files, fixtures, and logs. Vite `VITE_*` variables are public because they are bundled into the client; use them only for public configuration such as the API base URL.
+- Extend Gitleaks' default detectors with the checked-in app config and run its pinned pre-commit hook against staged changes. Keep allowlists narrow and explain confirmed false positives.
+- See [`security/gitleaks.md`](security/gitleaks.md) for hook installation and redacted working-tree/history scan commands.
