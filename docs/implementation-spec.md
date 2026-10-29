@@ -10,8 +10,8 @@ Bring the React app in line with the current backend contract and its rolling da
 
 - React, TypeScript, Vite, MUI, TanStack Query, and Apache ECharts.
 - Routes: overview (`/`) and facility detail (`/facility/:slug`).
-- The backend polls one enabled facility on a scheduled loop every 2.2 seconds. Four out of each five turns fetch a live snapshot from the upstream car-park endpoint; the fifth turn advances historical backfill through the upstream history endpoint. The facility rotates between turns.
-- Therefore, a facility's refresh interval is approximately `enabled facility count × 2.75 seconds`, plus upstream request and processing time. The 2.2 second scheduler delay is not the refresh interval for each facility.
+- The backend runs one global scheduler slot every five minutes. Four of every five work slots fetch a live facility record; the fifth advances history backfill. A facility rotates between live slots. The facility catalog refreshes every six hours and consumes a slot.
+- With N enabled facilities, the approximate live sweep interval is `N × 1440 / L` minutes, where L is about 227 live slots/day after catalog slots (about `6.34 × N` minutes). This is a global quota-aware schedule, not a per-facility polling guarantee; the upstream source timestamp remains the freshness signal.
 - The API exposes the latest stored upstream sample. Its `timeMs` is the source event time, so it can lag the current time.
 - The backend API rate limit is 60 requests per minute per client IP. Overview and facility queries should use a shared, conservative refresh cadence and avoid rapid retries.
 
