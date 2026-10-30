@@ -21,7 +21,8 @@ export function getFacilityAccent(slug?: string): Accent {
   if (config) {
     const isTrain = primaryLine === 'T';
     return {
-      background: 'accentColor' in config ? config.accentColor : config.color,
+      background:
+        'accentColor' in config ? String(config.accentColor) : config.color,
       foreground: 'textColor' in config ? config.textColor : '#fff',
       icon:
         isTrain || primaryLine === 'B'

@@ -30,3 +30,12 @@ dist-ssr
 /playwright/.cache/
 /playwright/.auth/
 /docs/pictograms
+!/docs/pictograms/
+/docs/pictograms/*
+!/docs/pictograms/Transport Network Colour Chart.md
+!/docs/pictograms/Modal colour palette.PNG
+!/docs/pictograms/Lines/
+!/docs/pictograms/Lines/**
+/docs/dataset
+/docs/lighthouse
+/output

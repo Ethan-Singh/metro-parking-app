@@ -14,7 +14,8 @@
     "test": "vitest",
     "test:run": "vitest run",
     "test:e2e": "playwright test",
-    "api:sync": "npx --yes --package openapi-typescript@7.13.0 openapi-typescript https://raw.githubusercontent.com/Ethan-Singh/Metro-Parking-Web-Service/main/docs/apis/metro-parking-api-v1.yaml -o src/main/features/parking/api/openapi.generated.d.ts"
+    "api:sync:parking": "npx --yes --package openapi-typescript@7.13.0 openapi-typescript https://raw.githubusercontent.com/Ethan-Singh/Metro-Parking-Web-Service/v0.0.3/docs/apis/metro-parking-api-v1.yaml -o src/main/features/parking/api/openapi.generated.d.ts",
+    "api:sync:timetable": "npx --yes --package openapi-typescript@7.13.0 openapi-typescript https://raw.githubusercontent.com/Ethan-Singh/Metro-Parking-Web-Service/main/docs/apis/timetable-api-v1.yaml -o src/main/features/timetable/api/openapi.generated.d.ts"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

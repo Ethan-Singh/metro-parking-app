@@ -3,10 +3,6 @@ import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it, vi } from 'vitest';
 import AppLayout from '../../main/app/AppLayout.tsx';
 
-vi.mock('../../main/features/parking/search/SearchBar.tsx', () => ({
-  SearchBar: () => <div>Search Bar</div>,
-}));
-
 vi.mock('../../main/features/parking/components/Footer.tsx', () => ({
   default: () => <footer>Footer</footer>,
 }));
@@ -33,14 +29,17 @@ describe('AppLayout', () => {
     renderLayout();
 
     expect(
-      screen.getByText(/Live and historical availability/i)
+      screen.getByText(/Live parking and Sydney public transport timetables/i)
     ).toBeInTheDocument();
   });
 
-  it('renders search bar', () => {
+  it('renders the Parking and Timetables mode switch', () => {
     renderLayout();
 
-    expect(screen.getByText('Search Bar')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Parking' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Timetables' })
+    ).toBeInTheDocument();
   });
 
   it('renders footer', () => {
@@ -52,21 +51,17 @@ describe('AppLayout', () => {
   it('renders the logo image', () => {
     renderLayout();
 
-    expect(
-      screen.getByRole('link', { name: 'A Metro Parking App home' })
-    ).toBeInTheDocument();
+    expect(screen.getByText('A Metro Parking App')).toBeInTheDocument();
     expect(document.querySelector('header img')).toHaveAttribute('alt', '');
   });
 
   it('provides skip navigation and page landmarks', () => {
     renderLayout();
 
-    expect(screen.getByRole('link', { name: 'Skip to main content' })).toHaveAttribute(
-      'href',
-      '#main-content'
-    );
+    expect(
+      screen.getByRole('link', { name: 'Skip to main content' })
+    ).toHaveAttribute('href', '#main-content');
     expect(screen.getByRole('banner')).toBeInTheDocument();
-    expect(screen.getByRole('search', { name: 'Find a parking facility' })).toBeInTheDocument();
     expect(screen.getByRole('main')).toHaveAttribute('id', 'main-content');
     expect(screen.getByRole('contentinfo')).toBeInTheDocument();
   });

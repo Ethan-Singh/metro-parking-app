@@ -19,9 +19,9 @@ vi.mock('../../../../main/css/lineBadge', () => ({
     map: {
       T1: { color: 'red' },
       T2: { color: 'blue' },
-      M: { color: 'teal' },
-      T: { color: 'orange' },
-      B: { color: 'blue' },
+      M: { color: 'teal', asset: 'metro.webp' },
+      T: { color: 'orange', asset: 'train.webp' },
+      B: { color: 'blue', asset: 'bus.webp' },
     },
   },
 }));
@@ -54,10 +54,10 @@ describe('LineBadge', () => {
     render(<LineBadge slug="park-ride-metro-train" />);
 
     expect(
-      screen.getByRole('img', { name: 'Sydney Metro' })
+      screen.getByRole('img', { name: 'M transit line' })
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('img', { name: 'Sydney Trains' })
+      screen.getByRole('img', { name: 'T transit line' })
     ).toBeInTheDocument();
   });
 
@@ -65,7 +65,7 @@ describe('LineBadge', () => {
     render(<LineBadge slug="park-ride-bus" />);
 
     expect(
-      screen.getByRole('img', { name: 'Bus service' })
+      screen.getByRole('img', { name: 'B transit line' })
     ).toBeInTheDocument();
     expect(screen.getAllByRole('img')).toHaveLength(1);
   });

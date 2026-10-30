@@ -101,11 +101,14 @@ test.describe('Overview Page', () => {
       'Sydney Metro Parking Availability | A Metro Parking App'
     );
     await expect(
-      page.getByRole('heading', { level: 1, name: 'Overview' })
+      page.getByRole('heading', { level: 1, name: 'Parkings' })
     ).toBeVisible();
     await expect(page.getByRole('banner')).toBeVisible();
     await expect(
-      page.getByRole('search', { name: 'Find a parking facility' })
+      page.getByRole('search', { name: 'Search parking facilities' })
+    ).toBeVisible();
+    await expect(
+      page.getByRole('combobox', { name: 'Find parking' })
     ).toBeVisible();
     await expect(page.getByRole('main')).toHaveAttribute('id', 'main-content');
     await expect(page.getByRole('contentinfo')).toBeVisible();
@@ -157,7 +160,7 @@ test.describe('Overview Page', () => {
 
     // Page title
     await expect(
-      page.getByRole('heading', { name: /overview/i })
+      page.getByRole('heading', { name: /parkings/i })
     ).toBeVisible();
 
     // The result count is shown as a readable facility label.
@@ -185,9 +188,13 @@ test.describe('Overview Page', () => {
     const bellaVistaQuickView = bellaVistaCard.getByRole('button', {
       name: /quick view/i,
     });
-    const quickViewYBefore = (await ashfieldQuickView.boundingBox())!.y;
-    const bellaVistaQuickViewYBefore =
-      (await bellaVistaQuickView.boundingBox())!.y;
+    const absoluteY = (locator: typeof ashfieldQuickView) =>
+      locator.evaluate((element) => {
+        const rect = element.getBoundingClientRect();
+        return rect.top + window.scrollY;
+      });
+    const quickViewYBefore = await absoluteY(ashfieldQuickView);
+    const bellaVistaQuickViewYBefore = await absoluteY(bellaVistaQuickView);
     expect(
       Math.abs(quickViewYBefore - bellaVistaQuickViewYBefore)
     ).toBeLessThan(2);
@@ -213,8 +220,7 @@ test.describe('Overview Page', () => {
     );
     expect(
       Math.abs(
-        (await bellaVistaQuickView.boundingBox())!.y -
-          bellaVistaQuickViewYBefore
+        (await absoluteY(bellaVistaQuickView)) - bellaVistaQuickViewYBefore
       )
     ).toBeLessThan(2);
 

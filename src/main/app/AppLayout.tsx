@@ -1,10 +1,14 @@
 import { Box, Card, CardContent, Container, Typography } from '@mui/material';
-import { Link as RouterLink, Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Logo from '../assets/Logo.svg';
+import { AppModeSwitch } from './AppModeSwitch.tsx';
 import { SearchBar } from '../features/parking/search/SearchBar.tsx';
 import Footer from '../features/parking/components/Footer.tsx';
 
 export default function AppLayout() {
+  const location = useLocation();
+  const isTimetable = location.pathname.startsWith('/timetable');
+  const isFacilityPage = location.pathname.startsWith('/facility');
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Box
@@ -34,25 +38,22 @@ export default function AppLayout() {
       </Box>
       {/* HEADER */}
       <Box component="header" sx={{ flex: 0 }}>
-        <Container maxWidth="lg" sx={{ py: 4 }}>
-          <Card sx={{ mb: 3 }}>
-            <CardContent>
+        <Container maxWidth="lg" sx={{ py: { xs: 1, sm: 2, md: 4 } }}>
+          <Card sx={{ mb: { xs: 1.5, sm: 3 } }}>
+            <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 3 } }}>
               <Box
                 sx={{
                   display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'flex-start',
-                  gap: 3,
+                  alignItems: 'center',
+                  gap: { xs: 1, sm: 2 },
                 }}
               >
-                {/* LEFT: BRAND */}
                 <Box
-                  component={RouterLink}
-                  to="/"
-                  aria-label="A Metro Parking App home"
+                  aria-label="A Metro Parking App"
                   sx={{
                     display: 'flex',
-                    gap: 2,
+                    gap: { xs: 1, sm: 2 },
+                    minWidth: 0,
                     alignItems: 'center',
                     color: 'inherit',
                     textDecoration: 'none',
@@ -69,8 +70,9 @@ export default function AppLayout() {
                     src={Logo}
                     alt=""
                     sx={{
-                      width: 44,
-                      height: 44,
+                      flexShrink: 0,
+                      width: { xs: 36, sm: 44 },
+                      height: { xs: 36, sm: 44 },
                       display: 'block',
                     }}
                   />
@@ -79,27 +81,46 @@ export default function AppLayout() {
                     <Typography
                       component="span"
                       variant="h5"
-                      sx={{ fontWeight: 700 }}
+                      sx={{
+                        fontWeight: 700,
+                        fontSize: { xs: '1rem', sm: '1.5rem' },
+                        lineHeight: 1.2,
+                      }}
                     >
                       A Metro Parking App
                     </Typography>
 
-                    <Typography variant="body2" color="text.secondary">
-                      Live and historical availability across Sydney's Park&Ride
-                      car parks
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ display: { xs: 'none', sm: 'block' } }}
+                    >
+                      Live parking and Sydney public transport timetables
                     </Typography>
                   </Box>
                 </Box>
               </Box>
 
-              {/* SEARCH */}
-              <Box
-                component="div"
-                role="search"
-                aria-label="Find a parking facility"
-                sx={{ mt: 2 }}
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: 'block', mt: { xs: 1.5, sm: 2 } }}
               >
-                <SearchBar />
+                {isTimetable ? 'Timetable planner' : 'Parking availability'}
+              </Typography>
+
+              {isFacilityPage && (
+                <Box
+                  role="search"
+                  aria-label="Search parking facilities"
+                  sx={{ mt: 2 }}
+                >
+                  <SearchBar />
+                </Box>
+              )}
+
+              <Box sx={{ mt: 2 }}>
+                <AppModeSwitch />
               </Box>
             </CardContent>
           </Card>
@@ -120,7 +141,7 @@ export default function AppLayout() {
           },
         }}
       >
-        <Container maxWidth="lg" sx={{ py: 4 }}>
+        <Container maxWidth="lg" sx={{ py: { xs: 2, sm: 3, md: 4 } }}>
           <Outlet />
         </Container>
       </Box>

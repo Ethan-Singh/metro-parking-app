@@ -117,7 +117,7 @@ describe('FacilityHistoryChart', () => {
     expect(await screen.findAllByTestId('echarts')).toHaveLength(1);
     expect(screen.getByTestId('echarts')).toHaveAttribute(
       'data-line-color',
-      '#F18500'
+      '#EC6606'
     );
     expect(
       screen.getByText('2026-01-01 – 2026-01-07 · Sydney time')

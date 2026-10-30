@@ -25,9 +25,13 @@ const mockData: Facility[] = [
 ];
 
 vi.mock('../../../../main/features/parking/components/FacilityCard', () => ({
-  FacilityCard: ({ facility, title }: { facility: Facility; title?: string }) => (
-    <div data-testid="facility-card">{title ?? facility.facilityName}</div>
-  ),
+  FacilityCard: ({
+    facility,
+    title,
+  }: {
+    facility: Facility;
+    title?: string;
+  }) => <div data-testid="facility-card">{title ?? facility.facilityName}</div>,
 }));
 
 vi.mock('../../../../main/features/parking/components/QueryBoundary', () => ({
@@ -46,11 +50,39 @@ vi.mock('../../../../main/features/parking/components/DataCredits', () => ({
   ),
 }));
 
+vi.mock('../../../../main/features/parking/search/SearchBar', () => ({
+  SearchBar: ({ label }: { label: string }) => <input aria-label={label} />,
+}));
+
 beforeEach(() => {
   vi.clearAllMocks();
 });
 
 describe('OverviewPage', () => {
+  it('shows Parkings and facility count above its dedicated labeled search box', () => {
+    vi.spyOn(hooks, 'useParkingQueries').mockReturnValue({
+      data: mockData,
+      isLoading: false,
+      isError: false,
+    } as unknown as ReturnType<typeof hooks.useParkingQueries>);
+    vi.spyOn(search, 'useSearch').mockReturnValue({
+      query: '',
+    } as ReturnType<typeof search.useSearch>);
+
+    render(<OverviewPage />);
+
+    expect(
+      screen.getByRole('heading', { level: 1, name: 'Parkings' })
+    ).toBeInTheDocument();
+    expect(screen.getByText('2 parking facilities')).toBeInTheDocument();
+    expect(
+      screen.getByRole('search', { name: 'Search parking facilities' })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('textbox', { name: 'Find parking' })
+    ).toBeInTheDocument();
+  });
+
   it('shows loading state', () => {
     vi.spyOn(hooks, 'useParkingQueries').mockReturnValue({
       data: [],
@@ -81,23 +113,38 @@ describe('OverviewPage', () => {
     render(<OverviewPage />);
 
     expect(screen.getAllByTestId('facility-card')).toHaveLength(2);
-    expect(screen.getByRole('button', { name: 'Park & Ride facilities' })).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.queryByRole('button', { name: 'Other facilities' })).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Park & Ride facilities' })
+    ).toHaveAttribute('aria-expanded', 'true');
+    expect(
+      screen.queryByRole('button', { name: 'Other facilities' })
+    ).not.toBeInTheDocument();
     expect(screen.getByText('Ashfield Parking')).toBeInTheDocument();
     expect(screen.queryByText(/^Park&Ride/)).not.toBeInTheDocument();
   });
 
   it('shows a collapsed Others group only when a facility is not Park & Ride', () => {
     vi.spyOn(hooks, 'useParkingQueries').mockReturnValue({
-      data: [...mockData, { slug: 'central-station', facilityName: 'Central Station', timeMs: 1785314400000 }],
+      data: [
+        ...mockData,
+        {
+          slug: 'central-station',
+          facilityName: 'Central Station',
+          timeMs: 1785314400000,
+        },
+      ],
       isLoading: false,
       isError: false,
     } as unknown as ReturnType<typeof hooks.useParkingQueries>);
-    vi.spyOn(search, 'useSearch').mockReturnValue({ query: '' } as ReturnType<typeof search.useSearch>);
+    vi.spyOn(search, 'useSearch').mockReturnValue({ query: '' } as ReturnType<
+      typeof search.useSearch
+    >);
 
     render(<OverviewPage />);
 
-    expect(screen.getByRole('button', { name: 'Other facilities' })).toHaveAttribute('aria-expanded', 'false');
+    expect(
+      screen.getByRole('button', { name: 'Other facilities' })
+    ).toHaveAttribute('aria-expanded', 'false');
   });
 
   it('filters by facility name', () => {

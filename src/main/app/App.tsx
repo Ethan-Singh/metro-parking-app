@@ -6,8 +6,11 @@ import AppLayout from './AppLayout.tsx';
 import OverviewPage from '../features/parking/pages/OverviewPage.tsx';
 import { theme } from '../css/theme.ts';
 import { SearchProvider } from '../features/parking/search/SearchProvider.tsx';
+import TimetablePage from '../features/timetable/pages/TimetablePage.tsx';
 
-const FacilityPage = lazy(() => import('../features/parking/pages/FacilityPage.tsx'));
+const FacilityPage = lazy(
+  () => import('../features/parking/pages/FacilityPage.tsx')
+);
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,6 +23,7 @@ const router = createBrowserRouter([
     element: <AppLayout />,
     children: [
       { path: '/', element: <OverviewPage /> },
+      { path: '/timetable', element: <TimetablePage /> },
       {
         path: '/facility/:slug',
         element: (

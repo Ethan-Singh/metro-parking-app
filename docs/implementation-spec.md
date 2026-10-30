@@ -9,7 +9,13 @@ Bring the React app in line with the current backend contract and its rolling da
 ## Current app and backend behavior
 
 - React, TypeScript, Vite, MUI, TanStack Query, and Apache ECharts.
-- Routes: overview (`/`) and facility detail (`/facility/:slug`).
+- The shared shell keeps the accessible Parking / Timetables two-option switch available on both pages. The Parkings page has a dedicated search card above its heading and results. Keep the header, search, controls, and departure boards usable without horizontal page scrolling on phones.
+- Keep the parking search in its own card above the **Parkings** overview heading and facility results. Credit timetable data to Transport for NSW on the Timetable page as well as parking data on the overview.
+- Routes: overview (`/`), facility detail (`/facility/:slug`), and timetable (`/timetable`).
+- The timetable's default board shows the next ten passenger departures from Central. Exclude non-revenue, empty-train, and out-of-service trips from that count by default; reveal them with the `Non revenue` and `Empty Train` controls, preserving the source description on each service. Keep line filters at the left and these controls at the right. Set the minimum connection time to three minutes by default and allow zero minutes as an explicit option.
+- Keep the weekday strip on available package dates for the default departures board, with unavailable weekdays muted and chevrons paging the strip. Route searches begin at the current Sydney time and load adjacent available date packages on demand in either direction; the weekday strip does not constrain route results. The station board selector searches stations locally within the selected package. Show the ticking Sydney clock and line/service filters in a separate box above the board's station heading. Selecting a valid To station submits the route search; an X clears the selection and returns to the Central departure board. Keep connection and route options directly beneath the station inputs.
+- Present searched timetable options as expandable rows with departure countdown, scheduled origin/destination times, platforms, duration, transfer count, line badges, matched alerts, and all calls. Overlay only fresh, feed-scoped matched realtime updates; keep scheduled times visible. Do not show car occupancy unless a contract provides that data.
+- Keep recognized Transport for NSW line artwork and colours centralized in `src/main/css/lineBadge.ts`; the same assets and colours are used by parking and timetable views. Render official logo files without an added outline.
 - The backend runs one global scheduler slot every five minutes. Four of every five work slots fetch a live facility record; the fifth advances history backfill. A facility rotates between live slots. The facility catalog refreshes every six hours and consumes a slot.
 - With N enabled facilities, the approximate live sweep interval is `N × 1440 / L` minutes, where L is about 227 live slots/day after catalog slots (about `6.34 × N` minutes). This is a global quota-aware schedule, not a per-facility polling guarantee; the upstream source timestamp remains the freshness signal.
 - The API exposes the latest stored upstream sample. Its `timeMs` is the source event time, so it can lag the current time.
@@ -21,13 +27,14 @@ Freshness indicators should be presented by the frontend from source `timeMs` an
 
 ## API contract
 
-The backend repository publishes `docs/apis/metro-parking-api-v1.yaml`. Frontend types are generated from the live `main` branch URL using `openapi-typescript`:
+The backend repository publishes the parking and timetable contracts in `docs/apis/`. Parking types are generated from the pinned `v0.0.3` service release; timetable types currently follow `main` because the timetable contract is not included in `v0.0.3`:
 
 ```sh
-npm run api:sync
+npm run api:sync:parking
+npm run api:sync:timetable
 ```
 
-The generated `openapi.generated.d.ts` is committed, and normal frontend builds use that checked-in snapshot without network access. Regenerate and review its diff when the backend contract changes. Because the sync URL tracks `main`, regenerate after backend changes and review the resulting types before adapting UI code.
+The generated definitions are committed under their respective feature API directories, and normal frontend builds use those checked-in snapshots without network access. Keep the commands separate. When the timetable contract is released in a service tag, pin its sync URL to that tag; update the parking pin to the same release when the parking contract is confirmed there. Regenerate and review each diff before adapting UI code.
 
 Contract endpoints and payloads:
 

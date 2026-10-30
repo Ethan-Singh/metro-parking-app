@@ -3,7 +3,9 @@ import {
   ListItemButton,
   ListItemText,
   Box,
+  FormControl,
   OutlinedInput,
+  InputLabel,
   InputAdornment,
   Paper,
   Popper,
@@ -18,7 +20,11 @@ import { useMemo, useState } from 'react';
 import { useSearch } from './useSearch.tsx';
 import Fuse from 'fuse.js';
 
-export function SearchBar() {
+export function SearchBar({
+  label = 'Search parking facilities',
+}: {
+  label?: string;
+}) {
   const { query, setQuery, clear } = useSearch();
   const navigate = useNavigate();
   const { isFacilityPage } = useSearchMode();
@@ -44,14 +50,14 @@ export function SearchBar() {
   const results = q ? fuse.search(q).map((result) => result.item) : [];
   const visibleResults = results.slice(0, 3);
 
-  const show = isFacilityPage && focused && q.length > 0 && !suggestionsDismissed;
+  const show =
+    isFacilityPage && focused && q.length > 0 && !suggestionsDismissed;
   const suggestionsOpen = show && visibleResults.length > 0;
   const activeOptionIndex = suggestionsOpen
     ? activeIndex % visibleResults.length
     : -1;
-  const activeOption = activeOptionIndex >= 0
-    ? visibleResults[activeOptionIndex]
-    : undefined;
+  const activeOption =
+    activeOptionIndex >= 0 ? visibleResults[activeOptionIndex] : undefined;
 
   const handleSelect = (slug: string) => {
     clear();
@@ -60,72 +66,78 @@ export function SearchBar() {
 
   return (
     <Box>
-      <OutlinedInput
-        fullWidth
-        inputProps={{
-          'aria-label': 'Search parking facilities',
-          role: 'combobox',
-          'aria-autocomplete': 'list',
-          'aria-haspopup': 'listbox',
-          'aria-expanded': suggestionsOpen,
-          'aria-controls': suggestionsOpen ? 'facility-search-results' : undefined,
-          'aria-activedescendant': activeOption
-            ? `facility-search-option-${activeIndex}`
-            : undefined,
-          autoComplete: 'off',
-        }}
-        value={query}
-        onChange={(e) => {
-          setQuery(e.target.value);
-          setActiveIndex(0);
-          setSuggestionsDismissed(false);
-        }}
-        onFocus={() => {
-          setFocused(true);
-          setSuggestionsDismissed(false);
-        }}
-        onBlur={() => setFocused(false)}
-        onKeyDown={(event) => {
-          if (event.key === 'ArrowDown' && suggestionsOpen) {
-            event.preventDefault();
-            setActiveIndex((index) => (index + 1) % visibleResults.length);
-          }
-          if (event.key === 'ArrowUp' && suggestionsOpen) {
-            event.preventDefault();
-            setActiveIndex(
-              (index) => (index - 1 + visibleResults.length) % visibleResults.length
-            );
-          }
-          if (event.key === 'Enter' && activeOption) {
-            event.preventDefault();
-            handleSelect(activeOption.slug);
-          }
-          if (event.key === 'Escape' && show) {
-            event.preventDefault();
-            setSuggestionsDismissed(true);
-          }
-        }}
-        placeholder="Search facilities..."
-        inputRef={setAnchorEl}
-        startAdornment={
-          <InputAdornment position="start">
-            <Search />
-          </InputAdornment>
-        }
-        endAdornment={
-          query ? (
-            <InputAdornment position="end">
-              <IconButton
-                aria-label="Clear search"
-                size="small"
-                onClick={clear}
-              >
-                <Close fontSize="small" />
-              </IconButton>
+      <FormControl fullWidth variant="outlined">
+        <InputLabel htmlFor="parking-facility-search">{label}</InputLabel>
+        <OutlinedInput
+          id="parking-facility-search"
+          label={label}
+          inputProps={{
+            role: 'combobox',
+            'aria-autocomplete': 'list',
+            'aria-haspopup': 'listbox',
+            'aria-expanded': suggestionsOpen,
+            'aria-controls': suggestionsOpen
+              ? 'facility-search-results'
+              : undefined,
+            'aria-activedescendant': activeOption
+              ? `facility-search-option-${activeIndex}`
+              : undefined,
+            autoComplete: 'off',
+          }}
+          value={query}
+          onChange={(e) => {
+            setQuery(e.target.value);
+            setActiveIndex(0);
+            setSuggestionsDismissed(false);
+          }}
+          onFocus={() => {
+            setFocused(true);
+            setSuggestionsDismissed(false);
+          }}
+          onBlur={() => setFocused(false)}
+          onKeyDown={(event) => {
+            if (event.key === 'ArrowDown' && suggestionsOpen) {
+              event.preventDefault();
+              setActiveIndex((index) => (index + 1) % visibleResults.length);
+            }
+            if (event.key === 'ArrowUp' && suggestionsOpen) {
+              event.preventDefault();
+              setActiveIndex(
+                (index) =>
+                  (index - 1 + visibleResults.length) % visibleResults.length
+              );
+            }
+            if (event.key === 'Enter' && activeOption) {
+              event.preventDefault();
+              handleSelect(activeOption.slug);
+            }
+            if (event.key === 'Escape' && show) {
+              event.preventDefault();
+              setSuggestionsDismissed(true);
+            }
+          }}
+          placeholder="Search facilities..."
+          inputRef={setAnchorEl}
+          startAdornment={
+            <InputAdornment position="start">
+              <Search />
             </InputAdornment>
-          ) : null
-        }
-      />
+          }
+          endAdornment={
+            query ? (
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="Clear search"
+                  size="small"
+                  onClick={clear}
+                >
+                  <Close fontSize="small" />
+                </IconButton>
+              </InputAdornment>
+            ) : null
+          }
+        />
+      </FormControl>
 
       <Popper
         open={suggestionsOpen}
@@ -148,7 +160,12 @@ export function SearchBar() {
             overflowY: 'auto',
           }}
         >
-          <List dense id="facility-search-results" role="listbox" disablePadding>
+          <List
+            dense
+            id="facility-search-results"
+            role="listbox"
+            disablePadding
+          >
             {visibleResults.map((f, index) => (
               <ListItemButton
                 key={f.slug}

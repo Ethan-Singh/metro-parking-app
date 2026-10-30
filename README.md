@@ -30,19 +30,21 @@ PlantUML sources and their scope are indexed in [`domain/models`](domain/models/
 - The backend uses a five-minute global scheduler slot: four of every five work slots refresh a live facility and the fifth advances history backfill. Catalog refreshes every six hours use a slot too. The app polls every two minutes and shows the upstream source sample time; the backend cadence is global, not a per-facility freshness guarantee.
 
 For one backend instance, the schedule has S = floor(24 × 60 / 5) = 288 slots/day. Catalog refreshes use C = ceil(24 / 6) = 4 slots, leaving W = 284 work slots: about L = 227 live slots and H = 57 history slots. During backlog catch-up, scheduled first attempts are at most S = 288/day. Once caught up, each of N enabled facilities adds about one prior-day history job per day, giving roughly C + L + min(H, N) calls/day (about 272 when N = 41). Empty history slots are skipped; retries can add upstream calls. See the backend [car-park implementation spec](https://github.com/Ethan-Singh/metro-parking-web-service/blob/main/domain/models/carpark/implementation-spec.md) for assumptions and the full formula.
+
 - The backend limits API traffic to 60 requests per minute per client IP. Client queries use a shared two-minute cadence, avoid background polling, and retry once.
 
 History responses report the actual resolution used by the backend, which the chart displays. Daily commuter metrics are fetched independently, so they remain exact and available regardless of the selected chart interval. Facility pages request the latest three Sydney dates; overview Quick Views request the latest date and fetch history separately for the chart. Occupancy values are preserved if they exceed facility capacity.
 
 ## OpenAPI types
 
-The backend's OpenAPI YAML is the API source of truth. TypeScript definitions are generated from the public backend repository's `main` branch and committed in `src/main/features/parking/api/openapi.generated.d.ts`.
+The backend's OpenAPI YAML is the API source of truth. Parking TypeScript definitions are generated from the public backend repository's pinned `v0.0.3` release. Timetable definitions currently follow `main`, because that contract is not included in `v0.0.3`. Both generated files are committed in their feature API directories.
 
 ```bash
-npm run api:sync
+npm run api:sync:parking
+npm run api:sync:timetable
 ```
 
-Review generated type changes and update API handling or fixtures when the backend contract changes. The normal build uses the committed generated file and does not require a network connection.
+Review generated type changes and update API handling or fixtures when the backend contract changes. The sync commands are separate so each contract can be pinned independently. The normal build uses the committed generated files and does not require a network connection.
 
 ## Development
 

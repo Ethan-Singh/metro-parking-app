@@ -4,8 +4,8 @@ import { getFacilityAccent } from '../../../../main/features/parking/utils/facil
 describe('getFacilityAccent', () => {
   it('uses the Sydney Trains badge color for train facilities', () => {
     expect(getFacilityAccent('park-ride-ashfield')).toEqual({
-      background: '#F18500',
-      foreground: '#1F2937',
+      background: '#EC6606',
+      foreground: '#fff',
       icon: '#fff',
       heading: '#fff',
     });
@@ -22,7 +22,7 @@ describe('getFacilityAccent', () => {
 
   it('uses the bus badge color when the facility has no rail connection', () => {
     expect(getFacilityAccent('park-ride-brookvale')).toEqual({
-      background: '#007DAE',
+      background: '#009ED7',
       foreground: '#fff',
       icon: '#fff',
       heading: '#fff',
